@@ -14,7 +14,7 @@ A modern web application for analyzing website resource usage and environmental 
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd web-carbon-tool
+cd green-web-compass
 
 # Install dependencies
 npm install
@@ -33,7 +33,7 @@ Visit `http://localhost:3000` to access the application.
 This application follows a modular, service-oriented architecture with clear separation of concerns:
 
 ```
-web-carbon-tool/
+green-web-compass/
 ├── src/
 │   ├── client/           # Frontend application
 │   ├── server/           # Backend API server

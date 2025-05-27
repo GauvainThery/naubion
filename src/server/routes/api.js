@@ -64,7 +64,7 @@ router.post(
 router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'web-carbon-tool-api',
+    service: 'green-web-compass-api',
     timestamp: new Date().toISOString()
   });
 });
