@@ -1,0 +1,16 @@
+/**
+ * Main stylesheet - imports all component stylesheets
+ * This replaces the original styles.css with a modular approach
+ */
+
+/* Base styles - typography, layout, utilities */
+@import './base.css';
+
+/* Component styles - header, input, buttons */
+@import './components.css';
+
+/* Loading states and progress indicators */
+@import './loading.css';
+
+/* Results display and data visualization */
+@import './results.css';
