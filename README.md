@@ -40,7 +40,6 @@ green-web-compass/
 │   ├── analysis/         # Core analysis engine
 │   ├── config/           # Configuration management
 │   └── utils/            # Shared utilities
-├── tests/                # Test suites
 ├── public/               # Static assets
 └── index.html           # Single-page application entry
 ```
