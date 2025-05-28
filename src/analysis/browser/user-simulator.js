@@ -5,7 +5,7 @@
 
 import { BehaviorSimulator } from './strategies/behavior-simulator.js';
 import { ElementFinder, injectElementFinderHelpers } from './strategies/element-finder.js';
-import { InteractionStrategies, injectPageHelpers } from './strategies/interaction-strategies.js';
+import { InteractionStrategies } from './strategies/interaction-strategies.js';
 
 export class UserSimulator {
   constructor(page, config = {}) {
@@ -19,9 +19,8 @@ export class UserSimulator {
       enableHoverSimulation: true,
       enableFormInteraction: false,
       enableResponsiveTesting: false,
-      interactionTimeout: 30000,
+      elementTimeout: 5000, // Timeout per element interaction
       verboseLogging: true,
-      strategies: ['direct', 'programmatic', 'data-attribute', 'text-based'],
       ...config
     };
 
@@ -107,10 +106,10 @@ export class UserSimulator {
   }
 
   /**
-   * Custom interaction with specific strategies
+   * Custom interaction with specific element
    */
-  async customInteraction(elementSelector, strategies = null) {
-    const strategiesToTry = strategies || this.config.strategies;
+  async customInteraction(elementSelector, timeout = null) {
+    const actualTimeout = timeout || this.config.elementTimeout;
 
     const element = await this.page.evaluate(selector => {
       const el = document.querySelector(selector);
@@ -123,13 +122,13 @@ export class UserSimulator {
       return { success: false, error: 'Element not found' };
     }
 
-    return await this._attemptElementInteraction(element, strategiesToTry);
+    const result = await this.interactionStrategies.clickElement(element, actualTimeout);
+    return result;
   }
 
   // Private orchestration methods
 
   async _injectHelpers() {
-    await injectPageHelpers(this.page);
     await injectElementFinderHelpers(this.page);
   }
 
@@ -239,57 +238,31 @@ export class UserSimulator {
     });
   }
 
-  async _attemptElementInteraction(element, strategiesToTry = null) {
-    const strategies = strategiesToTry || this.config.strategies;
-    const resourceCountBefore = this.networkMonitor ? this.networkMonitor.getResources().length : 0;
-
+  async _attemptElementInteraction(element) {
     console.log(`   🎯 Attempting interaction with: "${element.text}" (${element.type})`);
 
-    // Try each strategy until one succeeds
-    for (const strategyName of strategies) {
-      try {
-        let result;
+    try {
+      // Use the simplified clickElement method with timeout
+      const result = await this.interactionStrategies.clickElement(
+        element,
+        this.config.elementTimeout
+      );
 
-        switch (strategyName) {
-          case 'direct':
-            result = await this.interactionStrategies.directInteraction(element);
-            break;
-          case 'programmatic':
-            result = await this.interactionStrategies.programmaticInteraction(element);
-            break;
-          case 'data-attribute':
-            result = await this.interactionStrategies.dataAttributeInteraction(element);
-            break;
-          case 'text-based':
-            result = await this.interactionStrategies.textBasedInteraction(element);
-            break;
-          default:
-            continue;
-        }
-
-        if (result.success) {
-          console.log(`     ✅ Success using ${result.method} strategy`);
-
-          // Wait for any resulting network activity
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          await this.interactionStrategies.waitForNetworkSettlement(
-            resourceCountBefore,
-            this.config.interactionTimeout
-          );
-
-          return true;
-        } else if (this.config.verboseLogging) {
-          console.log(`     ⚠️ ${result.method} strategy failed: ${result.error}`);
-        }
-      } catch (error) {
+      if (result.success) {
+        console.log(`     ✅ Success using ${result.method} strategy in ${result.duration}ms`);
+        return true;
+      } else {
         if (this.config.verboseLogging) {
-          console.log(`     ⚠️ ${strategyName} strategy error: ${error.message}`);
+          console.log(`     ❌ Failed to interact: ${result.error} (${result.duration}ms)`);
         }
+        return false;
       }
+    } catch (error) {
+      if (this.config.verboseLogging) {
+        console.log(`     ⚠️ Interaction error: ${error.message}`);
+      }
+      return false;
     }
-
-    console.log(`     ❌ All strategies failed for: "${element.text}"`);
-    return false;
   }
 
   async _finalNetworkSettlement() {
@@ -330,7 +303,8 @@ export function createUserSimulator(page, profile = 'default') {
       maxScrollSteps: 5,
       enableHoverSimulation: true,
       enableFormInteraction: false,
-      enableResponsiveTesting: false
+      enableResponsiveTesting: false,
+      elementTimeout: 5000
     },
     thorough: {
       maxInteractions: 10,
@@ -338,7 +312,8 @@ export function createUserSimulator(page, profile = 'default') {
       enableHoverSimulation: true,
       enableFormInteraction: true,
       enableResponsiveTesting: true,
-      verboseLogging: true
+      verboseLogging: true,
+      elementTimeout: 8000
     },
     minimal: {
       maxInteractions: 3,
@@ -346,7 +321,8 @@ export function createUserSimulator(page, profile = 'default') {
       enableHoverSimulation: false,
       enableFormInteraction: false,
       enableResponsiveTesting: false,
-      verboseLogging: false
+      verboseLogging: false,
+      elementTimeout: 3000
     },
     mobile: {
       maxInteractions: 4,
@@ -354,7 +330,7 @@ export function createUserSimulator(page, profile = 'default') {
       enableHoverSimulation: false, // No hover on mobile
       enableFormInteraction: true,
       enableResponsiveTesting: false,
-      strategies: ['programmatic', 'data-attribute', 'text-based'] // Skip direct for mobile
+      elementTimeout: 4000 // Shorter timeout for mobile
     }
   };
 

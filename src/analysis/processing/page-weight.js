@@ -8,24 +8,10 @@ import { ResourceProcessor } from './resource-processor.js';
  * Orchestrates the analysis of a webpage's resource usage and environmental impact
  */
 export async function getPageWeight(url, options = {}) {
-  const { interactionLevel = 'default', deviceType = 'desktop', progressCallback = null } = options;
+  const { interactionLevel = 'default', deviceType = 'desktop' } = options;
 
   console.log(`🌐 Starting page weight analysis for: ${url}`);
   console.log(`📱 Device: ${deviceType}, Interaction: ${interactionLevel}`);
-
-  // Helper function to report progress
-  const reportProgress = (currentStep, stepProgress, additionalData = {}) => {
-    if (progressCallback) {
-      progressCallback({
-        currentStep,
-        stepProgress,
-        ...additionalData
-      });
-    }
-  };
-
-  // Step 0: Initialize (0-25%)
-  reportProgress(0, 0);
 
   // Configure Puppeteer launch options based on device type
   const launchOptions = {
@@ -42,13 +28,9 @@ export async function getPageWeight(url, options = {}) {
     );
   }
 
-  reportProgress(0, 15);
-
   // Launch Puppeteer
   const browser = await puppeteer.launch(launchOptions);
   const page = await browser.newPage();
-
-  reportProgress(0, 30);
 
   // Configure viewport and user agent based on device type
   if (deviceType === 'mobile') {
@@ -77,8 +59,6 @@ export async function getPageWeight(url, options = {}) {
     );
   }
 
-  reportProgress(0, 50);
-
   // Create CDP (Chrome DevTool Protocol) session
   const client = await page.createCDPSession();
 
@@ -87,8 +67,6 @@ export async function getPageWeight(url, options = {}) {
   const resourceProcessor = new ResourceProcessor();
 
   const userSimulator = createUserSimulator(page, interactionLevel);
-
-  reportProgress(0, 70);
 
   // Set up network monitoring
   await networkMonitor.setupListeners();
@@ -99,69 +77,23 @@ export async function getPageWeight(url, options = {}) {
   // Enable request interception
   await page.setRequestInterception(true);
 
-  // Handle intercepted requests with progress tracking
-  let resourceCount = 0;
-  let totalDataSize = 0;
-
   page.on('request', request => {
     request.continue();
   });
 
-  // Track responses for progress updates
-  page.on('response', response => {
-    resourceCount++;
-    const contentLength = response.headers()['content-length'];
-    if (contentLength) {
-      totalDataSize += parseInt(contentLength, 10);
-    }
-
-    // Update progress with resource stats
-    if (resourceCount % 5 === 0) {
-      // Update every 5 resources to avoid spam
-      reportProgress(networkMonitor.getCurrentStep?.() || 0, undefined, {
-        resourceCount,
-        dataSize: totalDataSize
-      });
-    }
-  });
-
-  reportProgress(0, 100);
-
   try {
-    // Step 1: Navigate to page (0-100%)
-    reportProgress(1, 0);
-
     // Navigate to the URL and wait for network idle
     console.log(`📖 Navigating to ${url}...`);
     await page.goto(url, {
       waitUntil: 'networkidle2',
-      timeout: 60000
+      timeout: 120000
     });
-
-    reportProgress(1, 70);
 
     // Wait for initial load
     console.log('⏱️ Initial page loaded, starting user simulation...');
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    reportProgress(1, 100);
-
-    // Step 2: Simulate realistic user interactions (0-100%)
-    reportProgress(2, 0);
-
-    // Configure user simulator to report progress
-    if (userSimulator.setProgressCallback) {
-      userSimulator.setProgressCallback(progress => {
-        reportProgress(2, progress, {
-          resourceCount,
-          dataSize: totalDataSize
-        });
-      });
-    }
-
     await userSimulator.simulateUserBehavior();
-
-    reportProgress(2, 100);
 
     // Wait a bit more to ensure all network events are captured
     console.log('⏳ Waiting for final network activity to settle...');

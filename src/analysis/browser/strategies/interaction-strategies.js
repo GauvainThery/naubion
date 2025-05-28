@@ -1,6 +1,6 @@
 /**
- * Generic interaction strategies for different types of elements
- * Each strategy is responsible for one specific way of interacting with elements
+ * Simplified interaction strategies for button clicks and element interactions
+ * Focuses on reliability and maintainability over comprehensive coverage
  */
 
 export class InteractionStrategies {
@@ -10,238 +10,173 @@ export class InteractionStrategies {
   }
 
   /**
-   * Strategy 1: Direct element interaction using Puppeteer's native methods
+   * Universal interaction method with timeout - tries multiple approaches
+   * @param {Object} element - Element to interact with
+   * @param {number} timeout - Timeout in milliseconds (default: 5000)
+   * @returns {Promise<Object>} Interaction result
    */
-  async directInteraction(element) {
+  async clickElement(element, timeout = 5000) {
+    const startTime = Date.now();
+
+    // Create timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error(`Interaction timeout after ${timeout}ms`)), timeout);
+    });
+
+    // Main interaction logic
+    const interactionPromise = this._attemptClick(element);
+
     try {
-      const elementHandle = await this.page.$(element.selector);
-      if (elementHandle) {
-        await elementHandle.click();
-        return { success: true, method: 'direct' };
+      const result = await Promise.race([interactionPromise, timeoutPromise]);
+      const duration = Date.now() - startTime;
+
+      if (result.success) {
+        console.log(`   ✅ Clicked "${element.text}" in ${duration}ms using ${result.method}`);
+
+        // Wait for any network activity to settle
+        await this._waitForNetworkResponse(timeout - duration);
       }
+
+      return result;
     } catch (error) {
-      return { success: false, method: 'direct', error: error.message };
+      const duration = Date.now() - startTime;
+      console.log(`   ❌ Failed to click "${element.text}" after ${duration}ms: ${error.message}`);
+      return { success: false, error: error.message, duration };
     }
-    return { success: false, method: 'direct', error: 'Element not found' };
   }
 
   /**
-   * Strategy 2: Enhanced programmatic interaction with comprehensive event simulation
+   * Attempt click using multiple fallback strategies
    */
-  async programmaticInteraction(element) {
-    try {
-      const result = await this.page.evaluate(elementData => {
-        const { selector, text } = elementData;
-        const targetElement = document.querySelector(selector);
+  async _attemptClick(element) {
+    const strategies = [
+      () => this._puppeteerClick(element),
+      () => this._evaluateClick(element),
+      () => this._textBasedClick(element)
+    ];
 
-        if (!targetElement) {
-          return { success: false, error: 'Element not found' };
+    for (let i = 0; i < strategies.length; i++) {
+      try {
+        const result = await strategies[i]();
+        if (result.success) {
+          return result;
         }
+      } catch (error) {
+        // Continue to next strategy
+        if (i === strategies.length - 1) {
+          throw error; // Last strategy failed
+        }
+      }
+    }
 
-        // Verify element matches expected text
-        if (text && !targetElement.textContent?.includes(text)) {
+    return { success: false, error: 'All strategies failed' };
+  }
+
+  /**
+   * Strategy 1: Native Puppeteer click
+   */
+  async _puppeteerClick(element) {
+    const elementHandle = await this.page.$(element.selector);
+    if (!elementHandle) {
+      return { success: false, error: 'Element not found' };
+    }
+
+    await elementHandle.click();
+    return { success: true, method: 'puppeteer' };
+  }
+
+  /**
+   * Strategy 2: JavaScript click in page context
+   */
+  async _evaluateClick(element) {
+    const result = await this.page.evaluate(
+      (selector, text) => {
+        const el = document.querySelector(selector);
+        if (!el) return { success: false, error: 'Element not found' };
+
+        // Optional text verification
+        if (text && !el.textContent?.includes(text)) {
           return { success: false, error: 'Text mismatch' };
         }
 
-        // Ensure element is interactive
-        this._makeElementInteractive(targetElement);
+        // Check if element is actually visible and interactable (like a real user would)
+        const rect = el.getBoundingClientRect();
+        const isVisible = rect.width > 0 && rect.height > 0;
+        const computedStyle = window.getComputedStyle(el);
+        const isDisplayed = computedStyle.display !== 'none';
+        const isVisibilityVisible = computedStyle.visibility !== 'hidden';
+        const isInteractable = computedStyle.pointerEvents !== 'none';
 
-        // Simulate comprehensive interaction
-        this._simulateUserInteraction(targetElement);
+        if (!isVisible || !isDisplayed || !isVisibilityVisible || !isInteractable) {
+          return { success: false, error: 'Element not visible or interactable' };
+        }
 
-        return { success: true, text: targetElement.textContent?.trim() };
-      }, element);
+        // Click the element
+        el.click();
+        return { success: true };
+      },
+      element.selector,
+      element.text
+    );
 
-      return { success: result.success, method: 'programmatic', ...result };
-    } catch (error) {
-      return { success: false, method: 'programmatic', error: error.message };
-    }
+    return { success: result.success, method: 'evaluate', ...result };
   }
 
   /**
-   * Strategy 3: Data-attribute based interaction for modern web apps
+   * Strategy 3: Text-based fallback
    */
-  async dataAttributeInteraction(element) {
-    if (!element.dataAttributes || element.dataAttributes.length === 0) {
-      return {
-        success: false,
-        method: 'data-attribute',
-        error: 'No data attributes'
-      };
-    }
-
-    try {
-      const result = await this.page.evaluate(elementData => {
-        const { dataAttributes, text } = elementData;
-
-        // Find elements with specific data attributes
-        const dataSelectors = this._extractDataSelectors(dataAttributes);
-        let targetElement = null;
-
-        for (const selector of dataSelectors) {
-          const elements = Array.from(document.querySelectorAll(selector));
-          targetElement = elements.find(el => !text || el.textContent?.trim().includes(text));
-          if (targetElement) break;
-        }
-
-        if (!targetElement) {
-          return { success: false, error: 'No matching element found' };
-        }
-
-        this._makeElementInteractive(targetElement);
-        this._simulateUserInteraction(targetElement);
-
-        return {
-          success: true,
-          selector: this._getElementSelector(targetElement)
-        };
-      }, element);
-
-      return { success: result.success, method: 'data-attribute', ...result };
-    } catch (error) {
-      return { success: false, method: 'data-attribute', error: error.message };
-    }
-  }
-
-  /**
-   * Strategy 4: Text-based element discovery and interaction
-   */
-  async textBasedInteraction(element) {
+  async _textBasedClick(element) {
     if (!element.text) {
-      return {
-        success: false,
-        method: 'text-based',
-        error: 'No text provided'
-      };
+      return { success: false, error: 'No text for fallback' };
     }
 
-    try {
-      const result = await this.page.evaluate(searchText => {
-        // Common button selectors
-        const buttonSelectors = [
-          'button',
-          '[role="button"]',
-          'input[type="button"]',
-          'input[type="submit"]',
-          '.btn',
-          '.button'
-        ];
+    const result = await this.page.evaluate(searchText => {
+      const selectors = ['button', '[role="button"]', '.btn', '.button'];
 
-        for (const selector of buttonSelectors) {
-          const elements = Array.from(document.querySelectorAll(selector));
-          const targetElement = elements.find(el =>
-            el.textContent?.trim().toLowerCase().includes(searchText.toLowerCase())
-          );
+      for (const selector of selectors) {
+        const elements = Array.from(document.querySelectorAll(selector));
+        const target = elements.find(el => {
+          const textMatch = el.textContent?.toLowerCase().includes(searchText.toLowerCase());
+          if (!textMatch) return false;
 
-          if (targetElement) {
-            this._makeElementInteractive(targetElement);
-            this._simulateUserInteraction(targetElement);
-            return {
-              success: true,
-              selector: this._getElementSelector(targetElement),
-              matchedText: targetElement.textContent?.trim()
-            };
-          }
+          // Check if element is visible and interactable (like a real user would see it)
+          const rect = el.getBoundingClientRect();
+          const isVisible = rect.width > 0 && rect.height > 0;
+          const computedStyle = window.getComputedStyle(el);
+          const isDisplayed = computedStyle.display !== 'none';
+          const isVisibilityVisible = computedStyle.visibility !== 'hidden';
+          const isInteractable = computedStyle.pointerEvents !== 'none';
+
+          return isVisible && isDisplayed && isVisibilityVisible && isInteractable;
+        });
+
+        if (target) {
+          target.click();
+          return { success: true };
         }
+      }
 
-        return { success: false, error: 'No matching text found' };
-      }, element.text);
+      return { success: false, error: 'No visible matching element found' };
+    }, element.text);
 
-      return { success: result.success, method: 'text-based', ...result };
-    } catch (error) {
-      return { success: false, method: 'text-based', error: error.message };
-    }
+    return { success: result.success, method: 'text-based', ...result };
   }
 
   /**
-   * Wait for network activity to settle after interaction
+   * Wait for network activity after interaction (with timeout)
    */
-  async waitForNetworkSettlement(resourceCountBefore, maxWaitTime = 30000) {
-    if (!this.networkMonitor) return;
+  async _waitForNetworkResponse(maxWait = 5000) {
+    if (!this.networkMonitor || maxWait <= 0) return;
 
-    const resourceCountAfter = this.networkMonitor.getResources().length;
-
-    if (resourceCountAfter > resourceCountBefore) {
-      console.log(
-        `     Interaction triggered ${resourceCountAfter - resourceCountBefore} new resource(s)`
-      );
-
+    try {
       await this.networkMonitor.waitForNetworkIdle(
-        3000, // 3 seconds of quiet time
-        maxWaitTime,
-        false // Less verbose for strategies
+        1000, // 1 second quiet time
+        Math.min(maxWait, 5000), // Max 5 seconds
+        false // Not verbose
       );
+    } catch (error) {
+      // Network timeout is not critical - continue
+      console.log(`   ⚠️ Network wait timeout: ${error.message}`);
     }
   }
-}
-
-// Helper functions that will be injected into the page context
-const pageHelpers = `
-  window._makeElementInteractive = function(element) {
-    const style = window.getComputedStyle(element);
-    if (style.pointerEvents === 'none') {
-      element.style.pointerEvents = 'auto';
-    }
-    if (style.visibility === 'hidden') {
-      element.style.visibility = 'visible';
-    }
-    if (style.display === 'none') {
-      element.style.display = 'block';
-    }
-  };
-
-  window._simulateUserInteraction = function(element) {
-    const rect = element.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const events = [
-      new FocusEvent('focus', { bubbles: true }),
-      new MouseEvent('mouseenter', { bubbles: true, cancelable: true, clientX: centerX, clientY: centerY }),
-      new MouseEvent('mouseover', { bubbles: true, cancelable: true, clientX: centerX, clientY: centerY }),
-      new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX: centerX, clientY: centerY, button: 0 }),
-      new MouseEvent('mouseup', { bubbles: true, cancelable: true, clientX: centerX, clientY: centerY, button: 0 }),
-      new MouseEvent('click', { bubbles: true, cancelable: true, clientX: centerX, clientY: centerY, button: 0 })
-    ];
-
-    events.forEach(event => {
-      try {
-        element.dispatchEvent(event);
-      } catch (e) {
-        // Ignore unsupported events
-      }
-    });
-
-    // Try direct click as backup
-    if (typeof element.click === 'function') {
-      element.click();
-    }
-  };
-
-  window._extractDataSelectors = function(dataAttributes) {
-    const selectors = [];
-    const attributes = dataAttributes.split(' ');
-    
-    attributes.forEach(attr => {
-      if (attr.includes('=')) {
-        const [name, value] = attr.split('=');
-        const cleanValue = value.replace(/"/g, '');
-        selectors.push(\`[\${name}="\${cleanValue}"]\`);
-        selectors.push(\`[\${name}*="\${cleanValue}"]\`);
-      }
-    });
-    
-    return selectors;
-  };
-
-  window._getElementSelector = function(element) {
-    if (element.id) return \`#\${element.id}\`;
-    if (element.className) return \`.\${element.className.split(' ')[0]}\`;
-    return element.tagName.toLowerCase();
-  };
-`;
-
-// Inject helper functions into page context
-export async function injectPageHelpers(page) {
-  await page.evaluate(pageHelpers);
 }

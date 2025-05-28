@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
 
   // Analysis configuration
   analysis: {
-    timeout: parseInt(process.env.ANALYSIS_TIMEOUT) || 60000,
+    timeout: parseInt(process.env.ANALYSIS_TIMEOUT) || 120000,
     maxInteractions: parseInt(process.env.MAX_INTERACTIONS) || 5,
     maxScrollSteps: parseInt(process.env.MAX_SCROLL_STEPS) || 5,
     networkIdleTime: parseInt(process.env.NETWORK_IDLE_TIME) || 2000,
