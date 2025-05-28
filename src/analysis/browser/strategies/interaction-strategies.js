@@ -23,8 +23,8 @@ export class InteractionStrategies {
       setTimeout(() => reject(new Error(`Interaction timeout after ${timeout}ms`)), timeout);
     });
 
-    // Main interaction logic
-    const interactionPromise = this._attemptClick(element);
+    // Main interaction logic with retry
+    const interactionPromise = this._attemptClickWithRetry(element);
 
     try {
       const result = await Promise.race([interactionPromise, timeoutPromise]);
@@ -33,11 +33,17 @@ export class InteractionStrategies {
       if (result.success) {
         console.log(`   ✅ Clicked "${element.text}" in ${duration}ms using ${result.method}`);
 
-        // Wait for any network activity to settle
-        await this._waitForNetworkResponse(timeout - duration);
-      }
+        // Smart network waiting based on interaction type
+        const networkWaitTime = this._calculateNetworkWaitTime(element, timeout - duration);
+        if (networkWaitTime > 0) {
+          await this._waitForNetworkResponse(networkWaitTime);
+        }
 
-      return result;
+        return { ...result, duration };
+      } else {
+        console.log(`   ❌ Failed to click "${element.text}" after ${duration}ms: ${result.error}`);
+        return { ...result, duration };
+      }
     } catch (error) {
       const duration = Date.now() - startTime;
       console.log(`   ❌ Failed to click "${element.text}" after ${duration}ms: ${error.message}`);
@@ -46,47 +52,217 @@ export class InteractionStrategies {
   }
 
   /**
-   * Attempt click using multiple fallback strategies
+   * Attempt click with intelligent retry logic
    */
-  async _attemptClick(element) {
-    const strategies = [
-      () => this._puppeteerClick(element),
-      () => this._evaluateClick(element),
-      () => this._textBasedClick(element)
-    ];
+  async _attemptClickWithRetry(element) {
+    let lastError = null;
+    const maxRetries = 2;
 
-    for (let i = 0; i < strategies.length; i++) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // Wait a bit between retries (except first attempt)
+      if (attempt > 0) {
+        await new Promise(resolve => setTimeout(resolve, 200 * attempt));
+      }
+
       try {
-        const result = await strategies[i]();
+        const result = await this._attemptClick(element);
         if (result.success) {
           return result;
         }
+        lastError = result;
+
+        // If element is not in viewport, try scrolling before next attempt
+        if (attempt < maxRetries && result.error?.includes('not visible')) {
+          await this._ensureElementInViewport(element);
+        }
       } catch (error) {
+        lastError = { success: false, error: error.message };
+      }
+    }
+
+    return lastError || { success: false, error: 'Unknown error during retry attempts' };
+  }
+
+  /**
+   * Ensure element is in viewport before interaction
+   */
+  async _ensureElementInViewport(element) {
+    try {
+      await this.page.evaluate(selector => {
+        const el = document.querySelector(selector);
+        if (el) {
+          el.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+        }
+      }, element.selector);
+      // Give time for scroll to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
+    } catch (error) {
+      // Ignore scroll errors
+    }
+  }
+
+  /**
+   * Calculate optimal network wait time based on element type
+   */
+  _calculateNetworkWaitTime(element, remainingTime) {
+    if (remainingTime <= 0) return 0;
+
+    // Different elements typically trigger different amounts of network activity
+    const baseWaitTime = {
+      submit: 3000, // Form submissions often trigger significant network activity
+      button: 2000, // Buttons might trigger API calls or navigation
+      link: 1500, // Links typically navigate or load content
+      menu: 1000, // Menu interactions might load content
+      modal: 800, // Modal interactions are usually quick
+      default: 1500 // Default wait time
+    };
+
+    const elementType = element.type || 'default';
+    const suggestedWait = baseWaitTime[elementType] || baseWaitTime.default;
+
+    // Don't wait longer than remaining time, and cap at reasonable limits
+    return Math.min(suggestedWait, remainingTime, 4000);
+  }
+
+  /**
+   * Attempt click using optimized strategy selection
+   */
+  async _attemptClick(element) {
+    // Pre-flight validation
+    const validation = await this._validateElement(element);
+    if (!validation.isValid) {
+      return { success: false, error: validation.reason };
+    }
+
+    // Smart strategy selection based on element properties
+    const strategies = this._selectOptimalStrategies(element);
+    const errors = [];
+
+    for (let i = 0; i < strategies.length; i++) {
+      try {
+        const result = await strategies[i].fn();
+        if (result.success) {
+          return result;
+        } else {
+          errors.push(`${strategies[i].name}: ${result.error}`);
+        }
+      } catch (error) {
+        errors.push(`${strategies[i].name}: ${error.message}`);
         // Continue to next strategy
         if (i === strategies.length - 1) {
-          throw error; // Last strategy failed
+          // Last strategy failed, return detailed error
+          return {
+            success: false,
+            error: `All strategies failed: ${errors.join('; ')}`,
+            attempts: errors.length
+          };
         }
       }
     }
 
-    return { success: false, error: 'All strategies failed' };
+    return {
+      success: false,
+      error: `All strategies failed: ${errors.join('; ')}`,
+      attempts: errors.length
+    };
   }
 
   /**
-   * Strategy 1: Native Puppeteer click
+   * Pre-flight element validation to avoid unnecessary strategy attempts
    */
-  async _puppeteerClick(element) {
-    const elementHandle = await this.page.$(element.selector);
-    if (!elementHandle) {
-      return { success: false, error: 'Element not found' };
+  async _validateElement(element) {
+    if (!element || !element.selector) {
+      return { isValid: false, reason: 'Invalid element or missing selector' };
     }
 
-    await elementHandle.click();
-    return { success: true, method: 'puppeteer' };
+    // Check if element exists and is interactable in a single page evaluation
+    const validation = await this.page.evaluate(selector => {
+      const el = document.querySelector(selector);
+      if (!el) return { isValid: false, reason: 'Element not found in DOM' };
+
+      // Comprehensive visibility and interactability check
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+
+      const isVisible = rect.width > 0 && rect.height > 0;
+      const isDisplayed = style.display !== 'none';
+      const isVisibilityVisible = style.visibility !== 'hidden';
+      const isInteractable = style.pointerEvents !== 'none';
+      const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
+      const isNotDisabled = !el.disabled && !el.hasAttribute('disabled');
+
+      if (!isVisible) return { isValid: false, reason: 'Element not visible (zero dimensions)' };
+      if (!isDisplayed) return { isValid: false, reason: 'Element display is none' };
+      if (!isVisibilityVisible) return { isValid: false, reason: 'Element visibility is hidden' };
+      if (!isInteractable) return { isValid: false, reason: 'Element pointer-events is none' };
+      if (!isNotDisabled) return { isValid: false, reason: 'Element is disabled' };
+
+      return {
+        isValid: true,
+        isInViewport,
+        elementType: el.tagName.toLowerCase(),
+        hasText: !!el.textContent?.trim(),
+        hasId: !!el.id,
+        hasClickHandler: !!(el.onclick || el.getAttribute('onclick'))
+      };
+    }, element.selector);
+
+    return validation;
   }
 
   /**
-   * Strategy 2: JavaScript click in page context
+   * Select optimal strategies based on element characteristics
+   */
+  _selectOptimalStrategies(element) {
+    const allStrategies = [
+      { name: 'puppeteer', fn: () => this._puppeteerClick(element), priority: 1 },
+      { name: 'evaluate', fn: () => this._evaluateClick(element), priority: 2 },
+      { name: 'text-based', fn: () => this._textBasedClick(element), priority: 3 }
+    ];
+
+    // Adjust strategy priority based on element characteristics
+    if (element.hasId || element.selector.startsWith('#')) {
+      // Elements with IDs are more reliable for direct clicking
+      allStrategies[0].priority = 0; // Boost puppeteer priority
+    }
+
+    if (!element.text || !element.hasText) {
+      // No text means text-based strategy will fail
+      allStrategies[2].priority = 10; // Lower text-based priority
+    }
+
+    if (element.hasClickHandler) {
+      // Elements with click handlers work better with evaluate strategy
+      allStrategies[1].priority = 0.5; // Boost evaluate priority
+    }
+
+    // Sort by priority (lower = higher priority)
+    return allStrategies.sort((a, b) => a.priority - b.priority);
+  }
+
+  /**
+   * Strategy 1: Native Puppeteer click (optimized)
+   */
+  async _puppeteerClick(element) {
+    try {
+      const elementHandle = await this.page.$(element.selector);
+      if (!elementHandle) {
+        return { success: false, error: 'Element not found' };
+      }
+
+      // Ensure element is in viewport before clicking
+      await elementHandle.scrollIntoViewIfNeeded();
+      await elementHandle.click();
+      await elementHandle.dispose(); // Clean up handle
+
+      return { success: true, method: 'puppeteer' };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Strategy 2: JavaScript click in page context (optimized)
    */
   async _evaluateClick(element) {
     const result = await this.page.evaluate(
@@ -94,21 +270,14 @@ export class InteractionStrategies {
         const el = document.querySelector(selector);
         if (!el) return { success: false, error: 'Element not found' };
 
-        // Optional text verification
+        // Optional text verification (skip detailed visibility check since we pre-validated)
         if (text && !el.textContent?.includes(text)) {
           return { success: false, error: 'Text mismatch' };
         }
 
-        // Check if element is actually visible and interactable (like a real user would)
-        const rect = el.getBoundingClientRect();
-        const isVisible = rect.width > 0 && rect.height > 0;
-        const computedStyle = window.getComputedStyle(el);
-        const isDisplayed = computedStyle.display !== 'none';
-        const isVisibilityVisible = computedStyle.visibility !== 'hidden';
-        const isInteractable = computedStyle.pointerEvents !== 'none';
-
-        if (!isVisible || !isDisplayed || !isVisibilityVisible || !isInteractable) {
-          return { success: false, error: 'Element not visible or interactable' };
+        // Scroll into view if needed before clicking
+        if (!el.getBoundingClientRect().top || el.getBoundingClientRect().top < 0) {
+          el.scrollIntoView({ behavior: 'auto', block: 'center' });
         }
 
         // Click the element
@@ -123,7 +292,7 @@ export class InteractionStrategies {
   }
 
   /**
-   * Strategy 3: Text-based fallback
+   * Strategy 3: Text-based fallback (optimized)
    */
   async _textBasedClick(element) {
     if (!element.text) {
@@ -139,18 +308,16 @@ export class InteractionStrategies {
           const textMatch = el.textContent?.toLowerCase().includes(searchText.toLowerCase());
           if (!textMatch) return false;
 
-          // Check if element is visible and interactable (like a real user would see it)
+          // Quick visibility check (detailed check was done in pre-validation)
           const rect = el.getBoundingClientRect();
-          const isVisible = rect.width > 0 && rect.height > 0;
-          const computedStyle = window.getComputedStyle(el);
-          const isDisplayed = computedStyle.display !== 'none';
-          const isVisibilityVisible = computedStyle.visibility !== 'hidden';
-          const isInteractable = computedStyle.pointerEvents !== 'none';
-
-          return isVisible && isDisplayed && isVisibilityVisible && isInteractable;
+          return rect.width > 0 && rect.height > 0;
         });
 
         if (target) {
+          // Scroll into view if needed
+          if (target.getBoundingClientRect().top < 0) {
+            target.scrollIntoView({ behavior: 'auto', block: 'center' });
+          }
           target.click();
           return { success: true };
         }
@@ -163,17 +330,28 @@ export class InteractionStrategies {
   }
 
   /**
-   * Wait for network activity after interaction (with timeout)
+   * Smart network activity waiting (optimized)
    */
   async _waitForNetworkResponse(maxWait = 5000) {
     if (!this.networkMonitor || maxWait <= 0) return;
 
     try {
+      // Start with shorter idle time and increase if needed
+      const initialIdleTime = 500;
+      const extendedIdleTime = 1000;
+
+      // First try short wait for immediate responses
       await this.networkMonitor.waitForNetworkIdle(
-        1000, // 1 second quiet time
-        Math.min(maxWait, 5000), // Max 5 seconds
-        false // Not verbose
+        initialIdleTime,
+        Math.min(maxWait * 0.3, 2000), // Use 30% of max wait for quick responses
+        false
       );
+
+      // If there's still time, wait a bit longer for slower responses
+      const remainingTime = maxWait - maxWait * 0.3;
+      if (remainingTime > 1000) {
+        await this.networkMonitor.waitForNetworkIdle(extendedIdleTime, remainingTime, false);
+      }
     } catch (error) {
       // Network timeout is not critical - continue
       console.log(`   ⚠️ Network wait timeout: ${error.message}`);
