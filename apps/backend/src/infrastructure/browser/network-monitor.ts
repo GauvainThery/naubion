@@ -1,0 +1,295 @@
+/**
+ * Network monitoring infrastructure - Chrome DevTools Protocol integration
+ */
+
+import { CDPSession } from 'puppeteer';
+import { Resource } from '../../domain/models/resource.js';
+import logger from '../../shared/logger.js';
+
+interface NetworkEvent {
+  requestId: string;
+  url: string;
+  method: string;
+  timestamp: number;
+}
+
+interface ResponseEvent extends NetworkEvent {
+  status: number;
+  headers: Record<string, string>;
+  contentType: string;
+}
+
+interface LoadingFinishedEvent {
+  requestId: string;
+  timestamp: number;
+  encodedDataLength: number;
+}
+
+export class NetworkMonitor {
+  private client: CDPSession;
+  private resources: Resource[] = [];
+  private requests: Map<string, NetworkEvent> = new Map();
+  private responses: Map<string, ResponseEvent> = new Map();
+  private isMonitoring = false;
+  private activityListeners: Array<(type: string, data: any) => void> = [];
+  private lastActivity = Date.now();
+  private pendingRequests = new Set<string>();
+
+  constructor(client: CDPSession) {
+    this.client = client;
+  }
+
+  /**
+   * Set up network monitoring listeners
+   */
+  async setupListeners(): Promise<void> {
+    await this.client.send('Network.enable');
+    await this.client.send('Runtime.enable');
+
+    this.client.on('Network.requestWillBeSent', this.handleRequestWillBeSent.bind(this));
+    this.client.on('Network.responseReceived', this.handleResponseReceived.bind(this));
+    this.client.on('Network.loadingFinished', this.handleLoadingFinished.bind(this));
+    this.client.on('Network.loadingFailed', this.handleLoadingFailed.bind(this));
+
+    this.isMonitoring = true;
+    logger.debug('Network monitoring enabled');
+  }
+
+  /**
+   * Handle request will be sent event
+   */
+  private handleRequestWillBeSent(params: any): void {
+    const { requestId, request } = params;
+
+    this.requests.set(requestId, {
+      requestId,
+      url: request.url,
+      method: request.method,
+      timestamp: params.timestamp
+    });
+
+    this.pendingRequests.add(requestId);
+    this.notifyActivity('request', { requestId, url: request.url, method: request.method });
+  }
+
+  /**
+   * Handle response received event
+   */
+  private handleResponseReceived(params: any): void {
+    const { requestId, response } = params;
+
+    this.responses.set(requestId, {
+      requestId,
+      url: response.url,
+      method: 'GET',
+      timestamp: params.timestamp,
+      status: response.status,
+      headers: response.headers,
+      contentType: response.headers['content-type'] || response.mimeType || 'unknown'
+    });
+
+    this.notifyActivity('response', { requestId, url: response.url, status: response.status });
+  }
+
+  /**
+   * Handle loading finished event
+   */
+  private handleLoadingFinished(params: LoadingFinishedEvent): void {
+    const { requestId, encodedDataLength } = params;
+    const request = this.requests.get(requestId);
+    const response = this.responses.get(requestId);
+
+    if (request && response) {
+      const resource: Resource = {
+        url: response.url,
+        contentType: response.contentType,
+        transferSize: encodedDataLength,
+        status: response.status,
+        resourceType: this.determineResourceType(response.url, response.contentType)
+      };
+
+      this.resources.push(resource);
+      this.notifyActivity('finished', {
+        url: resource.url,
+        type: resource.resourceType,
+        size: resource.transferSize
+      });
+    }
+
+    // Clean up maps to prevent memory leaks
+    this.pendingRequests.delete(requestId);
+    this.requests.delete(requestId);
+    this.responses.delete(requestId);
+  }
+
+  /**
+   * Handle loading failed event
+   */
+  private handleLoadingFailed(params: any): void {
+    const { requestId } = params;
+    this.requests.delete(requestId);
+    this.responses.delete(requestId);
+    this.pendingRequests.delete(requestId);
+    logger.debug('Resource loading failed', { requestId });
+  }
+
+  /**
+   * Register activity listener
+   */
+  onActivity(callback: (type: string, data: any) => void): void {
+    this.activityListeners.push(callback);
+  }
+
+  /**
+   * Remove activity listener
+   */
+  removeActivityListener(callback: (type: string, data: any) => void): void {
+    const index = this.activityListeners.indexOf(callback);
+    if (index > -1) {
+      this.activityListeners.splice(index, 1);
+    }
+  }
+
+  /**
+   * Check if there's recent activity
+   */
+  hasActivity(): boolean {
+    return this.resources.length > 0 || this.pendingRequests.size > 0;
+  }
+
+  /**
+   * Notify activity listeners
+   */
+  private notifyActivity(type: string, data: any): void {
+    this.lastActivity = Date.now();
+    this.activityListeners.forEach(callback => {
+      try {
+        callback(type, data);
+      } catch (error) {
+        logger.warn('Activity listener error:', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    });
+  }
+
+  /**
+   * Check if there are pending requests
+   */
+  hasPendingRequests(): boolean {
+    return this.pendingRequests.size > 0;
+  }
+
+  /**
+   * Get time since last activity
+   */
+  getTimeSinceLastActivity(): number {
+    return Date.now() - this.lastActivity;
+  }
+
+  /**
+   * Determine resource type from URL and content type
+   */
+  private determineResourceType(
+    url: string,
+    contentType: string
+  ): 'html' | 'css' | 'js' | 'media' | 'font' | 'other' {
+    const fileExtension = url.split('?')[0].split('#')[0].split('.').pop()?.toLowerCase() || '';
+
+    // Check for favicon specifically
+    if (url.includes('favicon.ico') || fileExtension === 'ico') {
+      return 'media';
+    }
+
+    if (contentType.includes('text/html')) {
+      return 'html';
+    } else if (contentType.includes('text/css') || fileExtension === 'css') {
+      return 'css';
+    } else if (
+      contentType.includes('javascript') ||
+      contentType.includes('text/javascript') ||
+      ['js', 'mjs', 'jsx', 'ts', 'tsx'].includes(fileExtension)
+    ) {
+      return 'js';
+    } else if (
+      contentType.includes('image/') ||
+      contentType.includes('video/') ||
+      contentType.includes('audio/') ||
+      ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'mp4', 'webm', 'mp3', 'wav'].includes(
+        fileExtension
+      )
+    ) {
+      return 'media';
+    } else if (
+      contentType.includes('font/') ||
+      contentType.includes('application/font') ||
+      ['woff', 'woff2', 'ttf', 'otf', 'eot'].includes(fileExtension)
+    ) {
+      return 'font';
+    }
+
+    return 'other';
+  }
+
+  /**
+   * Wait for network to be idle
+   */
+  async waitForNetworkIdle(idleTime = 2000, maxWait = 30000, verbose = false): Promise<void> {
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWait) {
+      if (this.getTimeSinceLastActivity() >= idleTime && !this.hasPendingRequests()) {
+        if (verbose) {
+          logger.debug(`Network idle achieved after ${Date.now() - startTime}ms`);
+        }
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    if (verbose) {
+      logger.warn(
+        `Network idle timeout after ${maxWait}ms, ${this.pendingRequests.size} requests still pending`
+      );
+    }
+  }
+
+  /**
+   * Get all captured resources
+   */
+  getResources(): Resource[] {
+    return [...this.resources];
+  }
+
+  /**
+   * Get total transfer size
+   */
+  getTotalTransferSize(): number {
+    return this.resources.reduce((total, resource) => total + resource.transferSize, 0);
+  }
+
+  /**
+   * Reset monitoring state
+   */
+  reset(): void {
+    this.resources = [];
+    this.requests.clear();
+    this.responses.clear();
+    this.pendingRequests.clear();
+    this.lastActivity = Date.now();
+    logger.debug('Network monitor reset');
+  }
+
+  /**
+   * Disable network monitoring
+   */
+  async disable(): Promise<void> {
+    if (this.isMonitoring) {
+      await this.client.send('Network.disable');
+      await this.client.send('Runtime.disable');
+      this.isMonitoring = false;
+      logger.debug('Network monitoring disabled');
+    }
+  }
+}
