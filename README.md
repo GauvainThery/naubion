@@ -1,328 +1,222 @@
-# Green Web Compass - Page Weight Analyzer
+# Green Web Compass
 
-A modern web application for analyzing website resource usage and environmental impact through intelligent page weight analysis.
+A TypeScript monorepo for analyzing website resource usage and environmental impact.
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-
-### Installation & Setup
-
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd green-web-compass
-
 # Install dependencies
-npm install
+pnpm install
 
 # Copy environment template
-cp .env.example .env
+cp apps/backend/.env.example apps/backend/.env
 
-# Start development server
-npm run dev
+# Start development (both frontend and backend)
+pnpm run dev
 ```
 
-Visit `http://localhost:3000` to access the application.
+**Access:**
 
-## 🏗️ Architecture Overview
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:3001`
 
-This application follows a modular, service-oriented architecture with clear separation of concerns:
+## 🏗️ Monorepo Architecture
+
+This application uses a modern monorepo structure with TypeScript throughout:
 
 ```
 green-web-compass/
-├── src/
-│   ├── client/           # Frontend application
-│   ├── server/           # Backend API server
-│   ├── analysis/         # Core analysis engine
-│   ├── config/           # Configuration management
-│   └── utils/            # Shared utilities
-├── public/               # Static assets
-└── index.html           # Single-page application entry
+├── apps/
+│   ├── frontend/         # React + TypeScript frontend (port 3000)
+│   │   ├── src/          # React components, hooks, utilities
+│   │   ├── package.json  # Frontend dependencies
+│   │   └── README.md     # Frontend-specific documentation
+│   └── backend/          # Express + TypeScript backend (port 3001)
+│       ├── src/          # API routes, services, configuration
+│       ├── package.json  # Backend dependencies
+│       └── README.md     # Backend-specific documentation
+├── packages/
+│   └── shared/           # Shared TypeScript types and utilities
+│       ├── src/          # Common interfaces and types
+│       └── package.json  # Shared package config
+├── package.json          # Root workspace configuration
+├── pnpm-workspace.yaml   # pnpm workspace setup
+└── README.md             # This file
 ```
 
-### Core Components
+## 📜 Available Scripts
 
-- **Analysis Engine**: Puppeteer-based browser automation with intelligent user simulation
-- **Network Monitoring**: Real-time resource tracking via Chrome DevTools Protocol
-- **Modular Frontend**: Component-based UI with vanilla JavaScript
-- **REST API**: Express.js backend with comprehensive validation
-- **Progressive Enhancement**: Works without JavaScript for basic functionality
-
-## 🔬 Analysis Engine Deep Dive
-
-The analysis engine is the heart of the application, consisting of several specialized modules:
-
-### Browser Automation (`src/analysis/browser/`)
-
-**UserSimulator** - Orchestrates realistic user behavior simulation:
-
-- Configurable interaction strategies (minimal, default, thorough)
-- Multi-device viewport simulation (desktop, mobile, tablet)
-- Intelligent element discovery and interaction
-- Form filling and hover behavior simulation
-
-**Strategy Pattern Implementation**:
-
-- `InteractionStrategies`: Direct, programmatic, data-attribute, and text-based interactions
-- `ElementFinder`: Smart element discovery using CSS selectors, data attributes, and semantic analysis
-- `BehaviorSimulator`: Scrolling, focus events, viewport changes, and device capability simulation
-
-### Network Monitoring (`src/analysis/monitoring/`)
-
-**NetworkMonitor** - Real-time resource tracking:
-
-- Chrome DevTools Protocol (CDP) integration
-- Request/response lifecycle monitoring
-- Transfer size and timing analysis
-- Resource type classification
-- Network activity settlement detection
-
-### Resource Processing (`src/analysis/processing/`)
-
-**ResourceProcessor** - Categorizes and analyzes collected resources:
-
-- Resource type determination (HTML, CSS, JS, media, fonts, other)
-- Size aggregation and statistics
-- Duplicate resource detection
-- Performance metrics calculation
-
-**PageWeight** - Main orchestrator:
-
-- Coordinates browser automation, monitoring, and processing
-- Progress tracking and reporting
-- Error handling and cleanup
-- Configurable analysis options
-
-## 🌐 Frontend Architecture
-
-### Component Structure (`src/client/`)
-
-```
-client/
-├── js/
-│   ├── app.js           # Main application entry point
-│   ├── ui/              # UI components
-│   │   ├── form.js      # Analysis form handler
-│   │   ├── loading.js   # Progress indicator
-│   │   └── results.js   # Results visualization
-│   └── utils/           # Client utilities
-└── css/                 # Stylesheets
-```
-
-### Design Principles
-
-- **Progressive Enhancement**: Core functionality works without JavaScript
-- **Component Isolation**: Each UI component is self-contained with clear APIs
-- **State Management**: Centralized state handling with event-driven updates
-- **Performance**: Lazy loading, efficient DOM manipulation, minimal dependencies
-
-## 🔧 Backend Architecture
-
-### Server Structure (`src/server/`)
-
-```
-server/
-├── app.js              # Express application setup
-├── routes/
-│   └── api.js          # RESTful API endpoints
-└── services/
-    └── analysis.js     # Business logic layer
-```
-
-### Configuration Management (`src/config/`)
-
-Centralized configuration system with:
-
-- Environment variable support
-- Validation and type checking
-- Device and simulation profiles
-- Development/production configurations
-
-### Utilities (`src/utils/`)
-
-- **Error Handling**: Custom error classes with HTTP status mapping
-- **Logging**: Structured logging with configurable levels
-- **Validation**: Input validation and sanitization
-
-### API Design
-
-**POST `/api/analyze`**
-
-- Validates URL and analysis options
-- Handles device type and interaction level parameters
-- Returns structured analysis results
-- Comprehensive error handling with meaningful messages
-
-## 🔧 Development Workflow
-
-### Code Quality
+### Root level (manages entire monorepo)
 
 ```bash
-# Lint code
-npm run lint
+# Development - starts both frontend and backend
+pnpm run dev
 
-# Fix lint issues
-npm run lint:fix
+# Build all packages and apps
+pnpm run build
 
-# Format code
-npm run format
+# Start production backend only
+pnpm run start
 
+# Type checking across all packages
+pnpm run type-check
+
+# Install dependencies for all workspaces
+pnpm install
 ```
 
-### Environment Configuration
+### App-specific commands
 
-Copy `.env.example` to `.env` and configure:
+```bash
+# Frontend specific
+cd apps/frontend && pnpm dev     # Start frontend dev server
+cd apps/frontend && pnpm build   # Build frontend for production
+
+# Backend specific
+cd apps/backend && pnpm dev      # Start backend dev server
+cd apps/backend && pnpm build    # Build backend TypeScript
+cd apps/backend && pnpm start    # Start production backend
+```
+
+## 🏗️ Applications
+
+### 🎨 Frontend ([apps/frontend/](./apps/frontend/))
+
+- **Framework**: React 19 + TypeScript
+- **Build Tool**: Vite 6
+- **Styling**: Tailwind CSS 4
+- **Architecture**: Atomic Design pattern
+- **Port**: 3000
+
+**Key Features:**
+
+- Responsive design with mobile support
+- Real-time analysis progress tracking
+- Interactive data visualizations
+- TypeScript type safety throughout
+
+### 🔧 Backend ([apps/backend/](./apps/backend/))
+
+- **Framework**: Express.js + TypeScript
+- **Browser Automation**: Puppeteer
+- **Real-time**: WebSocket support
+- **Port**: 3001
+
+**Key Features:**
+
+- Website analysis engine
+- RESTful API with comprehensive validation
+- Real-time progress updates via WebSocket
+- Intelligent user behavior simulation
+
+### 📦 Shared ([packages/shared/](./packages/shared/))
+
+- **Purpose**: Common TypeScript types and utilities
+- **Exports**: Analysis interfaces, API types, utility types
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Backend configuration (create `apps/backend/.env`):
 
 ```env
 # Server Configuration
-PORT=3000
+PORT=3001
+HOST=localhost
 NODE_ENV=development
+LOG_LEVEL=info
 
-# Analysis Configuration
-ANALYSIS_TIMEOUT=120000
-MAX_CONCURRENT_ANALYSES=3
+# CORS Configuration
+CORS_ORIGIN=http://localhost:3000
 
 # Browser Configuration
 BROWSER_HEADLESS=true
 BROWSER_TIMEOUT=30000
 
-# Logging Configuration
-LOG_LEVEL=info
-LOG_FORMAT=dev
+# Analysis Configuration
+MAX_CONCURRENT_ANALYSIS=3
+ANALYSIS_TIMEOUT=120000
+ANALYSIS_RETRIES=2
 ```
 
-### Scripts Reference
+## 🛠️ Tech Stack
 
-- `npm start` - Production server
-- `npm run dev` - Development server with hot reload
-- `npm run lint` - Code linting
-- `npm run format` - Code formatting
+**Frontend:**
 
-## 📊 Performance Monitoring
+- ⚛️ React 19 with TypeScript
+- ⚡ Vite 6 for build tooling
+- 🎨 Tailwind CSS 4 for styling
+- 🧩 Atomic Design component architecture
 
-### Metrics Collection
+**Backend:**
 
-The application tracks:
+- 🟢 Node.js + Express with TypeScript
+- 🎭 Puppeteer for browser automation
+- 🔌 WebSocket support for real-time updates
+- 🛡️ Comprehensive error handling and validation
 
-- Analysis execution time
-- Resource processing performance
-- Network request patterns
-- Error rates and types
-- User interaction patterns
+**Shared:**
 
-### Logging Levels
+- 📘 TypeScript type definitions
+- 🔄 Common interfaces and utilities
+- 📦 Workspace dependencies
 
-- **ERROR**: System errors and failures
-- **WARN**: Performance issues and recoverable errors
-- **INFO**: General application flow
-- **DEBUG**: Detailed execution information
+**Development:**
 
-## 🔒 Security Considerations
+- 📦 pnpm workspaces for monorepo management
+- 🔄 Hot Module Replacement (HMR) for frontend
+- 👀 File watching for backend development
+- 🧪 TypeScript compilation with strict mode
 
-### Input Validation
+## 🚀 Getting Started
 
-- URL format validation
-- Parameter sanitization
-- Request size limits
-- Rate limiting (configurable)
+1. **Read the app-specific READMEs** for detailed setup instructions:
 
-### Error Handling
+   - [Frontend README](./apps/frontend/README.md)
+   - [Backend README](./apps/backend/README.md)
 
-- Sensitive information filtering
-- Structured error responses
-- Graceful degradation
-- Resource cleanup
+2. **Development workflow**:
 
-## 🛠️ Extending the Application
+   ```bash
+   # Install all dependencies
+   pnpm install
 
-### Adding New Analysis Features
+   # Start development (both apps)
+   pnpm run dev
 
-1. **Create new analysis module** in `src/analysis/`
-2. **Integrate with PageWeight orchestrator**
-3. **Update API response schema**
-4. **Add frontend visualization**
+   # In separate terminals, you can also run individually:
+   cd apps/frontend && pnpm dev  # Frontend only
+   cd apps/backend && pnpm dev   # Backend only
+   ```
 
-### Custom User Simulation Strategies
+3. **Production build**:
 
-```javascript
-// Example: Custom interaction strategy
-export class CustomInteractionStrategy {
-  constructor(page, networkMonitor) {
-    this.page = page;
-    this.networkMonitor = networkMonitor;
-  }
+   ```bash
+   # Build all packages and apps
+   pnpm run build
 
-  async customInteraction(element) {
-    // Implement custom interaction logic
-    return { success: true, method: 'custom' };
-  }
-}
-```
+   # Start production backend
+   pnpm run start
+   ```
 
-### Adding New Resource Types
+## 📚 Documentation
 
-1. **Extend ResourceProcessor.determineResourceType()**
-2. **Update sizeByType tracking**
-3. **Add frontend visualization support**
-4. **Update API documentation**
+- [Frontend Documentation](./apps/frontend/README.md) - React app setup, components, and development
+- [Backend Documentation](./apps/backend/README.md) - API documentation, services, and deployment
+- [Shared Types](./packages/shared/src/index.ts) - Common TypeScript interfaces
 
-## 📚 API Documentation
+## 🤝 Contributing
 
-### Analysis Endpoint
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes in the appropriate app directory
+4. Ensure all TypeScript builds pass (`pnpm run type-check`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
-**POST /api/analyze**
-
-Request Body:
-
-```json
-{
-  "url": "https://example.com",
-  "interactionLevel": "default", // minimal, default, thorough
-  "deviceType": "desktop" // desktop, mobile, tablet
-}
-```
-
-Response:
-
-```json
-{
-  "url": "https://example.com",
-  "totalSize": 1247,
-  "sizeByType": {
-    "html": 45,
-    "css": 156,
-    "js": 789,
-    "media": 234,
-    "font": 23,
-    "other": 0
-  },
-  "resourceCount": 28,
-  "resources": [
-    {
-      "url": "https://example.com/",
-      "type": "html",
-      "transferSize": 46234,
-      "status": 200,
-      "contentType": "text/html"
-    }
-  ]
-}
-```
-
-### Error Responses
-
-```json
-{
-  "error": "Invalid URL format",
-  "details": "URL must include protocol (http:// or https://)"
-}
-```
-
-## 📝 License
+## 📄 License
 
 This project is licensed under the ISC License - see the LICENSE file for details.
 

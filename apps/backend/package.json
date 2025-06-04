@@ -1,0 +1,32 @@
+{
+  "name": "@green-web-compass/backend",
+  "version": "1.0.0",
+  "description": "Backend Express server for Green Web Compass",
+  "type": "module",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "tsc && node --watch dist/app.js",
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@green-web-compass/shared": "workspace:*",
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "puppeteer": "^23.10.4",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.15.29",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.8.3",
+    "eslint": "^9.15.0",
+    "@typescript-eslint/parser": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.18.1"
+  }
+}
