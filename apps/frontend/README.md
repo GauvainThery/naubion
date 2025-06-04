@@ -1,531 +1,198 @@
-# Green Web Compass - Frontend
+# Frontend - Green Web Compass
 
-A modern React + TypeScript frontend application for analyzing website resource usage and environmental impact. Built with Vite for lightning-fast development and optimized production builds.
+React + TypeScript frontend for analyzing website environmental impact. Built with Vite and Tailwind CSS using Atomic Design principles.
 
-## ✨ Features
-
-- 🎨 **Modern React 19 + TypeScript**: Full type safety with latest React features
-- ⚡ **Vite 6 Build System**: Lightning-fast HMR and optimized builds
-- 🎨 **Tailwind CSS 4**: Modern utility-first styling framework
-- 📱 **Responsive Design**: Mobile-first design that works on all devices
-- 🔍 **Real-time Analysis**: Live progress tracking with WebSocket integration
-- 📊 **Interactive Visualizations**: Beautiful charts and resource breakdowns
-- 🏗️ **Atomic Design**: Scalable component architecture
-- 🔄 **Shared Types**: Type safety across the entire monorepo
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- pnpm (recommended) or npm
-- The backend application running on port 3001
-
-### Installation & Development
+## Quick Start
 
 ```bash
-# From the monorepo root
+# From monorepo root
 pnpm install
 
-# Start frontend development server
-cd apps/frontend
-pnpm dev
-
-# Or from the root (starts both frontend and backend)
-cd ../..
-pnpm run dev
+# Start frontend development
+cd apps/frontend && pnpm dev
+# or from root: pnpm dev (starts both frontend and backend)
 ```
 
-The frontend will be available at `http://localhost:3000`
+**Prerequisites:**
 
-## 🏗️ Architecture
+- Node.js 18+
+- Backend running on port 3001
 
-### Project Structure
+The app will be available at http://localhost:3000
 
-```
-apps/frontend/
-├── src/
-│   ├── components/          # Atomic Design components
-│   │   ├── atoms/           # Basic UI elements
-│   │   │   ├── Button.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── LoadingSpinner.tsx
-│   │   │   ├── ProgressBar.tsx
-│   │   │   └── RadioOption.tsx
-│   │   ├── molecules/       # Component combinations
-│   │   │   ├── LoadingStep.tsx
-│   │   │   ├── MetricCard.tsx
-│   │   │   ├── RadioGroup.tsx
-│   │   │   └── ResourceBreakdownItem.tsx
-│   │   ├── organisms/       # Complex UI sections
-│   │   │   ├── AnalysisForm.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── LoadingSection.tsx
-│   │   │   └── ResultsSection.tsx
-│   │   └── templates/       # Page layouts
-│   │       └── MainLayout.tsx
-│   ├── hooks/
-│   │   └── useAnalysis.ts   # Custom React hooks with TypeScript
-│   ├── types/
-│   │   └── index.ts         # Re-exports shared types + frontend-specific
-│   ├── utils/
-│   │   └── helpers.ts       # Utility functions
-│   ├── App.tsx              # Main application component
-│   └── main.tsx             # Application entry point
-├── public/                  # Static assets
-├── package.json             # Frontend dependencies
-├── tsconfig.json            # TypeScript configuration
-├── vite.config.ts           # Vite configuration
-├── tailwind.config.js       # Tailwind CSS configuration
-└── README.md                # This file
-```
+## Architecture
 
-### Component Architecture
+### Component Structure
 
-This frontend follows **Atomic Design** principles for scalable component organization:
+Built using **Atomic Design** methodology:
 
-#### Atoms (`src/components/atoms/`)
+- **`components/atoms/`** - Basic UI elements (Button, Input, Card, etc.)
+- **`components/molecules/`** - Simple component combinations (RadioGroup, MetricCard, etc.)
+- **`components/organisms/`** - Complex sections (AnalysisForm, ResultsSection, etc.)
+- **`components/templates/`** - Page layout components
 
-Basic UI building blocks with no dependencies:
+### Key Directories
 
-- **Button**: Reusable button with variants (primary, secondary, disabled)
-- **Card**: Container component with consistent styling
-- **Input**: Form input with proper TypeScript typing
-- **LoadingSpinner**: Animated loading indicator
-- **ProgressBar**: Progress visualization component
-- **RadioOption**: Individual radio button option
+- **`hooks/`** - Custom React hooks (useAnalysis for state management)
+- **`types/`** - TypeScript types (re-exports shared types + frontend-specific)
+- **`utils/`** - Utility functions and helpers
+- **`styles/`** - Global CSS and Tailwind configuration
 
-#### Molecules (`src/components/molecules/`)
+## State Management
 
-Simple combinations of atoms:
+### useAnalysis Hook
 
-- **LoadingStep**: Loading state with progress step indication
-- **MetricCard**: Displays analysis metrics with proper formatting
-- **RadioGroup**: Group of radio options with TypeScript generics
-- **ResourceBreakdownItem**: Individual resource breakdown display
-
-#### Organisms (`src/components/organisms/`)
-
-Complex UI components combining molecules and atoms:
-
-- **AnalysisForm**: Complete form for analysis configuration
-- **Header**: Application header with branding
-- **LoadingSection**: Full loading state management
-- **ResultsSection**: Complete results display with visualizations
-
-#### Templates (`src/components/templates/`)
-
-Page-level layout components:
-
-- **MainLayout**: Main application layout structure
-
-## 🔧 TypeScript Integration
-
-### Type Safety Features
-
-- **🛡️ Complete Type Coverage**: All components, props, and state are strictly typed
-- **📝 Shared Types**: Uses types from `@green-web-compass/shared` package
-- **🎯 Smart Autocomplete**: Enhanced IDE support with intelligent completion
-- **🚫 Runtime Error Prevention**: Catch type errors at compile time
-- **🔄 Safe Refactoring**: Confident code changes with type validation
-
-### Key Type Definitions
+Primary hook for managing analysis workflow:
 
 ```typescript
-// Example of component props typing
-interface AnalysisFormProps {
-  onSubmit: (data: AnalysisRequest) => void;
-  isLoading: boolean;
-  disabled?: boolean;
-}
-
-// Example of hook return typing
-interface UseAnalysisReturn {
-  data: AnalysisResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  submitAnalysis: (request: AnalysisRequest) => Promise<void>;
-}
-```
-
-## 📜 Available Scripts
-
-```bash
-# Development server with HMR
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Preview production build
-pnpm preview
-
-# Type checking only (no build)
-pnpm type-check
-
-# Lint TypeScript files
-pnpm lint
-
-# Clean build artifacts
-pnpm clean
-```
-
-## 🎨 Styling
-
-### Tailwind CSS 4
-
-The project uses **Tailwind CSS 4** for styling:
-
-- **🎨 Utility-First**: Compose styles using utility classes
-- **📱 Responsive Design**: Mobile-first responsive utilities
-- **🎭 Dark Mode**: Built-in dark mode support
-- **⚡ Optimized**: Automatic CSS purging for smaller bundles
-
-### Design System
-
-```css
-/* Color palette */
-Primary: Blue (analysis theme)
-Secondary: Green (environmental theme)
-Neutral: Gray scale for text and backgrounds
-Success: Green for completed states
-Warning: Yellow for warnings
-Error: Red for error states
-
-/* Typography */
-Font Family: System font stack for optimal performance
-Sizes: Responsive typography scale
-Weights: 400 (normal), 500 (medium), 600 (semibold), 700 (bold)
-
-/* Spacing */
-Scale: 0.25rem increments (4px base)
-Container: Max-width containers for content
-Grid: CSS Grid and Flexbox for layouts
-```
-
-## 🔌 API Integration
-
-### Backend Communication
-
-The frontend communicates with the backend API running on port 3001:
-
-```typescript
-// Example API integration
-const analyzeWebsite = async (request: AnalysisRequest): Promise<AnalysisResponse> => {
-  const response = await fetch('http://localhost:3001/api/analyze', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(request)
-  });
-
-  if (!response.ok) {
-    throw new Error(`Analysis failed: ${response.statusText}`);
-  }
-
-  return response.json();
-};
-```
-
-### Real-time Updates
-
-WebSocket integration for real-time analysis progress:
-
-```typescript
-// WebSocket connection for progress updates
-const ws = new WebSocket('ws://localhost:3001');
-ws.onmessage = event => {
-  const update: ProgressUpdate = JSON.parse(event.data);
-  // Handle progress updates in real-time
-};
-```
-
-## 🔄 State Management
-
-### Custom Hooks
-
-The application uses custom React hooks for state management:
-
-#### `useAnalysis` Hook
-
-```typescript
-interface UseAnalysisReturn {
-  // Analysis state
-  data: AnalysisResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  progress: ProgressUpdate | null;
-
-  // Actions
-  submitAnalysis: (request: AnalysisRequest) => Promise<void>;
-  resetAnalysis: () => void;
-}
+const { isLoading, results, error, startAnalysis } = useAnalysis();
 ```
 
 **Features:**
 
 - Type-safe state management
+- Real-time progress tracking via WebSocket
 - Error handling and loading states
-- Real-time progress tracking
-- Automatic cleanup on component unmount
+- Automatic cleanup
 
-## 🛠️ Development
+## Styling
+
+### Tailwind CSS
+
+Utility-first CSS framework with:
+
+- Mobile-first responsive design
+- Consistent design system
+- Optimized production builds
+- Custom color palette for environmental theme
+
+## API Integration
+
+### Backend Communication
+
+Communicates with Express backend on port 3001:
+
+- REST API for analysis requests
+- WebSocket for real-time progress updates
+- Type-safe API calls using shared types
+
+### Real-time Updates
+
+WebSocket integration provides live analysis progress:
+
+- Connection management
+- Progress percentage updates
+- Step-by-step status messages
+
+## Development
+
+### Available Scripts
+
+```bash
+pnpm dev          # Start development server with HMR
+pnpm build        # Build for production
+pnpm preview      # Preview production build
+pnpm type-check   # TypeScript validation
+pnpm lint         # ESLint validation
+```
 
 ### Hot Module Replacement
 
-Vite provides instant HMR for React components:
+Vite provides instant updates:
 
-- **⚡ Instant Updates**: Changes reflect immediately without page refresh
-- **🔄 State Preservation**: Component state is preserved during updates
-- **🧩 TypeScript Integration**: Type errors are shown in real-time
+- Component state preservation
+- Real-time type checking
+- Fast refresh on changes
 
-### Development Workflow
+### Environment Configuration
 
-1. **Start development server**: `pnpm dev`
-2. **Make changes**: Edit TypeScript files with full type checking
-3. **See updates**: Changes appear instantly in the browser
-4. **Type checking**: TypeScript validates types in real-time
-5. **Build validation**: `pnpm build` ensures production readiness
-
-### ESLint Configuration
-
-The project includes comprehensive ESLint rules:
-
-```json
-{
-  "extends": [
-    "eslint:recommended",
-    "@typescript-eslint/recommended",
-    "plugin:react-hooks/recommended"
-  ],
-  "rules": {
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-    "@typescript-eslint/no-unused-vars": "error"
-  }
-}
-```
-
-## 📦 Build Process
-
-### Vite Configuration
-
-The Vite configuration includes:
-
-```typescript
-// vite.config.ts
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true
-      }
-    }
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: true,
-    target: 'es2020'
-  }
-});
-```
-
-**Features:**
-
-- **🔄 API Proxy**: Automatic proxy to backend during development
-- **📦 Optimized Builds**: Tree-shaking and code splitting
-- **🗺️ Source Maps**: Debug support for production builds
-- **⚡ Fast Builds**: Optimized for both development and production
-
-### Production Build
-
-```bash
-# Build for production
-pnpm build
-
-# Preview production build locally
-pnpm preview
-```
-
-**Build Output:**
-
-- **`dist/`**: Optimized production assets
-- **Chunked JS**: Code splitting for optimal loading
-- **CSS Optimization**: Purged and minified styles
-- **Asset Optimization**: Compressed images and fonts
-
-## 🧪 Testing
-
-### Type Testing
-
-TypeScript serves as compile-time testing:
-
-```bash
-# Validate all types without building
-pnpm type-check
-```
-
-### Component Testing Strategy
-
-Recommended testing approach:
-
-1. **Type Safety**: TypeScript ensures compile-time correctness
-2. **Component Contracts**: Props and state interfaces serve as contracts
-3. **Integration Testing**: Test full user workflows
-4. **Visual Testing**: Ensure responsive design works across devices
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Frontend environment configuration in `.env`:
+Create `.env` for custom settings:
 
 ```env
-# Development
 VITE_API_URL=http://localhost:3001
 VITE_WS_URL=ws://localhost:3001
-
-# Production
-VITE_API_URL=https://your-backend-domain.com
-VITE_WS_URL=wss://your-backend-domain.com
 ```
 
-### TypeScript Configuration
+## Adding Features
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}
-```
+### Component Development
 
-## 🚀 Deployment
+1. **Choose the right level** - Start with atoms, compose into molecules/organisms
+2. **Define TypeScript interfaces** for all props and state
+3. **Export from index.ts** in the appropriate directory
+4. **Use shared types** from `@green-web-compass/shared` when possible
 
-### Production Build
-
-```bash
-# Build optimized production assets
-pnpm build
-
-# The dist/ folder contains all production files
-# Deploy the contents of dist/ to your static hosting provider
-```
-
-### Deployment Options
-
-**Static Hosting:**
-
-- Vercel (recommended for React apps)
-- Netlify
-- GitHub Pages
-- AWS S3 + CloudFront
-
-**Configuration:**
-
-- Ensure backend API URLs are configured for production
-- Set up proper CORS headers on the backend
-- Configure WebSocket connections for production domain
-
-## 🤝 Contributing
-
-### Adding New Components
-
-1. **Create component** in appropriate atomic design level
-2. **Add TypeScript interfaces** for props and state
-3. **Export component** from the components directory
-4. **Update shared types** if needed
-5. **Follow naming conventions**: PascalCase for components
-
-### Code Style Guidelines
-
-- **TypeScript**: Always use TypeScript for new files
-- **Props Interface**: Define interfaces for all component props
-- **Naming**: Use descriptive names for components and functions
-- **Imports**: Use absolute imports for shared types
-- **Styling**: Use Tailwind CSS classes for styling
-
-### Example Component Template
+### Example Component
 
 ```typescript
 import React from 'react';
-import { SomeSharedType } from '@green-web-compass/shared';
+import type { SomeSharedType } from '@green-web-compass/shared';
 
-interface ComponentNameProps {
+interface ComponentProps {
   data: SomeSharedType;
   onAction: (id: string) => void;
   isLoading?: boolean;
 }
 
-export const ComponentName: React.FC<ComponentNameProps> = ({
-  data,
-  onAction,
-  isLoading = false,
-}) => {
-  return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      {/* Component implementation */}
-    </div>
-  );
-};
+export const ComponentName: React.FC<ComponentProps> = ({
+  data, onAction, isLoading = false
+}) => (
+  <div className="p-4 bg-white rounded-lg shadow">
+    {/* Component implementation */}
+  </div>
+);
 ```
 
-## 📚 Resources
+### State Management
 
-- [React Documentation](https://react.dev/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Vite Guide](https://vitejs.dev/guide/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Atomic Design Methodology](https://bradfrost.com/blog/post/atomic-web-design/)
+For complex state, create custom hooks following the `useAnalysis` pattern:
 
-## 🐛 Troubleshooting
+- Return typed state and actions
+- Handle loading and error states
+- Clean up resources on unmount
+
+## Build
+
+### Production Build
+
+```bash
+pnpm build  # Creates optimized build in dist/
+```
+
+## TypeScript Integration
+
+### Type Safety
+
+- **Complete type coverage** - All components, props, and state typed
+- **Shared types** - Consistent interfaces across frontend/backend
+- **Compile-time validation** - Catch errors before runtime
+- **IDE support** - Enhanced autocomplete and refactoring
+
+### Key Types
+
+Import shared types for API communication:
+
+```typescript
+import type { AnalysisRequest, AnalysisResponse, ProgressUpdate } from '@green-web-compass/shared';
+```
+
+## Troubleshooting
 
 ### Common Issues
 
-**TypeScript Errors:**
+**Build failures:**
 
-- Run `pnpm type-check` to see all type errors
-- Ensure shared types are properly imported from `@green-web-compass/shared`
-- Check that all props interfaces are correctly defined
+- Run `pnpm type-check` to see TypeScript errors
+- Clear Vite cache: `rm -rf node_modules/.vite`
+- Ensure backend is accessible during development
 
-**Build Failures:**
+**Styling issues:**
 
-- Clear cache: `rm -rf node_modules/.vite`
-- Rebuild dependencies: `pnpm install`
-- Check for TypeScript errors: `pnpm type-check`
-
-**Development Server Issues:**
-
-- Ensure port 3000 is available
-- Check that backend is running on port 3001
-- Verify proxy configuration in `vite.config.ts`
-
-**Styling Issues:**
-
-- Ensure Tailwind CSS is properly configured
-- Check that `tailwind.config.js` includes all content paths
+- Check Tailwind config includes all content paths
 - Verify PostCSS configuration
 
----
+**WebSocket connection:**
 
-Built with ❤️ using React + TypeScript + Vite for the Green Web Compass project.
+- Ensure backend WebSocket server is running
+- Check browser console for connection errors
+- Verify CORS settings allow WebSocket connections

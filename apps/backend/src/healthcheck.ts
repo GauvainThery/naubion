@@ -1,5 +1,5 @@
 /**
- * Health check script for future Docker container
+ * Health check script for monitoring deployment
  * Tests if the application is running and responding
  */
 
