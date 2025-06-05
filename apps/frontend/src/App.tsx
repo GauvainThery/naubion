@@ -7,7 +7,17 @@ import useAnalysis from './hooks/useAnalysis';
 import type { AnalysisFormData } from './types';
 
 const App: React.FC = () => {
-  const { isLoading, results, error, steps, startAnalysis, shareResults } = useAnalysis();
+  const {
+    isLoading,
+    results,
+    error,
+    steps,
+    progress,
+    currentStep,
+    estimatedDuration,
+    startAnalysis,
+    shareResults
+  } = useAnalysis();
 
   // Check for URL parameters on mount and create form data
   const getFormDataFromUrlParams = (): AnalysisFormData | null => {
@@ -57,7 +67,12 @@ const App: React.FC = () => {
         {/* Loading Section */}
         {isLoading && (
           <section>
-            <LoadingSection steps={steps} />
+            <LoadingSection
+              steps={steps}
+              progress={progress}
+              currentStep={currentStep}
+              estimatedDuration={estimatedDuration}
+            />
           </section>
         )}
 
