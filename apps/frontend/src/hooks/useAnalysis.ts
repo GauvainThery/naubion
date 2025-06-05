@@ -6,6 +6,7 @@ const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastFormData, setLastFormData] = useState<AnalysisFormData | null>(null);
 
   const steps: LoadingStep[] = [
     {
@@ -34,6 +35,7 @@ const useAnalysis = () => {
     setIsLoading(true);
     setError(null);
     setResults(null);
+    setLastFormData(formData); // Store the form data for sharing
 
     try {
       // Start the analysis
@@ -65,13 +67,21 @@ const useAnalysis = () => {
   }, []);
 
   const shareResults = useCallback(() => {
-    if (results) {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?url=${encodeURIComponent(results.url)}`;
+    if (results && lastFormData) {
+      const params = new URLSearchParams({
+        websiteUrl: lastFormData.url,
+        averagePages: lastFormData.averagePages.toString(),
+        interactionLevel: lastFormData.interactionLevel,
+        deviceType: lastFormData.deviceType,
+        autoAnalyze: 'true' // This tells the app to auto-analyze when the link is opened
+      });
+
+      const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         console.log('Share link copied to clipboard');
       });
     }
-  }, [results]);
+  }, [results, lastFormData]);
 
   return {
     isLoading,

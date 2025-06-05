@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../atoms/Card';
 import Input from '../atoms/Input';
 import Button from '../atoms/Button';
@@ -19,6 +19,66 @@ const DEFAULT_FORM_DATA: AnalysisFormData = {
 
 const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
   const [formData, setFormData] = useState<AnalysisFormData>(DEFAULT_FORM_DATA);
+
+  // Check for URL parameters on mount and populate form
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Support both 'url' and 'websiteUrl' parameters
+    const urlParam = urlParams.get('url') || urlParams.get('websiteUrl');
+
+    if (urlParam) {
+      const averagePages = parseInt(urlParams.get('averagePages') || '5');
+      const interactionLevel =
+        (urlParams.get('interactionLevel') as 'minimal' | 'default' | 'thorough') || 'default';
+      const deviceType = (urlParams.get('deviceType') as 'desktop' | 'mobile') || 'desktop';
+
+      setFormData({
+        url: urlParam,
+        averagePages: isNaN(averagePages) ? 5 : averagePages,
+        interactionLevel: ['minimal', 'default', 'thorough'].includes(interactionLevel)
+          ? interactionLevel
+          : 'default',
+        deviceType: ['desktop', 'mobile'].includes(deviceType) ? deviceType : 'desktop'
+      });
+    }
+  }, []);
+
+  // Update URL parameters live as form data changes (debounced for better performance)
+  useEffect(() => {
+    const updateUrlParams = () => {
+      const params = new URLSearchParams();
+
+      // Only add parameters if they differ from defaults or if URL is provided
+      if (formData.url) {
+        params.set('websiteUrl', formData.url);
+      }
+
+      if (formData.averagePages !== DEFAULT_FORM_DATA.averagePages) {
+        params.set('averagePages', formData.averagePages.toString());
+      }
+
+      if (formData.interactionLevel !== DEFAULT_FORM_DATA.interactionLevel) {
+        params.set('interactionLevel', formData.interactionLevel);
+      }
+
+      if (formData.deviceType !== DEFAULT_FORM_DATA.deviceType) {
+        params.set('deviceType', formData.deviceType);
+      }
+
+      // Update the URL without causing a page reload
+      const newUrl = params.toString()
+        ? `${window.location.pathname}?${params.toString()}`
+        : window.location.pathname;
+
+      window.history.replaceState({}, '', newUrl);
+    };
+
+    // Debounce URL updates for better performance (especially while typing)
+    const timeoutId = setTimeout(updateUrlParams, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
 
   const interactionLevelOptions = [
     {
