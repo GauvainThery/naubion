@@ -14,7 +14,7 @@ type AnalysisRequestBody = {
 };
 
 export class AnalysisController {
-  constructor(private analysisService: WebsiteAnalysisService) {}
+  constructor(private websiteAnalysisService: WebsiteAnalysisService) {}
 
   /**
    * Analyze a website
@@ -36,7 +36,7 @@ export class AnalysisController {
     let result;
 
     // Single page analysis
-    result = await this.analysisService.analyzeUrl(url, {
+    result = await this.websiteAnalysisService.analyzeUrl(url, {
       interactionLevel,
       deviceType
     });

@@ -3,7 +3,7 @@
  * Orchestrates the entire website analysis process using DDD components
  */
 
-import { AnalysisResult, createAnalysisOptions } from '../../domain/models/analysis.js';
+import { AnalysisResult } from '../../domain/models/analysis.js';
 import { ResourceService } from '../../domain/services/resource-service.js';
 import { AnalysisDomainService } from '../../domain/services/analysis-service.js';
 import { BrowserManager } from '../../infrastructure/browser/browser-manager.js';

@@ -22,7 +22,6 @@ export interface DeviceConfiguration {
     isMobile: boolean;
     hasTouch: boolean;
   };
-  userAgent: string;
 }
 
 // Analysis result aggregate root
@@ -52,9 +51,7 @@ export const DEVICE_CONFIGURATIONS: Record<string, DeviceConfiguration> = {
       deviceScaleFactor: 1,
       isMobile: false,
       hasTouch: false
-    },
-    userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
   },
   mobile: {
     viewport: {
@@ -63,9 +60,7 @@ export const DEVICE_CONFIGURATIONS: Record<string, DeviceConfiguration> = {
       deviceScaleFactor: 2,
       isMobile: true,
       hasTouch: true
-    },
-    userAgent:
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+    }
   }
 };
 

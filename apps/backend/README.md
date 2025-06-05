@@ -8,8 +8,16 @@ Express.js + TypeScript API server with Puppeteer browser automation for website
 # From monorepo root
 pnpm install
 
+# Install Puppeteer and download Chrome
+cd apps/backend
+pnpm add puppeteer
+
 # Set up environment
-cd apps/backend && cp .env.example .env
+cp .env.example .env
+
+# Configure Puppeteer executable path in .env
+# Add the path to your Puppeteer Chrome installation:
+# PUPPETEER_EXECUTABLE_PATH=/path/to/puppeteer/chrome
 
 # Start development
 pnpm dev
@@ -19,7 +27,7 @@ pnpm dev
 **Prerequisites:**
 
 - Node.js 18+
-- Chrome/Chromium (for Puppeteer)
+- Puppeteer (automatically downloads Chrome/Chromium)
 
 The API will be available at http://localhost:3001
 
@@ -129,11 +137,33 @@ CORS_ORIGIN=http://localhost:3000
 BROWSER_HEADLESS=true
 BROWSER_TIMEOUT=30000
 
+# Puppeteer Configuration
+PUPPETEER_EXECUTABLE_PATH=/path/to/puppeteer/chrome
+
 # Analysis
 MAX_CONCURRENT_ANALYSIS=3
 ANALYSIS_TIMEOUT=120000
 ANALYSIS_RETRIES=2
 ```
+
+### Puppeteer Setup
+
+After installing Puppeteer, you need to configure the Chrome executable path:
+
+1. **Find your Puppeteer Chrome installation:**
+
+   ```bash
+   # The path is typically in your home directory under .cache/puppeteer
+   # Example paths:
+   # macOS: ~/.cache/puppeteer/chrome/mac_arm-*/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing
+   # Linux: ~/.cache/puppeteer/chrome/linux-*/chrome-linux64/chrome
+   # Windows: %USERPROFILE%\.cache\puppeteer\chrome\win64-*\chrome-win64\chrome.exe
+   ```
+
+2. **Set the PUPPETEER_EXECUTABLE_PATH in your .env file:**
+   ```env
+   PUPPETEER_EXECUTABLE_PATH='/Users/username/.cache/puppeteer/chrome/mac_arm-136.0.7103.94/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
+   ```
 
 ## Browser Automation
 
@@ -262,7 +292,10 @@ Recommended for production:
 
 **Puppeteer Issues:**
 
-- Ensure Chrome/Chromium is installed
+- Install Puppeteer: `pnpm add puppeteer` (automatically downloads Chrome)
+- Set `PUPPETEER_EXECUTABLE_PATH` in your .env file to point to the downloaded Chrome
+- Find Chrome path: typically in `~/.cache/puppeteer/chrome/`
+- Ensure Chrome/Chromium is accessible and executable
 - Check browser timeout settings
 - Verify memory limitations in production environments
 

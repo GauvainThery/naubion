@@ -3,7 +3,11 @@
  * Centralizes all configuration settings for easier maintenance
  */
 
+import dotenv from 'dotenv';
 import { Config } from '../../../../libs/shared/dist';
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Default configuration values
 const DEFAULT_CONFIG: Config = {
