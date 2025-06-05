@@ -38,9 +38,10 @@ export class UserSimulator {
     this.config = {
       maxInteractions: options.maxInteractions,
       maxScrollSteps: options.maxScrollSteps,
-      enableHoverSimulation: true,
-      enableFormInteraction: false,
-      enableResponsiveTesting: false,
+      enableHoverSimulation: options.interactionLevel !== 'minimal',
+      enableFormInteraction: options.interactionLevel === 'thorough',
+      enableResponsiveTesting:
+        options.deviceType === 'desktop' && options.interactionLevel === 'thorough',
       elementTimeout: 5000,
       verboseLogging: options.verboseLogging
     };
@@ -85,6 +86,7 @@ export class UserSimulator {
       successfulInteractions += interactionResult.successful;
 
       // Phase 4: Advanced interactions (optional)
+      console.log('🔥 ・ simulateUserBehavior ・ this.config:', this.config);
       if (this.config.enableHoverSimulation) {
         await this.performHoverInteractions();
       }

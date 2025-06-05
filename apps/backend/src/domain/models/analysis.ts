@@ -69,11 +69,13 @@ export function createAnalysisOptions(
   interactionLevel: 'minimal' | 'default' | 'thorough' = 'default',
   deviceType: 'desktop' | 'mobile' = 'desktop'
 ): AnalysisOptions {
-  const baseConfig = {
+  const baseConfig: AnalysisOptions = {
     interactionLevel,
     deviceType,
     timeout: 120000,
-    verboseLogging: true
+    verboseLogging: true,
+    maxInteractions: 2,
+    maxScrollSteps: 3
   };
 
   switch (interactionLevel) {
@@ -89,11 +91,7 @@ export function createAnalysisOptions(
         maxInteractions: 5,
         maxScrollSteps: 6
       };
-    default: // 'default'
-      return {
-        ...baseConfig,
-        maxInteractions: 2,
-        maxScrollSteps: 3
-      };
+    default:
+      return baseConfig;
   }
 }
