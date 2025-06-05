@@ -3,6 +3,7 @@ import Card from '../atoms/Card';
 import Button from '../atoms/Button';
 import MetricCard from '../molecules/MetricCard';
 import ResourceBreakdownItem from '../molecules/ResourceBreakdownItem';
+import ResourceList from '../molecules/ResourceList';
 import { AnalysisResult } from '../../../../backend/src/domain/models/analysis';
 import {
   processLargestResources,
@@ -104,27 +105,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
           </div>
         </div>
 
-        {largestResources && largestResources.length > 0 && (
-          <div className="mt-8">
-            <h4 className="text-lg font-semibold text-gray-900 mb-6">Largest Resources</h4>
-            <div className="space-y-3">
-              {largestResources.map((resource, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"
-                >
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 truncate">{resource.name}</div>
-                    <div className="text-sm text-gray-500">{resource.type}</div>
-                  </div>
-                  <div className="text-right ml-4">
-                    <div className="font-semibold text-gray-900">{resource.size}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <ResourceList title="Largest Resources" resources={largestResources} className="mt-8" />
       </Card>
     </div>
   );

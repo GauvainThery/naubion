@@ -78,12 +78,6 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
             <ProgressBar progress={progress} className="h-4" animated={true} showGlow={true} />
           </div>
         )}
-
-        <p className="text-gray-600">
-          {currentStep && progress > 0
-            ? `Currently ${currentStep.replace(/([A-Z])/g, ' $1').toLowerCase()}...`
-            : "This may take a moment as we analyze your website's resources..."}
-        </p>
       </div>
 
       <div className="space-y-2">
