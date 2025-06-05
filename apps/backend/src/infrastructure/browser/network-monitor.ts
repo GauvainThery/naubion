@@ -2,8 +2,11 @@
  * Network monitoring infrastructure - Chrome DevTools Protocol integration
  */
 
-import { CDPSession } from 'puppeteer';
+import { CDPSession, Page } from 'puppeteer';
 import { Resource } from '../../domain/models/resource.js';
+import { determineResourceType } from '../../domain/models/resource.js';
+import { CrossOriginResourceFetcher } from './cross-origin-resource-fetcher.js';
+import { CrossOriginRequestHandler } from './cross-origin-request-handler.js';
 import logger from '../../shared/logger.js';
 
 interface NetworkEvent {
@@ -11,6 +14,7 @@ interface NetworkEvent {
   url: string;
   method: string;
   timestamp: number;
+  isSameSite?: boolean;
 }
 
 interface ResponseEvent extends NetworkEvent {
@@ -27,16 +31,41 @@ interface LoadingFinishedEvent {
 
 export class NetworkMonitor {
   private client: CDPSession;
+  private page?: Page;
   private resources: Resource[] = [];
-  private requests: Map<string, NetworkEvent> = new Map();
+  private requests: Map<string, NetworkEvent & { isSameSite?: boolean }> = new Map();
   private responses: Map<string, ResponseEvent> = new Map();
   private isMonitoring = false;
-  private activityListeners: Array<(type: string, data: any) => void> = [];
+  private activityListeners: Array<
+    (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  > = [];
   private lastActivity = Date.now();
-  private pendingRequests = new Set<string>();
+  private crossOriginFetcher?: CrossOriginResourceFetcher;
+  private crossOriginHandler?: CrossOriginRequestHandler;
 
-  constructor(client: CDPSession) {
+  constructor(client: CDPSession, page?: Page) {
     this.client = client;
+    this.page = page;
+
+    // Initialize cross-origin handling if page is available
+    if (this.page) {
+      this.crossOriginFetcher = new CrossOriginResourceFetcher(this.page, {
+        notifyActivity: this.notifyActivity.bind(this)
+      });
+      this.crossOriginHandler = new CrossOriginRequestHandler(this.crossOriginFetcher, {
+        notifyActivity: this.notifyActivity.bind(this)
+      });
+    }
   }
 
   /**
@@ -52,30 +81,41 @@ export class NetworkMonitor {
     this.client.on('Network.loadingFailed', this.handleLoadingFailed.bind(this));
 
     this.isMonitoring = true;
-    logger.debug('Network monitoring enabled');
+    logger.debug('Network monitoring enabled with enhanced cross-origin support');
   }
 
   /**
    * Handle request will be sent event
    */
-  private handleRequestWillBeSent(params: any): void {
+  private handleRequestWillBeSent(params: {
+    requestId: string;
+    request: { url: string; method: string; isSameSite?: boolean };
+    timestamp: number;
+    type?: string;
+    redirectResponse?: unknown;
+    initiator?: unknown;
+  }): void {
     const { requestId, request } = params;
 
     this.requests.set(requestId, {
       requestId,
       url: request.url,
       method: request.method,
-      timestamp: params.timestamp
+      timestamp: params.timestamp,
+      isSameSite: request.isSameSite
     });
 
-    this.pendingRequests.add(requestId);
     this.notifyActivity('request', { requestId, url: request.url, method: request.method });
   }
 
   /**
    * Handle response received event
    */
-  private handleResponseReceived(params: any): void {
+  private handleResponseReceived(params: {
+    requestId: string;
+    response: { url: string; status: number; headers: Record<string, string>; mimeType?: string };
+    timestamp: number;
+  }): void {
     const { requestId, response } = params;
 
     this.responses.set(requestId, {
@@ -105,7 +145,7 @@ export class NetworkMonitor {
         contentType: response.contentType,
         transferSize: encodedDataLength,
         status: response.status,
-        resourceType: this.determineResourceType(response.url, response.contentType)
+        resourceType: determineResourceType(response.url, response.contentType)
       };
 
       this.resources.push(resource);
@@ -117,7 +157,6 @@ export class NetworkMonitor {
     }
 
     // Clean up maps to prevent memory leaks
-    this.pendingRequests.delete(requestId);
     this.requests.delete(requestId);
     this.responses.delete(requestId);
   }
@@ -125,25 +164,81 @@ export class NetworkMonitor {
   /**
    * Handle loading failed event
    */
-  private handleLoadingFailed(params: any): void {
+  private handleLoadingFailed(params: {
+    requestId: string;
+    errorText: string;
+    timestamp: number;
+    canceled?: boolean;
+  }): void {
     const { requestId } = params;
     this.requests.delete(requestId);
     this.responses.delete(requestId);
-    this.pendingRequests.delete(requestId);
     logger.debug('Resource loading failed', { requestId });
+  }
+
+  /**
+   * Process any pending cross-origin requests before closing
+   * This should be called before the page closes to handle orphaned requests
+   */
+  async processPendingCrossOriginRequests(): Promise<void> {
+    if (!this.crossOriginHandler) {
+      logger.debug('No cross-origin handler available - skipping pending requests');
+      return;
+    }
+
+    // Update handler with current resources to avoid duplicates
+    this.crossOriginHandler.updateExistingResources(this.resources);
+
+    // Process pending requests and add new resources
+    const newResources = await this.crossOriginHandler.processPendingRequests(this.requests);
+    this.resources.push(...newResources);
+
+    logger.debug('Finished processing pending cross-origin requests');
+  }
+
+  /**
+   * Clean up request/response maps
+   */
+  private cleanup(requestId: string): void {
+    this.requests.delete(requestId);
+    this.responses.delete(requestId);
   }
 
   /**
    * Register activity listener
    */
-  onActivity(callback: (type: string, data: any) => void): void {
+  onActivity(
+    callback: (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  ): void {
     this.activityListeners.push(callback);
   }
 
   /**
    * Remove activity listener
    */
-  removeActivityListener(callback: (type: string, data: any) => void): void {
+  removeActivityListener(
+    callback: (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  ): void {
     const index = this.activityListeners.indexOf(callback);
     if (index > -1) {
       this.activityListeners.splice(index, 1);
@@ -154,13 +249,23 @@ export class NetworkMonitor {
    * Check if there's recent activity
    */
   hasActivity(): boolean {
-    return this.resources.length > 0 || this.pendingRequests.size > 0;
+    return this.resources.length > 0;
   }
 
   /**
    * Notify activity listeners
    */
-  private notifyActivity(type: string, data: any): void {
+  private notifyActivity(
+    type: string,
+    data: {
+      requestId?: string;
+      url?: string;
+      method?: string;
+      status?: number;
+      type?: string;
+      size?: number;
+    }
+  ): void {
     this.lastActivity = Date.now();
     this.activityListeners.forEach(callback => {
       try {
@@ -174,13 +279,6 @@ export class NetworkMonitor {
   }
 
   /**
-   * Check if there are pending requests
-   */
-  hasPendingRequests(): boolean {
-    return this.pendingRequests.size > 0;
-  }
-
-  /**
    * Get time since last activity
    */
   getTimeSinceLastActivity(): number {
@@ -188,47 +286,20 @@ export class NetworkMonitor {
   }
 
   /**
-   * Determine resource type from URL and content type
+   * Reset monitoring state
    */
-  private determineResourceType(
-    url: string,
-    contentType: string
-  ): 'html' | 'css' | 'js' | 'media' | 'font' | 'other' {
-    const fileExtension = url.split('?')[0].split('#')[0].split('.').pop()?.toLowerCase() || '';
+  reset(): void {
+    this.resources = [];
+    this.requests.clear();
+    this.responses.clear();
+    this.lastActivity = Date.now();
 
-    // Check for favicon specifically
-    if (url.includes('favicon.ico') || fileExtension === 'ico') {
-      return 'media';
+    // Reset cross-origin fetcher if available
+    if (this.crossOriginFetcher) {
+      this.crossOriginFetcher.reset();
     }
 
-    if (contentType.includes('text/html')) {
-      return 'html';
-    } else if (contentType.includes('text/css') || fileExtension === 'css') {
-      return 'css';
-    } else if (
-      contentType.includes('javascript') ||
-      contentType.includes('text/javascript') ||
-      ['js', 'mjs', 'jsx', 'ts', 'tsx'].includes(fileExtension)
-    ) {
-      return 'js';
-    } else if (
-      contentType.includes('image/') ||
-      contentType.includes('video/') ||
-      contentType.includes('audio/') ||
-      ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'mp4', 'webm', 'mp3', 'wav'].includes(
-        fileExtension
-      )
-    ) {
-      return 'media';
-    } else if (
-      contentType.includes('font/') ||
-      contentType.includes('application/font') ||
-      ['woff', 'woff2', 'ttf', 'otf', 'eot'].includes(fileExtension)
-    ) {
-      return 'font';
-    }
-
-    return 'other';
+    logger.debug('Network monitor reset');
   }
 
   /**
@@ -238,7 +309,7 @@ export class NetworkMonitor {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWait) {
-      if (this.getTimeSinceLastActivity() >= idleTime && !this.hasPendingRequests()) {
+      if (this.getTimeSinceLastActivity() >= idleTime) {
         if (verbose) {
           logger.debug(`Network idle achieved after ${Date.now() - startTime}ms`);
         }
@@ -246,12 +317,6 @@ export class NetworkMonitor {
       }
 
       await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    if (verbose) {
-      logger.warn(
-        `Network idle timeout after ${maxWait}ms, ${this.pendingRequests.size} requests still pending`
-      );
     }
   }
 
@@ -267,18 +332,6 @@ export class NetworkMonitor {
    */
   getTotalTransferSize(): number {
     return this.resources.reduce((total, resource) => total + resource.transferSize, 0);
-  }
-
-  /**
-   * Reset monitoring state
-   */
-  reset(): void {
-    this.resources = [];
-    this.requests.clear();
-    this.responses.clear();
-    this.pendingRequests.clear();
-    this.lastActivity = Date.now();
-    logger.debug('Network monitor reset');
   }
 
   /**

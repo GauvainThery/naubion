@@ -4,6 +4,35 @@
 
 import { Page } from 'puppeteer';
 
+// Type definitions for browser helper functions
+interface FindElementsConfig {
+  maxElements?: number;
+  mustBeVisible?: boolean;
+  excludeNavigation?: boolean;
+}
+
+interface SmartSelector {
+  selector: string;
+  confidence: number;
+}
+
+interface HTMLElementWithOnClick extends HTMLElement {
+  onclick: ((this: GlobalEventHandlers, ev: MouseEvent) => unknown) | null;
+}
+
+interface WindowWithHelpers extends Window {
+  _findElementsBySelectors: (
+    selectors: string[],
+    type: string,
+    config: FindElementsConfig
+  ) => ElementInfo[];
+  _createElement: (element: HTMLElement, id: string, type: string) => ElementInfo;
+  _getBestSelector: (element: HTMLElement) => string;
+  _getDataAttributes: (element: HTMLElement) => string;
+  _isNavigationElement: (element: HTMLElement) => boolean;
+  _isElementInteractive: (element: HTMLElement) => boolean;
+}
+
 export interface ElementInfo {
   id: string;
   type: string;
@@ -46,18 +75,19 @@ export class ElementFinder {
     await this.injectHelpers();
 
     return await this.page.evaluate(() => {
-      const buttons = (window as any)._findElementsBySelectors(
+      const windowTyped = window as unknown as WindowWithHelpers;
+      const buttons = windowTyped._findElementsBySelectors(
         ['button', 'input[type="button"]', 'input[type="submit"]', '[role="button"]'],
         'button',
         { maxElements: 10, mustBeVisible: true }
       );
 
-      const links = (window as any)._findElementsBySelectors(['a[href]', '[role="link"]'], 'link', {
+      const links = windowTyped._findElementsBySelectors(['a[href]', '[role="link"]'], 'link', {
         maxElements: 8,
         mustBeVisible: true
       });
 
-      const inputs = (window as any)._findElementsBySelectors(
+      const inputs = windowTyped._findElementsBySelectors(
         ['input', 'textarea', 'select'],
         'input',
         { maxElements: 5, mustBeVisible: true }
@@ -87,7 +117,8 @@ export class ElementFinder {
 
     return await this.page.evaluate(
       (selectors, type, config) => {
-        return (window as any)._findElementsBySelectors(selectors, type, config);
+        const windowTyped = window as unknown as WindowWithHelpers;
+        return windowTyped._findElementsBySelectors(selectors, type, config);
       },
       selectors,
       type,
@@ -102,7 +133,7 @@ export class ElementFinder {
     await this.injectHelpers();
 
     return await this.page.evaluate(() => {
-      const smartSelectors = [
+      const smartSelectors: SmartSelector[] = [
         // High-value interactive elements
         { selector: '[data-testid]', confidence: 0.9 },
         { selector: '[data-track]', confidence: 0.8 },
@@ -120,12 +151,16 @@ export class ElementFinder {
         { selector: '[aria-label*="menu"], [aria-label*="navigation"]', confidence: 0.6 }
       ];
 
-      const foundElements: any[] = [];
+      const foundElements: ElementInfo[] = [];
+      const windowTyped = window as unknown as WindowWithHelpers;
 
       smartSelectors.forEach(({ selector, confidence }) => {
         const elements = document.querySelectorAll(selector);
-        Array.from(elements).forEach((el: any, index) => {
-          if ((window as any)._isNavigationElement && (window as any)._isNavigationElement(el)) {
+        Array.from(elements).forEach((el: Element, index) => {
+          if (
+            windowTyped._isNavigationElement &&
+            windowTyped._isNavigationElement(el as HTMLElement)
+          ) {
             return; // Skip navigation elements
           }
 
@@ -133,8 +168,8 @@ export class ElementFinder {
           const isVisible = rect.width > 0 && rect.height > 0;
 
           if (isVisible) {
-            const element = (window as any)._createElement(
-              el,
+            const element = windowTyped._createElement(
+              el as HTMLElement,
               `smart_${selector}_${index}`,
               'smart'
             );
@@ -145,7 +180,7 @@ export class ElementFinder {
       });
 
       // Sort by confidence and return top elements
-      return foundElements.sort((a, b) => b.confidence - a.confidence).slice(0, 15);
+      return foundElements.sort((a, b) => (b.confidence || 0) - (a.confidence || 0)).slice(0, 15);
     });
   }
 
@@ -155,20 +190,22 @@ export class ElementFinder {
   private async injectHelpers(): Promise<void> {
     await this.page.evaluate(() => {
       // Only inject if not already present
-      if ((window as any)._findElementsBySelectors) return;
+      if ('_findElementsBySelectors' in window) return;
 
-      (window as any)._findElementsBySelectors = function (
+      const windowTyped = window as unknown as WindowWithHelpers;
+
+      windowTyped._findElementsBySelectors = function (
         selectors: string[],
         type: string,
-        config: any = {}
-      ) {
+        config: FindElementsConfig = {}
+      ): ElementInfo[] {
         const { maxElements = 5, mustBeVisible = true, excludeNavigation = true } = config;
-        const foundElements: any[] = [];
+        const foundElements: ElementInfo[] = [];
 
         selectors.forEach(selector => {
           const elements = document.querySelectorAll(selector);
-          Array.from(elements).forEach((el: any, index) => {
-            if (excludeNavigation && (window as any)._isNavigationElement(el)) {
+          Array.from(elements).forEach((el: Element, index) => {
+            if (excludeNavigation && windowTyped._isNavigationElement(el as HTMLElement)) {
               return;
             }
 
@@ -176,7 +213,9 @@ export class ElementFinder {
             const isVisible = rect.width > 0 && rect.height > 0;
 
             if (!mustBeVisible || isVisible) {
-              foundElements.push((window as any)._createElement(el, `${type}_${index}`, type));
+              foundElements.push(
+                windowTyped._createElement(el as HTMLElement, `${type}_${index}`, type)
+              );
             }
           });
         });
@@ -184,14 +223,18 @@ export class ElementFinder {
         return foundElements.slice(0, maxElements);
       };
 
-      (window as any)._createElement = function (element: HTMLElement, id: string, type: string) {
+      windowTyped._createElement = function (
+        element: HTMLElement,
+        id: string,
+        type: string
+      ): ElementInfo {
         const rect = element.getBoundingClientRect();
 
         return {
-          id: id,
-          type: type,
+          id,
+          type,
           text: element.textContent?.trim().substring(0, 50) || '',
-          selector: (window as any)._getBestSelector(element),
+          selector: windowTyped._getBestSelector(element),
           tagName: element.tagName.toLowerCase(),
           className: element.className || '',
           elementId: element.id || '',
@@ -203,16 +246,18 @@ export class ElementFinder {
             width: rect.width,
             height: rect.height
           },
-          dataAttributes: (window as any)._getDataAttributes(element),
-          isDisabled: (element as any).disabled || element.getAttribute('disabled') !== null,
-          hasClickHandler: !!(element as any).onclick || !!element.getAttribute('onclick'),
+          dataAttributes: windowTyped._getDataAttributes(element),
+          isDisabled:
+            (element as HTMLInputElement).disabled || element.getAttribute('disabled') !== null,
+          hasClickHandler:
+            !!(element as HTMLElementWithOnClick).onclick || !!element.getAttribute('onclick'),
           ariaLabel: element.getAttribute('aria-label') || '',
           role: element.getAttribute('role') || '',
-          isInteractive: (window as any)._isElementInteractive(element)
+          isInteractive: windowTyped._isElementInteractive(element)
         };
       };
 
-      (window as any)._getBestSelector = function (element: HTMLElement) {
+      windowTyped._getBestSelector = function (element: HTMLElement): string {
         if (element.id) return `#${element.id}`;
         if (element.className) {
           const firstClass = element.className.split(' ')[0];
@@ -221,28 +266,29 @@ export class ElementFinder {
         return element.tagName.toLowerCase();
       };
 
-      (window as any)._getDataAttributes = function (element: HTMLElement) {
+      windowTyped._getDataAttributes = function (element: HTMLElement): string {
         return Array.from(element.attributes)
           .filter(attr => attr.name.startsWith('data-'))
           .map(attr => `${attr.name}="${attr.value}"`)
           .join(' ');
       };
 
-      (window as any)._isNavigationElement = function (element: HTMLElement) {
+      windowTyped._isNavigationElement = function (element: HTMLElement): boolean {
         const navigationKeywords = ['download', 'link', 'external', 'href', 'navigate', 'redirect'];
         const text = element.textContent?.toLowerCase() || '';
-        const hasHref = element.getAttribute('href') || element.closest('a');
+        const hasHref = !!(element.getAttribute('href') || element.closest('a'));
 
         return hasHref || navigationKeywords.some(keyword => text.includes(keyword));
       };
 
-      (window as any)._isElementInteractive = function (element: HTMLElement) {
+      windowTyped._isElementInteractive = function (element: HTMLElement): boolean {
         const interactive = ['button', 'input', 'select', 'textarea', 'a', 'details', 'summary'];
 
         const isInteractiveTag = interactive.includes(element.tagName.toLowerCase());
         const hasInteractiveRole =
           element.getAttribute('role') === 'button' || element.getAttribute('role') === 'link';
-        const hasClickHandler = !!(element as any).onclick || !!element.getAttribute('onclick');
+        const hasClickHandler =
+          !!(element as HTMLElementWithOnClick).onclick || !!element.getAttribute('onclick');
         const hasTabIndex = element.getAttribute('tabindex') !== null;
 
         return isInteractiveTag || hasInteractiveRole || hasClickHandler || hasTabIndex;

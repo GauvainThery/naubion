@@ -39,7 +39,7 @@ class Logger {
   /**
    * Log an error message
    */
-  error(message: string, data?: Record<string, any>): void {
+  error(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.error) {
       console.error(`${COLORS.red}[ERROR]${COLORS.reset} ${message}`, data || '');
     }
@@ -48,7 +48,7 @@ class Logger {
   /**
    * Log a warning message
    */
-  warn(message: string, data?: Record<string, any>): void {
+  warn(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.warn) {
       console.warn(`${COLORS.yellow}[WARN]${COLORS.reset} ${message}`, data || '');
     }
@@ -57,7 +57,7 @@ class Logger {
   /**
    * Log an info message
    */
-  info(message: string, data?: Record<string, any>): void {
+  info(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.info) {
       console.info(`${COLORS.blue}[INFO]${COLORS.reset} ${message}`, data || '');
     }
@@ -66,7 +66,7 @@ class Logger {
   /**
    * Log a success message
    */
-  success(message: string, data?: Record<string, any>): void {
+  success(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.success) {
       console.info(`${COLORS.green}[SUCCESS]${COLORS.reset} ${message}`, data || '');
     }
@@ -75,7 +75,7 @@ class Logger {
   /**
    * Log a step message (for progress indication)
    */
-  step(message: string, data?: Record<string, any>): void {
+  step(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.step) {
       console.info(`${COLORS.cyan}[STEP]${COLORS.reset} ${message}`, data || '');
     }
@@ -84,7 +84,7 @@ class Logger {
   /**
    * Log a debug message
    */
-  debug(message: string, data?: Record<string, any>): void {
+  debug(message: string, data?: Record<string, unknown>): void {
     if (this.level >= LOG_LEVELS.debug) {
       console.debug(`${COLORS.gray}[DEBUG]${COLORS.reset} ${message}`, data || '');
     }

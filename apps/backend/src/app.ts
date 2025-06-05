@@ -4,17 +4,12 @@
  * Implemented with Domain-Driven Design architecture
  */
 
-import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import { getConfig, validateConfig } from './config/index.js';
+import apiRoutes from './infrastructure/api/routes.js';
 import { errorHandler, notFoundHandler } from './shared/errors.js';
 import logger from './shared/logger.js';
-import apiRoutes from './infrastructure/api/routes.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * Create and configure Express application

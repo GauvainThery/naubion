@@ -2,6 +2,7 @@
  * Analysis domain service - Core analysis orchestration logic
  */
 
+import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
 import { AnalysisOptions, AnalysisResult, createAnalysisOptions } from '../models/analysis.js';
 import { ResourceCollection } from '../models/resource.js';
 
@@ -47,7 +48,13 @@ export class AnalysisDomainService {
   createAnalysisResult(
     context: AnalysisContext,
     resources: ResourceCollection,
-    metadata: any
+    metadata: {
+      hasFrames?: boolean;
+      hasServiceWorker?: boolean;
+      pageSize?: { width: number; height: number };
+      simulation?: SimulationResult;
+      networkActivity?: number;
+    }
   ): AnalysisResult {
     const endTime = new Date();
     const duration = endTime.getTime() - context.startTime.getTime();
@@ -159,7 +166,7 @@ export class AnalysisDomainService {
   private normalizeUrl(url: string): string {
     // Add protocol if missing
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
+      url = `https://${url}`;
     }
 
     // Normalize URL

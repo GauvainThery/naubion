@@ -11,9 +11,21 @@ const analysisController = new AnalysisController(websiteAnalysisService);
 
 /**
  * POST /api/analyze
- * Analyze a URL for page weight and resource breakdown
+ * Start analysis and return immediate response with estimation
  */
 router.post('/analyze', analysisController.analyze);
+
+/**
+ * GET /api/analysis/:analysisId/progress
+ * Server-Sent Events endpoint for real-time progress updates
+ */
+router.get('/analysis/:analysisId/progress', analysisController.progress);
+
+/**
+ * GET /api/analysis/:analysisId/result
+ * Get final analysis results
+ */
+router.get('/analysis/:analysisId/result', analysisController.result);
 
 /**
  * GET /api/health

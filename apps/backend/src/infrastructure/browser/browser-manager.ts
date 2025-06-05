@@ -2,7 +2,7 @@
  * Browser automation infrastructure - Puppeteer browser management
  */
 
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer, { Browser, LaunchOptions, Page } from 'puppeteer';
 import {
   AnalysisOptions,
   DeviceConfiguration,
@@ -17,19 +17,21 @@ export class BrowserManager {
    * Launch browser with analysis options
    */
   async launch(options: AnalysisOptions): Promise<Browser> {
-    const launchOptions = {
+    const launchOptions: LaunchOptions = {
+      browser: 'chrome',
+      executablePath: process.env.CHROME_EXECUTABLE_PATH || '',
       headless: true,
       args: [
         '--disable-extensions',
         '--disable-plugins',
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-feature=WebFontsCacheAwareTimeoutAdaption'
       ]
     };
 
     // Add mobile-specific optimizations
     if (options.deviceType === 'mobile') {
-      launchOptions.args.push(
+      launchOptions.args?.push(
         '--disable-features=TranslateUI',
         '--disable-ipc-flooding-protection',
         '--enable-features=NetworkService,NetworkServiceLogging'
@@ -68,7 +70,6 @@ export class BrowserManager {
    */
   private async configurePageDevice(page: Page, config: DeviceConfiguration): Promise<void> {
     await page.setViewport(config.viewport);
-    await page.setUserAgent(config.userAgent);
   }
 
   /**

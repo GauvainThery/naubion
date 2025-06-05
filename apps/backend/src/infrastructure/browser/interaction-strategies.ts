@@ -33,7 +33,6 @@ export interface InteractionResult {
   success: boolean;
   strategy?: string;
   error?: string;
-  networkActivity?: boolean;
 }
 
 export class InteractionStrategies {
@@ -45,7 +44,7 @@ export class InteractionStrategies {
   /**
    * Attempt to click an element using multiple strategies
    */
-  async clickElement(element: ElementInfo, timeout = 5000): Promise<InteractionResult> {
+  async clickElement(element: ElementInfo, timeout = 10000): Promise<InteractionResult> {
     const strategies = this.selectOptimalStrategies(element);
 
     for (const strategy of strategies) {
@@ -84,33 +83,23 @@ export class InteractionStrategies {
     element: ElementInfo,
     timeout: number
   ): Promise<InteractionResult> {
-    const startTime = Date.now();
-    let networkActivityDetected = false;
-
-    // Monitor network activity if available
-    const networkListener = () => {
-      networkActivityDetected = true;
-    };
-
-    if (this.networkMonitor) {
-      this.networkMonitor.onActivity(networkListener);
-    }
-
     try {
       const result = await strategy.execute(this.page, element, timeout);
-
-      // Wait a moment to capture any network activity
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await this.waitForNetworkIdle();
 
       return {
-        ...result,
-        networkActivity: networkActivityDetected
+        ...result
       };
-    } finally {
-      if (this.networkMonitor) {
-        this.networkMonitor.removeActivityListener(networkListener);
-      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Strategy execution failed'
+      };
     }
+  }
+
+  private async waitForNetworkIdle(): Promise<void> {
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -142,7 +131,7 @@ export class InteractionStrategies {
     }
 
     // Sort by priority (lower = higher priority)
-    return allStrategies.sort((a, b) => a.priority - b.priority);
+    return allStrategies.sort((a, b) => b.priority - a.priority);
   }
 }
 
@@ -178,7 +167,7 @@ class EvaluateStrategy implements InteractionStrategy {
   name = 'evaluate';
   priority = 0.3;
 
-  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
     try {
       const result = await page.evaluate(selector => {
         const el = document.querySelector(selector);
@@ -207,7 +196,7 @@ class DispatchEventStrategy implements InteractionStrategy {
   name = 'dispatch_event';
   priority = 0.4;
 
-  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
     try {
       const result = await page.evaluate(selector => {
         const el = document.querySelector(selector);
@@ -247,7 +236,7 @@ class CoordinateStrategy implements InteractionStrategy {
   name = 'coordinate';
   priority = 0.6;
 
-  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
     try {
       if (!element.isVisible || element.position.x <= 0 || element.position.y <= 0) {
         return { success: false, error: 'Element not visible or has invalid coordinates' };

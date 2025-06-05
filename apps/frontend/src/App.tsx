@@ -4,22 +4,55 @@ import AnalysisForm from './components/organisms/AnalysisForm';
 import LoadingSection from './components/organisms/LoadingSection';
 import ResultsSection from './components/organisms/ResultsSection';
 import useAnalysis from './hooks/useAnalysis';
+import type { AnalysisFormData } from './types';
 
 const App: React.FC = () => {
-  const { isLoading, results, error, steps, startAnalysis, shareResults } = useAnalysis();
+  const {
+    isLoading,
+    results,
+    error,
+    steps,
+    progress,
+    currentStep,
+    estimatedDuration,
+    startAnalysis,
+    shareResults
+  } = useAnalysis();
 
-  // Check for URL parameter on mount
+  // Check for URL parameters on mount and create form data
+  const getFormDataFromUrlParams = (): AnalysisFormData | null => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Support both 'url' and 'websiteUrl' parameters
+    const urlParam = urlParams.get('url') || urlParams.get('websiteUrl');
+
+    if (!urlParam) return null;
+
+    // Extract other optional parameters with fallbacks
+    const averagePages = parseInt(urlParams.get('averagePages') || '5');
+    const interactionLevel =
+      (urlParams.get('interactionLevel') as 'minimal' | 'default' | 'thorough') || 'default';
+    const deviceType = (urlParams.get('deviceType') as 'desktop' | 'mobile') || 'desktop';
+
+    return {
+      url: urlParam,
+      averagePages: isNaN(averagePages) ? 5 : averagePages,
+      interactionLevel: ['minimal', 'default', 'thorough'].includes(interactionLevel)
+        ? interactionLevel
+        : 'default',
+      deviceType: ['desktop', 'mobile'].includes(deviceType) ? deviceType : 'desktop'
+    };
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const urlParam = urlParams.get('url');
+    const autoAnalyze = urlParams.get('autoAnalyze') === 'true';
+    const hasLegacyUrl = urlParams.has('url'); // Legacy support for 'url' param
+    const formDataFromUrl = getFormDataFromUrlParams();
 
-    if (urlParam) {
-      startAnalysis({
-        url: urlParam,
-        averagePages: 5,
-        interactionLevel: 'default',
-        deviceType: 'desktop'
-      });
+    // Auto-analyze if explicitly requested, or if using legacy 'url' parameter for backwards compatibility
+    if (formDataFromUrl && (autoAnalyze || hasLegacyUrl)) {
+      startAnalysis(formDataFromUrl);
     }
   }, [startAnalysis]);
 
@@ -34,7 +67,12 @@ const App: React.FC = () => {
         {/* Loading Section */}
         {isLoading && (
           <section>
-            <LoadingSection steps={steps} />
+            <LoadingSection
+              steps={steps}
+              progress={progress}
+              currentStep={currentStep}
+              estimatedDuration={estimatedDuration}
+            />
           </section>
         )}
 

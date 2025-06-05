@@ -5,7 +5,7 @@
 import { Page } from 'puppeteer';
 import { AnalysisOptions } from '../../domain/models/analysis.js';
 import { NetworkMonitor } from './network-monitor.js';
-import { ElementFinder } from './element-finder.js';
+import { ElementFinder, ElementInfo } from './element-finder.js';
 import { InteractionStrategies } from './interaction-strategies.js';
 import { BehaviorSimulator } from './behavior-simulator.js';
 import logger from '../../shared/logger.js';
@@ -38,9 +38,10 @@ export class UserSimulator {
     this.config = {
       maxInteractions: options.maxInteractions,
       maxScrollSteps: options.maxScrollSteps,
-      enableHoverSimulation: true,
-      enableFormInteraction: false,
-      enableResponsiveTesting: false,
+      enableHoverSimulation: options.interactionLevel !== 'minimal',
+      enableFormInteraction: options.interactionLevel === 'thorough',
+      enableResponsiveTesting:
+        options.deviceType === 'desktop' && options.interactionLevel === 'thorough',
       elementTimeout: 5000,
       verboseLogging: options.verboseLogging
     };
@@ -74,7 +75,7 @@ export class UserSimulator {
       let successfulInteractions = 0;
 
       // Phase 1: Basic page exploration
-      const pageInfo = await this.explorePageStructure();
+      await this.explorePageStructure();
 
       // Phase 2: Simulate scrolling and reading behavior
       await this.simulateReadingBehavior();
@@ -85,6 +86,7 @@ export class UserSimulator {
       successfulInteractions += interactionResult.successful;
 
       // Phase 4: Advanced interactions (optional)
+      console.log('🔥 ・ simulateUserBehavior ・ this.config:', this.config);
       if (this.config.enableHoverSimulation) {
         await this.performHoverInteractions();
       }
@@ -123,7 +125,7 @@ export class UserSimulator {
    */
   async interactWithElements(
     elementType = 'buttons',
-    options: any = {}
+    options: { maxElements?: number } = {}
   ): Promise<SimulationResult> {
     const { maxElements = 3 } = options;
 
@@ -145,7 +147,7 @@ export class UserSimulator {
         networkActivity: this.networkMonitor?.hasActivity() || false
       };
     } catch (error) {
-      logger.error(`❌ Simplified interaction failed:`, {
+      logger.error('❌ Simplified interaction failed:', {
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -167,6 +169,7 @@ export class UserSimulator {
         if (!el) return null;
 
         // Use the helper functions injected by ElementFinder
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (window as any)._createElement(el, 'custom', 'custom');
       }, elementSelector);
 
@@ -186,7 +189,14 @@ export class UserSimulator {
 
   // Private orchestration methods
 
-  private async explorePageStructure(): Promise<any> {
+  private async explorePageStructure(): Promise<{
+    title: string;
+    url: string;
+    hasFrames: boolean;
+    hasServiceWorker: boolean;
+    viewport: { width: number; height: number };
+    pageSize: { width: number; height: number };
+  }> {
     logger.debug('🔍 Exploring page structure...');
 
     const pageInfo = await this.elementFinder['page'].evaluate(() => ({
@@ -298,7 +308,7 @@ export class UserSimulator {
     });
   }
 
-  private async attemptElementInteraction(element: any): Promise<boolean> {
+  private async attemptElementInteraction(element: ElementInfo): Promise<boolean> {
     try {
       if (this.config.verboseLogging) {
         logger.debug(
@@ -336,7 +346,7 @@ export class UserSimulator {
 
     await this.networkMonitor.waitForNetworkIdle(
       5000, // 5 seconds of complete quiet
-      30000, // Max wait 30 seconds
+      1000, // Max wait 30 seconds
       this.config.verboseLogging
     );
 
@@ -348,7 +358,7 @@ export class UserSimulator {
     );
   }
 
-  private deduplicateElements(elements: any[]): any[] {
+  private deduplicateElements(elements: ElementInfo[]): ElementInfo[] {
     const seen = new Set();
     return elements.filter(element => {
       const key = `${element.selector}_${element.text}`;

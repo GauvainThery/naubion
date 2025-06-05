@@ -5,12 +5,14 @@ export { default as RadioOption } from './atoms/RadioOption';
 export { default as Card } from './atoms/Card';
 export { default as ProgressBar } from './atoms/ProgressBar';
 export { default as LoadingSpinner } from './atoms/LoadingSpinner';
+export { default as ResourceItem } from './atoms/ResourceItem';
 
 // Molecules
 export { default as RadioGroup } from './molecules/RadioGroup';
 export { default as MetricCard } from './molecules/MetricCard';
 export { default as ResourceBreakdownItem } from './molecules/ResourceBreakdownItem';
 export { default as LoadingStep } from './molecules/LoadingStep';
+export { default as ResourceList } from './molecules/ResourceList';
 
 // Organisms
 export { default as Header } from './organisms/Header';

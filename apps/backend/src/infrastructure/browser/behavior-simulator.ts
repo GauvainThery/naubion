@@ -6,6 +6,31 @@ import { Page } from 'puppeteer';
 import { NetworkMonitor } from './network-monitor.js';
 import logger from '../../shared/logger.js';
 
+// Import ElementInfo from interaction-strategies or define it locally
+interface ElementInfo {
+  id: string;
+  type: string;
+  text: string;
+  selector: string;
+  tagName: string;
+  className: string;
+  elementId: string;
+  isVisible: boolean;
+  position: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  dataAttributes: string;
+  isDisabled: boolean;
+  hasClickHandler: boolean;
+  ariaLabel: string;
+  role: string;
+  isInteractive: boolean;
+  confidence?: number;
+}
+
 export interface ScrollOptions {
   maxSteps?: number;
   pauseBetweenScrolls?: [number, number];
@@ -22,6 +47,21 @@ export interface HoverOptions {
 export interface ViewportOptions {
   viewports?: Array<{ width: number; height: number }>;
   pauseBetweenChanges?: number;
+}
+
+export interface FocusOptions {
+  maxElements?: number;
+  focusDuration?: [number, number];
+}
+
+export interface TypingOptions {
+  maxFields?: number;
+  sampleTexts?: string[];
+}
+
+export interface DeviceCapabilityOptions {
+  enableTouch?: boolean;
+  enableOrientation?: boolean;
 }
 
 export class BehaviorSimulator {
@@ -103,7 +143,7 @@ export class BehaviorSimulator {
   /**
    * Simulate hover effects on elements
    */
-  async simulateHoverEffects(elements: any[], options: HoverOptions = {}): Promise<void> {
+  async simulateHoverEffects(elements: ElementInfo[], options: HoverOptions = {}): Promise<void> {
     const { hoverDuration = [500, 1500], waitForContent = 1000, maxElements = 3 } = options;
 
     logger.debug(
@@ -137,7 +177,7 @@ export class BehaviorSimulator {
   /**
    * Simulate focus events on interactive elements
    */
-  async simulateFocusEvents(elements: any[], options: any = {}): Promise<void> {
+  async simulateFocusEvents(elements: ElementInfo[], options: FocusOptions = {}): Promise<void> {
     const { maxElements = 5, focusDuration = [300, 800] } = options;
 
     logger.debug(
@@ -171,7 +211,7 @@ export class BehaviorSimulator {
   /**
    * Simulate typing in form fields
    */
-  async simulateTyping(formElements: any[], options: any = {}): Promise<void> {
+  async simulateTyping(formElements: ElementInfo[], options: TypingOptions = {}): Promise<void> {
     const { maxFields = 3, sampleTexts = ['test', 'sample', 'example'] } = options;
 
     logger.debug(
@@ -245,7 +285,7 @@ export class BehaviorSimulator {
   /**
    * Simulate device capabilities like touch, orientation
    */
-  async simulateDeviceCapabilities(options: any = {}): Promise<void> {
+  async simulateDeviceCapabilities(options: DeviceCapabilityOptions = {}): Promise<void> {
     const { enableTouch = true, enableOrientation = false } = options;
 
     logger.debug('📱 Simulating device capabilities...');
@@ -336,7 +376,7 @@ export class BehaviorSimulator {
     }
   }
 
-  private async scrollToElement(element: any): Promise<void> {
+  private async scrollToElement(element: ElementInfo): Promise<void> {
     try {
       await this.page.evaluate(selector => {
         const el = document.querySelector(selector);

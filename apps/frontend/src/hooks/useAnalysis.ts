@@ -1,82 +1,157 @@
-import { useState, useCallback } from 'react';
-import type { AnalysisFormData, AnalysisResults, LoadingStep } from '../types';
+import { useState, useCallback, useRef } from 'react';
+import type { AnalysisFormData, LoadingStep } from '../types';
+import { AnalysisResult } from '../../../backend/src/domain/models/analysis';
+
+type AnalysisInitResponse = {
+  analysisId: string;
+  estimatedDuration: number;
+  status: 'started';
+  message: string;
+};
 
 const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [results, setResults] = useState<AnalysisResults | null>(null);
+  const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [lastFormData, setLastFormData] = useState<AnalysisFormData | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+  const [currentStep, setCurrentStep] = useState<string>('');
+  const [estimatedDuration, setEstimatedDuration] = useState<number>(0);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const steps: LoadingStep[] = [
     {
       id: 'step1',
-      title: 'Loading Page',
-      description: 'Navigating to the website and waiting for initial load'
+      title: 'Setup',
+      description: 'Setting up browser environment'
     },
     {
       id: 'step2',
-      title: 'Simulating User Behavior',
-      description: 'Scrolling, clicking buttons, and interacting with the page'
+      title: 'Navigation',
+      description: 'Navigating to target website'
     },
     {
       id: 'step3',
-      title: 'Monitoring Network Activity',
-      description: 'Tracking resources loaded after interactions'
+      title: 'Simulation',
+      description: 'Simulating user interactions'
     },
     {
       id: 'step4',
-      title: 'Analyzing Resources',
-      description: 'Processing and categorizing all loaded resources'
+      title: 'Processing',
+      description: 'Processing and categorizing resources'
     }
   ];
 
-  const startAnalysis = useCallback(async (formData: AnalysisFormData) => {
-    setIsLoading(true);
-    setError(null);
-    setResults(null);
-
+  const fetchFinalResults = useCallback(async (analysisId: string) => {
     try {
-      // Start the analysis
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = await fetch(`/api/analysis/${analysisId}/result`);
+
+      if (response.status === 202) {
+        // Still running, wait a bit and try again
+        setTimeout(() => fetchFinalResults(analysisId), 2000);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: any = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setResults(data as AnalysisResults);
+      const data = await response.json();
+      setResults(data as AnalysisResult);
+      setProgress(100);
       setIsLoading(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred during analysis';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch results';
       setError(errorMessage);
       setIsLoading(false);
+      setProgress(0);
     }
   }, []);
 
+  const startAnalysis = useCallback(
+    async (formData: AnalysisFormData) => {
+      setIsLoading(true);
+      setError(null);
+      setResults(null);
+      setProgress(0);
+      setCurrentStep('');
+      setLastFormData(formData);
+
+      try {
+        // Phase 1: Start analysis and get immediate response
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const initData = (await response.json()) as AnalysisInitResponse;
+        setEstimatedDuration(initData.estimatedDuration);
+
+        // Phase 2: Set up Server-Sent Events for progress updates
+        const eventSource = new EventSource(`/api/analysis/${initData.analysisId}/progress`);
+        eventSourceRef.current = eventSource;
+
+        eventSource.onmessage = event => {
+          const progressData = JSON.parse(event.data);
+          setProgress(progressData.progress);
+          setCurrentStep(progressData.step);
+
+          // If analysis is complete, fetch final results
+          if (progressData.progress >= 100 || progressData.step === 'complete') {
+            eventSource.close();
+            fetchFinalResults(initData.analysisId);
+          }
+        };
+
+        eventSource.onerror = error => {
+          console.error('SSE Error:', error);
+          eventSource.close();
+          // Fallback: try to fetch results anyway
+          fetchFinalResults(initData.analysisId);
+        };
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'An error occurred during analysis';
+        setError(errorMessage);
+        setIsLoading(false);
+        setProgress(0);
+      }
+    },
+    [fetchFinalResults]
+  );
+
   const shareResults = useCallback(() => {
-    if (results) {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?url=${encodeURIComponent(results.url)}`;
+    if (results && lastFormData) {
+      const params = new URLSearchParams({
+        websiteUrl: lastFormData.url,
+        averagePages: lastFormData.averagePages.toString(),
+        interactionLevel: lastFormData.interactionLevel,
+        deviceType: lastFormData.deviceType,
+        autoAnalyze: 'true' // This tells the app to auto-analyze when the link is opened
+      });
+
+      const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         console.log('Share link copied to clipboard');
       });
     }
-  }, [results]);
+  }, [results, lastFormData]);
 
   return {
     isLoading,
     results,
     error,
     steps,
+    progress,
+    currentStep,
+    estimatedDuration,
     startAnalysis,
     shareResults
   };
