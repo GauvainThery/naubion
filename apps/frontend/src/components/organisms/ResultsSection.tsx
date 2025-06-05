@@ -3,15 +3,24 @@ import Card from '../atoms/Card';
 import Button from '../atoms/Button';
 import MetricCard from '../molecules/MetricCard';
 import ResourceBreakdownItem from '../molecules/ResourceBreakdownItem';
-import type { AnalysisResults } from '../../types';
+import { AnalysisResult } from '../../../../backend/src/domain/models/analysis';
+import {
+  processLargestResources,
+  processResourceData,
+  roundResourceSize
+} from './../../utils/websiteAnalysisResultProcessors.ts';
 
 type ResultsSectionProps = {
-  results: AnalysisResults;
+  results: AnalysisResult;
   onShare: () => void;
 };
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => {
-  if (!results) return null;
+  if (!results) {
+    return null;
+  }
+
+  const largestResources = processLargestResources(results.resources.resources);
 
   const totalSizeIcon = (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -47,7 +56,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
         <div className="flex items-start justify-between mb-8">
           <div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Page Weight Analysis Results</h3>
-            <div className="text-gray-600 break-all">{results.analyzedUrl}</div>
+            <div className="text-gray-600 break-all">{results.url}</div>
           </div>
           <Button variant="outline" onClick={onShare} className="flex-shrink-0">
             📋 Copy Share Link
@@ -57,13 +66,13 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <MetricCard
             icon={totalSizeIcon}
-            value={results.totalSize}
+            value={roundResourceSize(results.resources.totalTransferSize)}
             label="Total Page Weight"
             isPrimary
           />
           <MetricCard
             icon={resourceCountIcon}
-            value={results.resourceCount}
+            value={results.resources.resourceCount}
             label="Total Resources"
           />
         </div>
@@ -72,12 +81,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
           <h4 className="text-lg font-semibold text-gray-900 mb-6">Resource Type Analysis</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {resourceTypes.map(resource => {
-              const data = results.breakdown?.[resource.type] || {
-                size: '0 KB',
-                count: 0,
-                percentage: 0,
-                average: '0 KB'
-              };
+              const data = processResourceData(
+                results.resources.resources,
+                results.resources.totalTransferSize,
+                resource.type
+              );
 
               return (
                 <ResourceBreakdownItem
@@ -96,11 +104,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
           </div>
         </div>
 
-        {results.largestResources && results.largestResources.length > 0 && (
+        {largestResources && largestResources.length > 0 && (
           <div className="mt-8">
             <h4 className="text-lg font-semibold text-gray-900 mb-6">Largest Resources</h4>
             <div className="space-y-3">
-              {results.largestResources.map((resource, index) => (
+              {largestResources.map((resource, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-xl"

@@ -1,5 +1,4 @@
-// Re-export shared types
-export * from '@green-web-compass/shared';
+import { AnalysisResult } from './../../../backend/src/domain/models/analysis';
 
 // Frontend-specific types
 export type AnalysisFormData = {
@@ -28,26 +27,6 @@ export type LargestResource = {
   size: string;
 };
 
-export type AnalysisResults = {
-  url: string;
-  analyzedUrl?: string;
-  timestamp: string;
-  totalSize: number;
-  resourceCount: number;
-  co2Emissions: number;
-  energyConsumption: number;
-  resources: ResourceInfo[];
-  largestResources?: LargestResource[];
-  breakdown: {
-    [key: string]: {
-      size: number;
-      count: number;
-      percentage: number;
-      average?: number;
-    };
-  };
-};
-
 // API Response types
 export type ApiResponse<T> = {
   success: boolean;
@@ -55,4 +34,4 @@ export type ApiResponse<T> = {
   error?: string;
 };
 
-export type AnalysisApiResponse = ApiResponse<AnalysisResults> | AnalysisResults;
+export type AnalysisApiResponse = ApiResponse<AnalysisResult> | AnalysisResult;
