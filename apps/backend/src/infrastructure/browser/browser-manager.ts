@@ -20,8 +20,13 @@ export class BrowserManager {
     const launchOptions: LaunchOptions = {
       browser: 'chrome',
       executablePath: process.env.CHROME_EXECUTABLE_PATH || '',
-      headless: true,
-      args: ['--disable-extensions', '--disable-plugins']
+      headless: false,
+      args: [
+        '--disable-extensions',
+        '--disable-plugins',
+        '--disable-features=IsolateOrigins,site-per-process',
+        '--disable-feature=WebFontsCacheAwareTimeoutAdaption'
+      ]
     };
 
     // Add mobile-specific optimizations

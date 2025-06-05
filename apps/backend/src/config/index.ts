@@ -38,8 +38,10 @@ const DEFAULT_CONFIG: Config = {
 /**
  * Get configuration value by path (e.g., 'cors.origin')
  */
-export function getConfig<T = any>(path: string): T {
-  return path.split('.').reduce((obj: any, key: string) => obj?.[key], DEFAULT_CONFIG) as T;
+export function getConfig<T = unknown>(path: string): T {
+  return path.split('.').reduce((obj: unknown, key: string) => {
+    return (obj as Record<string, unknown>)?.[key];
+  }, DEFAULT_CONFIG as unknown) as T;
 }
 
 /**

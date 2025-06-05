@@ -19,34 +19,34 @@ export class AnalysisController {
   /**
    * Analyze a website
    */
-  analyze = asyncHandler(async (req: Request<{}, any, AnalysisRequestBody>, res: Response) => {
-    const { url, interactionLevel = 'default', deviceType = 'desktop' } = req.body;
+  analyze = asyncHandler(
+    async (req: Request<object, unknown, AnalysisRequestBody>, res: Response) => {
+      const { url, interactionLevel = 'default', deviceType = 'desktop' } = req.body;
 
-    // Validate inputs
-    validateUrl(url);
-    validateAnalysisOptions({ interactionLevel, deviceType });
+      // Validate inputs
+      validateUrl(url);
+      validateAnalysisOptions({ interactionLevel, deviceType });
 
-    logger.info('Starting analysis', {
-      url,
-      interactionLevel,
-      deviceType,
-      userAgent: req.get('User-Agent')
-    });
+      logger.info('Starting analysis', {
+        url,
+        interactionLevel,
+        deviceType,
+        userAgent: req.get('User-Agent')
+      });
 
-    let result;
+      // Single page analysis
+      const result = await this.websiteAnalysisService.analyzeUrl(url, {
+        interactionLevel,
+        deviceType
+      });
 
-    // Single page analysis
-    result = await this.websiteAnalysisService.analyzeUrl(url, {
-      interactionLevel,
-      deviceType
-    });
+      logger.info('Analysis completed', {
+        url
+      });
 
-    logger.info('Analysis completed', {
-      url
-    });
-
-    res.json(result);
-  });
+      res.json(result);
+    }
+  );
 
   /**
    * Health check endpoint

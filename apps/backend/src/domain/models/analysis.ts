@@ -80,20 +80,20 @@ export function createAnalysisOptions(
     case 'minimal':
       return {
         ...baseConfig,
-        maxInteractions: 2,
-        maxScrollSteps: 2
+        maxInteractions: 0,
+        maxScrollSteps: 1
       };
     case 'thorough':
       return {
         ...baseConfig,
-        maxInteractions: 10,
-        maxScrollSteps: 8
+        maxInteractions: 5,
+        maxScrollSteps: 6
       };
     default: // 'default'
       return {
         ...baseConfig,
-        maxInteractions: 5,
-        maxScrollSteps: 5
+        maxInteractions: 2,
+        maxScrollSteps: 3
       };
   }
 }

@@ -45,7 +45,7 @@ export class TimeoutError extends Error {
 /**
  * Express error handling middleware
  */
-export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction): void {
+export function errorHandler(err: Error, req: Request, res: Response): void {
   // Determine if we're in development mode
   const isDevelopment = getConfig<string>('nodeEnv') === 'development';
 
@@ -60,10 +60,10 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
   });
 
   // Determine status code
-  const statusCode = 'statusCode' in err ? (err as any).statusCode : 500;
+  const statusCode = 'statusCode' in err ? err.statusCode : 500;
 
   // Prepare error response
-  const errorResponse: Record<string, any> = {
+  const errorResponse: Record<string, unknown> = {
     error: err.message || 'Internal server error',
     status: statusCode,
     timestamp: new Date().toISOString()
@@ -87,7 +87,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     errorResponse.stack = err.stack;
   }
 
-  res.status(statusCode).json(errorResponse);
+  res.status(statusCode as number).json(errorResponse);
 }
 
 /**
@@ -106,7 +106,7 @@ export function notFoundHandler(req: Request, res: Response): void {
  * Async handler wrapper to catch async errors
  */
 export function asyncHandler(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);

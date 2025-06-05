@@ -1,15 +1,6 @@
 import React from 'react';
 import ProgressBar from '../atoms/ProgressBar';
 
-type ResourceBreakdownItemProps = {
-  category: string;
-  data: {
-    size: number;
-    count: number;
-    percentage: number;
-  };
-};
-
 type ExtendedResourceBreakdownItemProps = {
   type: string;
   label: string;
@@ -22,7 +13,7 @@ type ExtendedResourceBreakdownItemProps = {
 };
 
 const ResourceBreakdownItem: React.FC<ExtendedResourceBreakdownItemProps> = ({
-  type,
+  type: _type,
   label,
   size,
   count,

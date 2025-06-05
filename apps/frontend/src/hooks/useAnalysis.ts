@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import type { AnalysisFormData, AnalysisResults, LoadingStep } from '../types';
+import type { AnalysisFormData, LoadingStep } from '../types';
+import { AnalysisResult } from '../../../backend/src/domain/models/analysis';
 
 const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [results, setResults] = useState<AnalysisResults | null>(null);
+  const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const steps: LoadingStep[] = [
@@ -48,13 +49,13 @@ const useAnalysis = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: any = await response.json();
+      const data: unknown = await response.json();
 
-      if (data.error) {
-        throw new Error(data.error);
+      if (data && typeof data === 'object' && 'error' in data) {
+        throw new Error(data.error as string);
       }
 
-      setResults(data as AnalysisResults);
+      setResults(data as AnalysisResult);
       setIsLoading(false);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during analysis';

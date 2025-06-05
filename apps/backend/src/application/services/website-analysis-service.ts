@@ -55,12 +55,11 @@ export class WebsiteAnalysisService {
       estimatedDuration: this.analysisDomainService.estimateAnalysisDuration(context.options)
     });
 
-    let browser;
     let page;
 
     try {
       // Phase 1: Setup browser environment
-      browser = await this.browserManager.launch(context.options);
+      await this.browserManager.launch(context.options);
       page = await this.browserManager.createPage(context.options);
 
       // Phase 2: Setup monitoring and simulation

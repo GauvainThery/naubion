@@ -16,8 +16,8 @@ export class ResourceService {
    */
   processResources(
     rawResources: {
-      url: any;
-      transferSize: any;
+      url: string;
+      transferSize: number;
       contentType: string;
       status: number;
     }[]

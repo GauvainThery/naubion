@@ -31,7 +31,19 @@ export class NetworkMonitor {
   private requests: Map<string, NetworkEvent> = new Map();
   private responses: Map<string, ResponseEvent> = new Map();
   private isMonitoring = false;
-  private activityListeners: Array<(type: string, data: any) => void> = [];
+  private activityListeners: Array<
+    (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  > = [];
   private lastActivity = Date.now();
   private pendingRequests = new Set<string>();
 
@@ -58,7 +70,11 @@ export class NetworkMonitor {
   /**
    * Handle request will be sent event
    */
-  private handleRequestWillBeSent(params: any): void {
+  private handleRequestWillBeSent(params: {
+    requestId: string;
+    request: { url: string; method: string };
+    timestamp: number;
+  }): void {
     const { requestId, request } = params;
 
     this.requests.set(requestId, {
@@ -75,7 +91,11 @@ export class NetworkMonitor {
   /**
    * Handle response received event
    */
-  private handleResponseReceived(params: any): void {
+  private handleResponseReceived(params: {
+    requestId: string;
+    response: { url: string; status: number; headers: Record<string, string>; mimeType?: string };
+    timestamp: number;
+  }): void {
     const { requestId, response } = params;
 
     this.responses.set(requestId, {
@@ -125,7 +145,12 @@ export class NetworkMonitor {
   /**
    * Handle loading failed event
    */
-  private handleLoadingFailed(params: any): void {
+  private handleLoadingFailed(params: {
+    requestId: string;
+    errorText: string;
+    timestamp: number;
+    canceled?: boolean;
+  }): void {
     const { requestId } = params;
     this.requests.delete(requestId);
     this.responses.delete(requestId);
@@ -136,14 +161,38 @@ export class NetworkMonitor {
   /**
    * Register activity listener
    */
-  onActivity(callback: (type: string, data: any) => void): void {
+  onActivity(
+    callback: (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  ): void {
     this.activityListeners.push(callback);
   }
 
   /**
    * Remove activity listener
    */
-  removeActivityListener(callback: (type: string, data: any) => void): void {
+  removeActivityListener(
+    callback: (
+      type: string,
+      data: {
+        requestId?: string;
+        url?: string;
+        method?: string;
+        status?: number;
+        type?: string;
+        size?: number;
+      }
+    ) => void
+  ): void {
     const index = this.activityListeners.indexOf(callback);
     if (index > -1) {
       this.activityListeners.splice(index, 1);
@@ -160,7 +209,17 @@ export class NetworkMonitor {
   /**
    * Notify activity listeners
    */
-  private notifyActivity(type: string, data: any): void {
+  private notifyActivity(
+    type: string,
+    data: {
+      requestId?: string;
+      url?: string;
+      method?: string;
+      status?: number;
+      type?: string;
+      size?: number;
+    }
+  ): void {
     this.lastActivity = Date.now();
     this.activityListeners.forEach(callback => {
       try {
@@ -249,6 +308,15 @@ export class NetworkMonitor {
     }
 
     if (verbose) {
+      // get inform ation about pending requests
+      this.pendingRequests.forEach(requestId => {
+        const request = this.requests.get(requestId);
+        const response = this.responses.get(requestId);
+        logger.debug(
+          `Pending Request: ${requestId}, URL: ${request?.url}, Method: ${request?.method}, Response Status: ${response?.status}`
+        );
+      });
+
       logger.warn(
         `Network idle timeout after ${maxWait}ms, ${this.pendingRequests.size} requests still pending`
       );

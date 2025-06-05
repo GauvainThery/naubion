@@ -24,7 +24,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({ steps }) => {
       </div>
 
       <div className="space-y-2">
-        {steps.map((step, index) => (
+        {steps.map((step, _index) => (
           <LoadingStep
             key={step.id}
             title={step.title}
