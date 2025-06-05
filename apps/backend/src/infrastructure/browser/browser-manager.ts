@@ -20,7 +20,7 @@ export class BrowserManager {
     const launchOptions: LaunchOptions = {
       browser: 'chrome',
       executablePath: process.env.CHROME_EXECUTABLE_PATH || '',
-      headless: false,
+      headless: true,
       args: [
         '--disable-extensions',
         '--disable-plugins',

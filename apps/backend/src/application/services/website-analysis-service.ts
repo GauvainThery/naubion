@@ -64,7 +64,7 @@ export class WebsiteAnalysisService {
 
       // Phase 2: Setup monitoring and simulation
       const client = await page.createCDPSession();
-      const networkMonitor = new NetworkMonitor(client);
+      const networkMonitor = new NetworkMonitor(client, page);
       const userSimulator = createUserSimulator(page, context.options);
 
       // Connect components
@@ -80,11 +80,14 @@ export class WebsiteAnalysisService {
       // Phase 4: Simulate user behavior
       const simulationResult = await userSimulator.simulateUserBehavior();
 
-      // Phase 5: Process results
+      // Phase 5: Process any pending cross-origin requests
+      await networkMonitor.processPendingCrossOriginRequests();
+
+      // Phase 6: Process results
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      // Phase 6: Create final result
+      // Phase 7: Create final result
       const pageMetadata = await page.evaluate(() => ({
         pageTitle: document.title,
         hasFrames: window.frames.length > 0,
