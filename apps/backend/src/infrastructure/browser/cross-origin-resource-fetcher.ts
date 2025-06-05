@@ -224,12 +224,6 @@ export class CrossOriginResourceFetcher {
             type: completeResource.resourceType,
             size: completeResource.transferSize
           });
-
-          logger.debug('Added cross-origin sub-resource', {
-            url: completeResource.url,
-            type: completeResource.resourceType,
-            size: completeResource.transferSize
-          });
         }
       }
     }
