@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import MainLayout from './components/templates/MainLayout';
-import AnalysisForm from './components/organisms/AnalysisForm';
+import CombinedAnalysisForm from './components/organisms/CombinedAnalysisForm';
 import LoadingSection from './components/organisms/LoadingSection';
 import ResultsSection from './components/organisms/ResultsSection';
 import useAnalysis from './hooks/useAnalysis';
-import type { AnalysisFormData } from './types';
+import type { AnalysisFormData, WebsiteAnalysisFormData, AnalysisType } from './types';
 
 const App: React.FC = () => {
   const {
@@ -44,6 +44,27 @@ const App: React.FC = () => {
     };
   };
 
+  const handleAnalysisSubmit = (
+    data: AnalysisFormData | WebsiteAnalysisFormData,
+    type: AnalysisType
+  ) => {
+    // For now, we'll handle both types the same way
+    // The backend integration will need to be updated to handle website analysis
+    if (type === 'page') {
+      startAnalysis(data as AnalysisFormData);
+    } else {
+      // Website analysis - convert to page analysis format for now
+      const websiteData = data as WebsiteAnalysisFormData;
+      const pageData: AnalysisFormData = {
+        url: websiteData.url,
+        averagePages: 5, // Default for website analysis
+        interactionLevel: websiteData.interactionLevel,
+        deviceType: websiteData.desktopMobileRatio >= 50 ? 'desktop' : 'mobile'
+      };
+      startAnalysis(pageData);
+    }
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const autoAnalyze = urlParams.get('autoAnalyze') === 'true';
@@ -61,7 +82,7 @@ const App: React.FC = () => {
       <div className="space-y-12">
         {/* Analysis Form */}
         <section>
-          <AnalysisForm onSubmit={startAnalysis} isLoading={isLoading} />
+          <CombinedAnalysisForm onSubmit={handleAnalysisSubmit} isLoading={isLoading} />
         </section>
 
         {/* Loading Section */}

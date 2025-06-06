@@ -8,6 +8,15 @@ export type AnalysisFormData = {
   deviceType: 'desktop' | 'mobile';
 };
 
+export type WebsiteAnalysisFormData = {
+  url: string;
+  desktopMobileRatio: number; // 0-100, percentage of desktop users
+  interactionLevel: 'minimal' | 'default' | 'thorough';
+  monthlyVisits: number;
+};
+
+export type AnalysisType = 'page' | 'website';
+
 export type LoadingStep = {
   id: string;
   title: string;

@@ -12,6 +12,7 @@ type RadioGroupProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  columns?: 1 | 2;
 };
 
 const RadioGroup: React.FC<RadioGroupProps> = ({
@@ -19,10 +20,14 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   name,
   value,
   onChange,
-  className = ''
+  className = '',
+  columns = 1
 }) => {
+  const containerClass =
+    columns === 2 ? `grid grid-cols-1 md:grid-cols-2 gap-3 ${className}` : `space-y-3 ${className}`;
+
   return (
-    <div className={`space-y-3 ${className}`}>
+    <div className={containerClass}>
       {options.map(option => (
         <RadioOption
           key={option.value}
