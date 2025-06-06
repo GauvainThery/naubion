@@ -2,14 +2,14 @@
  * Website domain service - Core business logic for analyzing websites
  */
 
-import { Website, WebPage } from '../models/website.js';
+import { Website, Page } from '../models/website.js';
 import logger from '../../shared/logger.js';
 
 export class WebsiteService {
   /**
    * Analyze a website by aggregating page metrics
    */
-  aggregateWebsiteMetrics(pages: WebPage[]): Website {
+  aggregateWebsiteMetrics(pages: Page[]): Website {
     if (pages.length === 0) {
       throw new Error('Cannot aggregate website metrics with no pages');
     }

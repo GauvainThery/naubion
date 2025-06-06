@@ -3,7 +3,7 @@
  */
 
 import { Page } from 'puppeteer';
-import { AnalysisOptions } from '../../domain/models/analysis.js';
+import { PageAnalysisOptions } from '../../domain/models/analysis/page-analysis.js';
 import { NetworkMonitor } from './network-monitor.js';
 import { ElementFinder, ElementInfo } from './element-finder.js';
 import { InteractionStrategies } from './interaction-strategies.js';
@@ -34,7 +34,7 @@ export class UserSimulator {
   private behaviorSimulator: BehaviorSimulator;
   private config: SimulationConfig;
 
-  constructor(page: Page, options: AnalysisOptions) {
+  constructor(page: Page, options: PageAnalysisOptions) {
     this.config = {
       maxInteractions: options.maxInteractions,
       maxScrollSteps: options.maxScrollSteps,
@@ -372,6 +372,9 @@ export class UserSimulator {
 /**
  * Factory function to create user simulator with configuration
  */
-export function createUserSimulator(page: Page, analysisOptions: AnalysisOptions): UserSimulator {
+export function createUserSimulator(
+  page: Page,
+  analysisOptions: PageAnalysisOptions
+): UserSimulator {
   return new UserSimulator(page, analysisOptions);
 }

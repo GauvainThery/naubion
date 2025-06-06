@@ -16,6 +16,7 @@ const App: React.FC = () => {
     currentStep,
     estimatedDuration,
     startAnalysis,
+    startWebsiteAnalysis,
     shareResults
   } = useAnalysis();
 
@@ -48,20 +49,10 @@ const App: React.FC = () => {
     data: AnalysisFormData | WebsiteAnalysisFormData,
     type: AnalysisType
   ) => {
-    // For now, we'll handle both types the same way
-    // The backend integration will need to be updated to handle website analysis
     if (type === 'page') {
       startAnalysis(data as AnalysisFormData);
     } else {
-      // Website analysis - convert to page analysis format for now
-      const websiteData = data as WebsiteAnalysisFormData;
-      const pageData: AnalysisFormData = {
-        url: websiteData.url,
-        averagePages: 5, // Default for website analysis
-        interactionLevel: websiteData.interactionLevel,
-        deviceType: websiteData.desktopMobileRatio >= 50 ? 'desktop' : 'mobile'
-      };
-      startAnalysis(pageData);
+      startWebsiteAnalysis(data as WebsiteAnalysisFormData);
     }
   };
 

@@ -4,8 +4,8 @@
 
 import { ResourceCollection } from './resource.js';
 
-// Page entity - represents a single webpage
-export interface WebPage {
+// Page entity - represents a single page
+export interface Page {
   url: string;
   title: string;
   resources: ResourceCollection;
@@ -14,7 +14,7 @@ export interface WebPage {
 // Website aggregate root - represents a complete website
 export interface Website {
   domain: string;
-  pages: WebPage[];
+  pages: Page[];
   avgResourcesPerPage: number;
   totalResourceSize: number;
   totalPages: number;

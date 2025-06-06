@@ -4,10 +4,10 @@
 
 import puppeteer, { Browser, LaunchOptions, Page } from 'puppeteer';
 import {
-  AnalysisOptions,
+  PageAnalysisOptions,
   DeviceConfiguration,
   DEVICE_CONFIGURATIONS
-} from '../../domain/models/analysis.js';
+} from '../../domain/models/analysis/page-analysis.js';
 import logger from '../../shared/logger.js';
 
 export class BrowserManager {
@@ -16,7 +16,7 @@ export class BrowserManager {
   /**
    * Launch browser with analysis options
    */
-  async launch(options: AnalysisOptions): Promise<Browser> {
+  async launch(options: PageAnalysisOptions): Promise<Browser> {
     const launchOptions: LaunchOptions = {
       browser: 'chrome',
       executablePath: process.env.CHROME_EXECUTABLE_PATH || '',
@@ -47,7 +47,7 @@ export class BrowserManager {
   /**
    * Create and configure a new page
    */
-  async createPage(options: AnalysisOptions): Promise<Page> {
+  async createPage(options: PageAnalysisOptions): Promise<Page> {
     if (!this.browser) {
       throw new Error('Browser not launched. Call launch() first.');
     }

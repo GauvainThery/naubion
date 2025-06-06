@@ -1,52 +1,56 @@
 /**
- * Analysis domain service - Core analysis orchestration logic
+ * Page analysis domain service - Core analysis orchestration logic
  */
 
-import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
-import { AnalysisOptions, AnalysisResult, createAnalysisOptions } from '../models/analysis.js';
-import { ResourceCollection } from '../models/resource.js';
+import { SimulationResult } from '../../../infrastructure/browser/user-simulator.js';
+import {
+  createPageAnalysisOptions,
+  PageAnalysisOptions,
+  PageAnalysisResult
+} from '../../models/analysis/page-analysis.js';
+import { ResourceCollection } from '../../models/resource.js';
 
-export interface AnalysisContext {
+export interface PageAnalysisContext {
   url: string;
-  options: AnalysisOptions;
+  options: PageAnalysisOptions;
   startTime: Date;
 }
 
-export interface AnalysisProgress {
+export interface PageAnalysisProgress {
   phase: 'setup' | 'navigation' | 'simulation' | 'processing' | 'complete';
   progress: number;
   message: string;
 }
 
-export class AnalysisDomainService {
+export class PageAnalysisDomainService {
   /**
-   * Create analysis context with validated options
+   * Create page analysis context with validated options
    */
-  createAnalysisContext(
+  createPageAnalysisContext(
     url: string,
     interactionLevel: 'minimal' | 'default' | 'thorough' = 'default',
     deviceType: 'desktop' | 'mobile' = 'desktop'
-  ): AnalysisContext {
+  ): PageAnalysisContext {
     // Validate URL
-    if (!this.isValidUrl(url)) {
+    if (!isValidUrl(url)) {
       throw new Error(`Invalid URL provided: ${url}`);
     }
 
     // Create normalized analysis options
-    const options = createAnalysisOptions(interactionLevel, deviceType);
+    const options = createPageAnalysisOptions(interactionLevel, deviceType);
 
     return {
-      url: this.normalizeUrl(url),
+      url: normalizeUrl(url),
       options,
       startTime: new Date()
     };
   }
 
   /**
-   * Create analysis result aggregate
+   * Create page analysis result aggregate
    */
-  createAnalysisResult(
-    context: AnalysisContext,
+  createPageAnalysisResult(
+    context: PageAnalysisContext,
     resources: ResourceCollection,
     metadata: {
       hasFrames?: boolean;
@@ -55,7 +59,7 @@ export class AnalysisDomainService {
       simulation?: SimulationResult;
       networkActivity?: number;
     }
-  ): AnalysisResult {
+  ): PageAnalysisResult {
     const endTime = new Date();
     const duration = endTime.getTime() - context.startTime.getTime();
 
@@ -75,11 +79,11 @@ export class AnalysisDomainService {
   }
 
   /**
-   * Validate analysis prerequisites
+   * Validate page analysis prerequisites
    */
-  validateAnalysisPrerequisites(context: AnalysisContext): void {
+  validatePageAnalysisPrerequisites(context: PageAnalysisContext): void {
     // Check URL accessibility
-    if (!this.isValidUrl(context.url)) {
+    if (!isValidUrl(context.url)) {
       throw new Error('Invalid URL format');
     }
 
@@ -99,9 +103,9 @@ export class AnalysisDomainService {
   }
 
   /**
-   * Calculate analysis complexity score
+   * Calculate page analysis complexity score
    */
-  calculateComplexityScore(options: AnalysisOptions): number {
+  calculatePageAnalysisComplexityScore(options: PageAnalysisOptions): number {
     let score = 1; // Base score
 
     // Interaction level complexity
@@ -132,9 +136,9 @@ export class AnalysisDomainService {
   /**
    * Estimate analysis duration based on options
    */
-  estimateAnalysisDuration(options: AnalysisOptions): number {
+  estimatePageAnalysisDuration(options: PageAnalysisOptions): number {
     const baseTime = 15000; // 15 seconds base
-    const complexityScore = this.calculateComplexityScore(options);
+    const complexityScore = this.calculatePageAnalysisComplexityScore(options);
 
     // Scale duration based on complexity
     return baseTime + complexityScore * 5000; // +5s per complexity point
@@ -143,7 +147,10 @@ export class AnalysisDomainService {
   /**
    * Generate progress updates for analysis phases
    */
-  generateProgressUpdate(phase: AnalysisProgress['phase'], details?: string): AnalysisProgress {
+  generatePageAnalysisProgressUpdate(
+    phase: PageAnalysisProgress['phase'],
+    details?: string
+  ): PageAnalysisProgress {
     const phases = {
       setup: { progress: 10, message: 'Setting up browser environment' },
       navigation: { progress: 25, message: 'Navigating to target URL' },
@@ -159,46 +166,59 @@ export class AnalysisDomainService {
       message: details || phaseInfo.message
     };
   }
+}
 
-  /**
-   * Validate and normalize URL
-   */
-  private normalizeUrl(url: string): string {
-    // Add protocol if missing
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = `https://${url}`;
-    }
-
-    // Normalize URL
-    try {
-      const urlObj = new URL(url);
-      return urlObj.toString();
-    } catch {
-      throw new Error(`Invalid URL format: ${url}`);
-    }
+/**
+ * Validate and normalize URL
+ */
+export function normalizeUrl(url: string): string {
+  // Add protocol if missing
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
   }
 
-  /**
-   * Validate URL format and accessibility
-   */
-  private isValidUrl(url: string): boolean {
-    try {
-      const normalizedUrl = this.normalizeUrl(url);
-      const urlObj = new URL(normalizedUrl);
+  // Normalize URL
+  try {
+    const urlObj = new URL(url);
+    return urlObj.toString();
+  } catch {
+    throw new Error(`Invalid URL format: ${url}`);
+  }
+}
 
-      // Check for valid protocols
-      if (!['http:', 'https:'].includes(urlObj.protocol)) {
-        return false;
-      }
+/**
+ * Validate URL format and accessibility
+ */
+export function isValidUrl(url: string): boolean {
+  try {
+    const normalizedUrl = normalizeUrl(url);
+    const urlObj = new URL(normalizedUrl);
 
-      // Check for valid hostname
-      if (!urlObj.hostname || urlObj.hostname.length === 0) {
-        return false;
-      }
-
-      return true;
-    } catch {
+    // Check for valid protocols
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
       return false;
     }
+
+    // Check for valid hostname
+    if (!urlObj.hostname || urlObj.hostname.length === 0) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Extract domain from URL
+ */
+export function extractDomain(url: string): string {
+  try {
+    const normalizedUrl = normalizeUrl(url);
+    const urlObj = new URL(normalizedUrl);
+    return urlObj.hostname;
+  } catch {
+    throw new Error(`Invalid URL format: ${url}`);
   }
 }

@@ -4,16 +4,25 @@
 
 import express from 'express';
 import { AnalysisController } from './controllers/analysis-controller.js';
-import { websiteAnalysisService } from '../di/index.js';
+import { websiteAnalysisService, fullWebsiteAnalysisService } from '../di/index.js';
 
 const router = express.Router();
-const analysisController = new AnalysisController(websiteAnalysisService);
+const analysisController = new AnalysisController(
+  websiteAnalysisService,
+  fullWebsiteAnalysisService
+);
 
 /**
  * POST /api/analyze
  * Start analysis and return immediate response with estimation
  */
 router.post('/analyze', analysisController.analyze);
+
+/**
+ * POST /api/analyze-website
+ * Start website analysis and return immediate response with estimation
+ */
+router.post('/analyze-website', analysisController.analyzeWebsite);
 
 /**
  * GET /api/analysis/:analysisId/progress
