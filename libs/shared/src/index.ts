@@ -27,3 +27,6 @@ export type DeepPartial<T> = {
 };
 
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// Page routes
+export { page } from './page';

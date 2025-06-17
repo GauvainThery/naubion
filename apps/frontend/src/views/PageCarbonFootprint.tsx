@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import MainLayout from './components/templates/MainLayout';
-import AnalysisForm from './components/organisms/AnalysisForm';
-import LoadingSection from './components/organisms/LoadingSection';
-import ResultsSection from './components/organisms/ResultsSection';
-import useAnalysis from './hooks/useAnalysis';
-import type { AnalysisFormData } from './types';
+import MainLayout from '../components/templates/MainLayout';
+import AnalysisForm from '../components/organisms/AnalysisForm';
+import LoadingSection from '../components/organisms/LoadingSection';
+import ResultsSection from '../components/organisms/ResultsSection';
+import useAnalysis from '../hooks/useAnalysis';
+import type { AnalysisFormData } from '../types';
 
-const App: React.FC = () => {
+const PageCarbonFootprint: React.FC = () => {
   const {
     isLoading,
     results,
@@ -107,4 +107,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default PageCarbonFootprint;
