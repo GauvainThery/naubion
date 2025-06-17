@@ -24,31 +24,37 @@
   --color-text-dark: #131d15;
 }
 
-@layer base {
-  body {
-    font-family: 'Inter', sans-serif;
-  }
+.container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
-@layer components {
-  .btn-primary {
-    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
-  }
+.drop-shadow {
+  @apply drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)];
+}
 
-  .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
-  }
+.noise {
+  position: relative;
+}
 
-  .input-primary {
-    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-colors duration-200;
-  }
+.noise::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('./assets/noise.svg');
+  background-repeat: repeat;
+  background-size: 324px;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+  opacity: 0.8;
+}
 
-  .card {
-    @apply bg-white rounded-2xl shadow-lg border border-gray-100;
-  }
-
-  .progress-shimmer {
-    animation: shimmer 2s ease-in-out infinite;
+@layer base {
+  body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
   }
 }
 

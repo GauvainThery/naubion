@@ -9,19 +9,15 @@ type LogoProps = {
 const Logo = ({ size = 'md', className = '', hasDropShadow = false }: LogoProps) => {
   const sizes: Record<LogoProps['size'], string> = {
     sm: 'w-[100px]',
-    md: 'w-[150px]',
-    lg: 'w-[221px]'
+    md: 'w-[256px]',
+    lg: 'w-[324px]'
   };
 
   return (
     <img
       src="assets/naubion-logo.svg"
       alt="naubion logo"
-      className={cn(
-        sizes[size],
-        hasDropShadow ? 'drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]' : '',
-        className
-      )}
+      className={cn(sizes[size], hasDropShadow ? 'drop-shadow' : '', className)}
     />
   );
 };

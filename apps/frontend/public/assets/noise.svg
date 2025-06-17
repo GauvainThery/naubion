@@ -1,0 +1,17 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="transparent" filter="url(#filter0_n_45_1184)" />
+  <defs>
+    <filter id="filter0_n_45_1184" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse"
+      color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.1666666716337204 0.1666666716337204"
+        stitchTiles="stitch" numOctaves="3" result="noise" seed="8016" />
+      <feColorMatrix in="noise" type="luminanceToAlpha" result="alphaNoise" />
+      <feComponentTransfer in="alphaNoise" result="coloredNoise1">
+        <feFuncA type="discrete"
+          tableValues="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 " />
+      </feComponentTransfer>
+      <feFlood flood-color="rgba(0, 0, 0, 0.25)" result="color1Flood" />
+      <feComposite operator="in" in2="coloredNoise1" in="color1Flood" result="color1" />
+    </filter>
+  </defs>
+</svg>
