@@ -15,7 +15,7 @@ const Header: React.FC = () => {
           {/* Mobile logo */}
           <Logo size="md" hasDropShadow className="lg:hidden" />
         </Link>
-        <p className="font-bold">Control the web environmental footprint</p>
+        <p className="font-bold text-xs">Control the web environmental footprint</p>
       </div>
 
       <div className="lg:w-1/3 flex items-center justify-end">

@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @theme {
@@ -45,7 +44,7 @@
   bottom: 0;
   background-image: url('./assets/noise.svg');
   background-repeat: repeat;
-  background-size: 324px;
+  background-size: 176px;
   pointer-events: none;
   z-index: 0;
   mix-blend-mode: multiply;
@@ -56,6 +55,10 @@
   body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
   }
+}
+
+.secondary-font {
+  font-family: 'Courier New', Courier, monospace;
 }
 
 @keyframes shimmer {

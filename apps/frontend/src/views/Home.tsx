@@ -1,8 +1,12 @@
 import React from 'react';
-import { MainLayout } from '../components';
+import { HeroSection, MainLayout } from '../components';
 
 const Home: React.FC = () => {
-  return <MainLayout>Hello</MainLayout>;
+  return (
+    <MainLayout>
+      <HeroSection />
+    </MainLayout>
+  );
 };
 
 export default Home;

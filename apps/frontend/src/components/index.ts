@@ -15,6 +15,7 @@ export { default as MetricCard } from './molecules/MetricCard';
 export { default as ResourceBreakdownItem } from './molecules/ResourceBreakdownItem';
 export { default as LoadingStep } from './molecules/LoadingStep';
 export { default as ResourceList } from './molecules/ResourceList';
+export { default as HeroSection } from './molecules/HeroSection';
 
 // Organisms
 export { default as Header } from './organisms/Header';
