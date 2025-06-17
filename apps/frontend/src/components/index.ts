@@ -7,6 +7,7 @@ export { default as ProgressBar } from './atoms/ProgressBar';
 export { default as LoadingSpinner } from './atoms/LoadingSpinner';
 export { default as ResourceItem } from './atoms/ResourceItem';
 export { default as Slider } from './atoms/Slider';
+export { default as Logo } from './atoms/Logo';
 
 // Molecules
 export { default as RadioGroup } from './molecules/RadioGroup';
