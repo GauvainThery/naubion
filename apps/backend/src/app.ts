@@ -1,5 +1,5 @@
 /**
- * Main server file for the Green Web Compass
+ * Main server file for naubion
  * Refactored with proper error handling, logging, and configuration
  * Implemented with Domain-Driven Design architecture
  */
@@ -100,14 +100,14 @@ function startServer(): void {
   const app = createApp();
   const port = getConfig<number>('port');
 
-  logger.info('Starting Green Web Compass server...', {
+  logger.info('Starting naubion server...', {
     port,
     env: process.env.NODE_ENV || 'development',
     nodeVersion: process.version
   });
 
   const server = app.listen(port, () => {
-    logger.success(`Green Web Compass server running at http://localhost:${port}`);
+    logger.success(`naubion server running at http://localhost:${port}`);
     logger.info('Ready to analyze websites! 📊');
   });
 

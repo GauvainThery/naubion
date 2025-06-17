@@ -1,4 +1,4 @@
-# Frontend - Green Web Compass
+# Frontend - naubion
 
 React + TypeScript frontend for analyzing website environmental impact. Built with Vite and Tailwind CSS using Atomic Design principles.
 
@@ -120,13 +120,13 @@ VITE_WS_URL=ws://localhost:3001
 1. **Choose the right level** - Start with atoms, compose into molecules/organisms
 2. **Define TypeScript interfaces** for all props and state
 3. **Export from index.ts** in the appropriate directory
-4. **Use shared types** from `@green-web-compass/shared` when possible
+4. **Use shared types** from `@naubion/shared` when possible
 
 ### Example Component
 
 ```typescript
 import React from 'react';
-import type { SomeSharedType } from '@green-web-compass/shared';
+import type { SomeSharedType } from '@naubion/shared';
 
 interface ComponentProps {
   data: SomeSharedType;
@@ -173,7 +173,7 @@ pnpm build  # Creates optimized build in dist/
 Import shared types for API communication:
 
 ```typescript
-import type { AnalysisRequest, AnalysisResponse, ProgressUpdate } from '@green-web-compass/shared';
+import type { AnalysisRequest, AnalysisResponse, ProgressUpdate } from '@naubion/shared';
 ```
 
 ## Troubleshooting

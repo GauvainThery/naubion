@@ -1,4 +1,4 @@
-# Green Web Compass
+# naubion
 
 A TypeScript monorepo for analyzing website resource usage and environmental impact using automated browser testing.
 

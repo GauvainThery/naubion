@@ -1,7 +1,7 @@
 {
-  "name": "@green-web-compass/frontend",
+  "name": "@naubion/frontend",
   "version": "1.0.0",
-  "description": "Frontend React application for Green Web Compass",
+  "description": "Frontend React application for naubion",
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000 --host",
@@ -13,7 +13,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@green-web-compass/shared": "workspace:*",
+    "@naubion/shared": "workspace:*",
     "clsx": "^2.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

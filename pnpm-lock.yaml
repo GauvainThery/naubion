@@ -32,7 +32,7 @@ importers:
 
   apps/backend:
     dependencies:
-      '@green-web-compass/shared':
+      '@naubion/shared':
         specifier: workspace:*
         version: link:../../libs/shared
       cors:
@@ -81,7 +81,7 @@ importers:
 
   apps/frontend:
     dependencies:
-      '@green-web-compass/shared':
+      '@naubion/shared':
         specifier: workspace:*
         version: link:../../libs/shared
       clsx:

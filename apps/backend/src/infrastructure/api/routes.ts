@@ -1,5 +1,5 @@
 /**
- * API routes for the Green Web Compass
+ * API routes for naubion
  */
 
 import express from 'express';

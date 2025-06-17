@@ -1,7 +1,7 @@
 {
-  "name": "@green-web-compass/shared",
+  "name": "@naubion/shared",
   "version": "1.0.0",
-  "description": "Shared types and utilities for Green Web Compass",
+  "description": "Shared types and utilities for naubion",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

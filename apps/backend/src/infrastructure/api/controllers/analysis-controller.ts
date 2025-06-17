@@ -247,7 +247,7 @@ export class AnalysisController {
   healthCheck = (req: Request, res: Response): void => {
     res.json({
       status: 'ok',
-      service: 'green-web-compass-api',
+      service: 'naubion-api',
       timestamp: new Date().toISOString()
     });
   };

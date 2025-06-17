@@ -1,6 +1,6 @@
 # Shared Library
 
-TypeScript types and interfaces shared across the Green Web Compass monorepo to ensure type consistency between frontend and backend.
+TypeScript types and interfaces shared across naubion monorepo to ensure type consistency between frontend and backend.
 
 ## Overview
 
@@ -16,7 +16,7 @@ Automatically included as a workspace dependency:
 ```json
 {
   "dependencies": {
-    "@green-web-compass/shared": "workspace:*"
+    "@naubion/shared": "workspace:*"
   }
 }
 ```

@@ -1,4 +1,4 @@
-# Backend - Green Web Compass
+# Backend - naubion
 
 Express.js + TypeScript API server with Puppeteer browser automation for website analysis. Provides REST API and WebSocket real-time updates.
 
