@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import MainLayout from './components/templates/MainLayout';
-import CombinedAnalysisForm from './components/organisms/CombinedAnalysisForm';
+import AnalysisForm from './components/organisms/AnalysisForm';
 import LoadingSection from './components/organisms/LoadingSection';
 import ResultsSection from './components/organisms/ResultsSection';
 import useAnalysis from './hooks/useAnalysis';
-import type { AnalysisFormData, WebsiteAnalysisFormData, AnalysisType } from './types';
+import type { AnalysisFormData } from './types';
 
 const App: React.FC = () => {
   const {
@@ -16,7 +16,6 @@ const App: React.FC = () => {
     currentStep,
     estimatedDuration,
     startAnalysis,
-    startWebsiteAnalysis,
     shareResults
   } = useAnalysis();
 
@@ -30,14 +29,12 @@ const App: React.FC = () => {
     if (!urlParam) return null;
 
     // Extract other optional parameters with fallbacks
-    const averagePages = parseInt(urlParams.get('averagePages') || '5');
     const interactionLevel =
       (urlParams.get('interactionLevel') as 'minimal' | 'default' | 'thorough') || 'default';
     const deviceType = (urlParams.get('deviceType') as 'desktop' | 'mobile') || 'desktop';
 
     return {
       url: urlParam,
-      averagePages: isNaN(averagePages) ? 5 : averagePages,
       interactionLevel: ['minimal', 'default', 'thorough'].includes(interactionLevel)
         ? interactionLevel
         : 'default',
@@ -45,25 +42,13 @@ const App: React.FC = () => {
     };
   };
 
-  const handleAnalysisSubmit = (
-    data: AnalysisFormData | WebsiteAnalysisFormData,
-    type: AnalysisType
-  ) => {
-    if (type === 'page') {
-      startAnalysis(data as AnalysisFormData);
-    } else {
-      startWebsiteAnalysis(data as WebsiteAnalysisFormData);
-    }
-  };
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const autoAnalyze = urlParams.get('autoAnalyze') === 'true';
-    const hasLegacyUrl = urlParams.has('url'); // Legacy support for 'url' param
     const formDataFromUrl = getFormDataFromUrlParams();
 
     // Auto-analyze if explicitly requested, or if using legacy 'url' parameter for backwards compatibility
-    if (formDataFromUrl && (autoAnalyze || hasLegacyUrl)) {
+    if (formDataFromUrl && autoAnalyze) {
       startAnalysis(formDataFromUrl);
     }
   }, [startAnalysis]);
@@ -73,7 +58,7 @@ const App: React.FC = () => {
       <div className="space-y-12">
         {/* Analysis Form */}
         <section>
-          <CombinedAnalysisForm onSubmit={handleAnalysisSubmit} isLoading={isLoading} />
+          <AnalysisForm onSubmit={startAnalysis} isLoading={isLoading} />
         </section>
 
         {/* Loading Section */}

@@ -4,24 +4,15 @@
 
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
-import { WebsiteAnalysisService } from '../../../application/services/website-analysis-service.js';
 import { PageAnalysisService } from '../../../application/services/page-analysis-service.js';
 import { PageAnalysisResult } from '../../../domain/models/analysis/page-analysis.js';
 import { asyncHandler, validateAnalysisOptions, validateUrl } from '../../../shared/errors.js';
 import logger from '../../../shared/logger.js';
-import { WebsiteAnalysisResult } from '../../../domain/models/analysis/website-analysis.js';
 
 type AnalysisRequestBody = {
   url: string;
   interactionLevel?: 'minimal' | 'default' | 'thorough';
   deviceType?: 'desktop' | 'mobile';
-};
-
-type WebsiteAnalysisRequestBody = {
-  url: string;
-  desktopMobileRatio: number;
-  interactionLevel: 'minimal' | 'default' | 'thorough';
-  monthlyVisits: number;
 };
 
 type AnalysisInitResponse = {
@@ -36,7 +27,7 @@ const ongoingAnalyses = new Map<
   string,
   {
     status: 'running' | 'completed' | 'failed';
-    result?: PageAnalysisResult | WebsiteAnalysisResult;
+    result?: PageAnalysisResult;
     error?: string;
     progress: number;
     currentStep: string;
@@ -63,10 +54,7 @@ function broadcastProgress(analysisId: string, progress: number, step: string, m
 }
 
 export class AnalysisController {
-  constructor(
-    private pageAnalysisService: PageAnalysisService,
-    private websiteAnalysisService: WebsiteAnalysisService
-  ) {}
+  constructor(private pageAnalysisService: PageAnalysisService) {}
 
   /**
    * Start analysis and return immediate response with estimation
@@ -196,65 +184,6 @@ export class AnalysisController {
   });
 
   /**
-   * Start website analysis and return immediate response with estimation
-   */
-  analyzeWebsite = asyncHandler(
-    async (req: Request<object, unknown, WebsiteAnalysisRequestBody>, res: Response) => {
-      const { url, desktopMobileRatio, interactionLevel, monthlyVisits } = req.body;
-
-      // Validate inputs
-      validateUrl(url);
-      this.validateWebsiteAnalysisOptions({ desktopMobileRatio, interactionLevel, monthlyVisits });
-
-      // Generate unique analysis ID
-      const analysisId = randomUUID();
-
-      // Get time estimation
-      const context = this.websiteAnalysisService.createAnalysisContext(
-        url,
-        interactionLevel,
-        desktopMobileRatio,
-        monthlyVisits
-      );
-      const estimatedDuration = this.websiteAnalysisService.estimateAnalysisDuration(context);
-
-      // Initialize tracking
-      ongoingAnalyses.set(analysisId, {
-        status: 'running',
-        progress: 0,
-        currentStep: 'initializing'
-      });
-
-      logger.info('Starting website analysis', {
-        analysisId,
-        url,
-        desktopMobileRatio,
-        interactionLevel,
-        monthlyVisits,
-        estimatedDuration,
-        userAgent: req.get('User-Agent')
-      });
-
-      // Return immediate response
-      const initResponse: AnalysisInitResponse = {
-        analysisId,
-        estimatedDuration,
-        status: 'started',
-        message: `Website analysis started. Estimated completion in ${Math.round(estimatedDuration / 1000)} seconds.`
-      };
-
-      res.json(initResponse);
-
-      // Start background website analysis
-      this.runBackgroundWebsiteAnalysis(analysisId, url, {
-        desktopMobileRatio,
-        interactionLevel,
-        monthlyVisits
-      });
-    }
-  );
-
-  /**
    * Background analysis execution with progress updates
    */
   private async runBackgroundAnalysis(
@@ -300,52 +229,6 @@ export class AnalysisController {
   }
 
   /**
-   * Background website analysis execution with progress updates
-   */
-  private async runBackgroundWebsiteAnalysis(
-    analysisId: string,
-    url: string,
-    options: {
-      desktopMobileRatio: number;
-      interactionLevel: 'minimal' | 'default' | 'thorough';
-      monthlyVisits: number;
-    }
-  ) {
-    try {
-      // Update progress: Setup (0-10%)
-      this.updateProgress(analysisId, 5, 'setup', 'Setting up website analysis...');
-
-      // Enhanced website analysis service call with progress callbacks
-      const result = await this.websiteAnalysisService.analyzeWebsite(url, options);
-
-      // Final update
-      this.updateProgress(analysisId, 100, 'complete', 'Website analysis completed successfully');
-
-      const analysis = ongoingAnalyses.get(analysisId);
-      if (analysis) {
-        analysis.status = 'completed';
-        analysis.result = result;
-      }
-
-      logger.info('Website analysis completed', { analysisId, url });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error(`Website analysis failed for ${url}`, {
-        analysisId,
-        error: errorMessage
-      });
-
-      const analysis = ongoingAnalyses.get(analysisId);
-      if (analysis) {
-        analysis.status = 'failed';
-        analysis.error = errorMessage;
-      }
-
-      this.updateProgress(analysisId, 0, 'error', `Website analysis failed: ${errorMessage}`);
-    }
-  }
-
-  /**
    * Update progress and broadcast to SSE connections
    */
   private updateProgress(analysisId: string, progress: number, step: string, message?: string) {
@@ -368,25 +251,4 @@ export class AnalysisController {
       timestamp: new Date().toISOString()
     });
   };
-
-  /**
-   * Validate website analysis options
-   */
-  private validateWebsiteAnalysisOptions(options: {
-    desktopMobileRatio: number;
-    interactionLevel: string;
-    monthlyVisits: number;
-  }): void {
-    if (options.desktopMobileRatio < 0 || options.desktopMobileRatio > 100) {
-      throw new Error('Desktop/mobile ratio must be between 0 and 100');
-    }
-
-    if (!['minimal', 'default', 'thorough'].includes(options.interactionLevel)) {
-      throw new Error('Invalid interaction level');
-    }
-
-    if (options.monthlyVisits <= 0) {
-      throw new Error('Monthly visits must be greater than 0');
-    }
-  }
 }

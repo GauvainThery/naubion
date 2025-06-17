@@ -7,7 +7,6 @@ export { default as ProgressBar } from './atoms/ProgressBar';
 export { default as LoadingSpinner } from './atoms/LoadingSpinner';
 export { default as ResourceItem } from './atoms/ResourceItem';
 export { default as Slider } from './atoms/Slider';
-export { default as Tabs } from './atoms/Tabs';
 
 // Molecules
 export { default as RadioGroup } from './molecules/RadioGroup';
@@ -19,8 +18,6 @@ export { default as ResourceList } from './molecules/ResourceList';
 // Organisms
 export { default as Header } from './organisms/Header';
 export { default as AnalysisForm } from './organisms/AnalysisForm';
-export { default as WebsiteAnalysisForm } from './organisms/WebsiteAnalysisForm';
-export { default as CombinedAnalysisForm } from './organisms/CombinedAnalysisForm';
 export { default as LoadingSection } from './organisms/LoadingSection';
 export { default as ResultsSection } from './organisms/ResultsSection';
 
