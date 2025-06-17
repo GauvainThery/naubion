@@ -1,11 +1,11 @@
 /**
- * Analysis domain model - Core analysis concepts and value objects
+ * Page analysis domain model - Core analysis concepts and value objects
  */
 
-import { ResourceCollection } from './resource.js';
+import { ResourceCollection } from '../resource.js';
 
 // Analysis configuration value objects
-export interface AnalysisOptions {
+export interface PageAnalysisOptions {
   interactionLevel: 'minimal' | 'default' | 'thorough';
   deviceType: 'desktop' | 'mobile';
   maxInteractions: number;
@@ -14,21 +14,11 @@ export interface AnalysisOptions {
   verboseLogging: boolean;
 }
 
-export interface DeviceConfiguration {
-  viewport: {
-    width: number;
-    height: number;
-    deviceScaleFactor: number;
-    isMobile: boolean;
-    hasTouch: boolean;
-  };
-}
-
 // Analysis result aggregate root
-export interface AnalysisResult {
+export interface PageAnalysisResult {
   url: string;
   timestamp: string;
-  options: AnalysisOptions;
+  options: PageAnalysisOptions;
   duration: number;
   resources: ResourceCollection;
   metadata: {
@@ -43,6 +33,16 @@ export interface AnalysisResult {
 }
 
 // Device configurations for different types
+export interface DeviceConfiguration {
+  viewport: {
+    width: number;
+    height: number;
+    deviceScaleFactor: number;
+    isMobile: boolean;
+    hasTouch: boolean;
+  };
+}
+
 export const DEVICE_CONFIGURATIONS: Record<string, DeviceConfiguration> = {
   desktop: {
     viewport: {
@@ -65,11 +65,11 @@ export const DEVICE_CONFIGURATIONS: Record<string, DeviceConfiguration> = {
 };
 
 // Analysis configuration factory
-export function createAnalysisOptions(
+export function createPageAnalysisOptions(
   interactionLevel: 'minimal' | 'default' | 'thorough' = 'default',
   deviceType: 'desktop' | 'mobile' = 'desktop'
-): AnalysisOptions {
-  const baseConfig: AnalysisOptions = {
+): PageAnalysisOptions {
+  const baseConfig: PageAnalysisOptions = {
     interactionLevel,
     deviceType,
     timeout: 120000,

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import type { AnalysisFormData, LoadingStep } from '../types';
-import { AnalysisResult } from '../../../backend/src/domain/models/analysis';
+import { PageAnalysisResult } from '../../../backend/src/domain/models/analysis/page-analysis';
 
 type AnalysisInitResponse = {
   analysisId: string;
@@ -11,7 +11,7 @@ type AnalysisInitResponse = {
 
 const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [results, setResults] = useState<AnalysisResult | null>(null);
+  const [results, setResults] = useState<PageAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastFormData, setLastFormData] = useState<AnalysisFormData | null>(null);
   const [progress, setProgress] = useState<number>(0);
@@ -57,7 +57,7 @@ const useAnalysis = () => {
       }
 
       const data = await response.json();
-      setResults(data as AnalysisResult);
+      setResults(data as PageAnalysisResult);
       setProgress(100);
       setIsLoading(false);
     } catch (err) {
@@ -130,8 +130,7 @@ const useAnalysis = () => {
   const shareResults = useCallback(() => {
     if (results && lastFormData) {
       const params = new URLSearchParams({
-        websiteUrl: lastFormData.url,
-        averagePages: lastFormData.averagePages.toString(),
+        url: lastFormData.url,
         interactionLevel: lastFormData.interactionLevel,
         deviceType: lastFormData.deviceType,
         autoAnalyze: 'true' // This tells the app to auto-analyze when the link is opened

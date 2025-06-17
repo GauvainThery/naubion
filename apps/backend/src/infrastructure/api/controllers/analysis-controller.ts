@@ -2,12 +2,12 @@
  * API controller for website analysis
  */
 
-import { Request, Response } from 'express';
-import { WebsiteAnalysisService } from '../../../application/services/website-analysis-service.js';
-import { asyncHandler, validateUrl, validateAnalysisOptions } from '../../../shared/errors.js';
-import { AnalysisResult } from '../../../domain/models/analysis.js';
-import logger from '../../../shared/logger.js';
 import { randomUUID } from 'crypto';
+import { Request, Response } from 'express';
+import { PageAnalysisService } from '../../../application/services/page-analysis-service.js';
+import { PageAnalysisResult } from '../../../domain/models/analysis/page-analysis.js';
+import { asyncHandler, validateAnalysisOptions, validateUrl } from '../../../shared/errors.js';
+import logger from '../../../shared/logger.js';
 
 type AnalysisRequestBody = {
   url: string;
@@ -27,7 +27,7 @@ const ongoingAnalyses = new Map<
   string,
   {
     status: 'running' | 'completed' | 'failed';
-    result?: AnalysisResult;
+    result?: PageAnalysisResult;
     error?: string;
     progress: number;
     currentStep: string;
@@ -54,7 +54,7 @@ function broadcastProgress(analysisId: string, progress: number, step: string, m
 }
 
 export class AnalysisController {
-  constructor(private websiteAnalysisService: WebsiteAnalysisService) {}
+  constructor(private pageAnalysisService: PageAnalysisService) {}
 
   /**
    * Start analysis and return immediate response with estimation
@@ -71,14 +71,12 @@ export class AnalysisController {
       const analysisId = randomUUID();
 
       // Get time estimation
-      const context = this.websiteAnalysisService.createAnalysisContext(
+      const context = this.pageAnalysisService.createAnalysisContext(
         url,
         interactionLevel,
         deviceType
       );
-      const estimatedDuration = this.websiteAnalysisService.estimateAnalysisDuration(
-        context.options
-      );
+      const estimatedDuration = this.pageAnalysisService.estimateAnalysisDuration(context.options);
 
       // Initialize tracking
       ongoingAnalyses.set(analysisId, {
@@ -198,7 +196,7 @@ export class AnalysisController {
       this.updateProgress(analysisId, 5, 'setup', 'Setting up browser environment...');
 
       // Enhanced analysis service call with progress callbacks
-      const result = await this.websiteAnalysisService.analyzeUrlWithProgress(url, {
+      const result = await this.pageAnalysisService.analyzeUrlWithProgress(url, {
         interactionLevel: options.interactionLevel as 'minimal' | 'default' | 'thorough',
         deviceType: options.deviceType as 'desktop' | 'mobile',
         progressCallback: (progress: number, step: string, message?: string) => {

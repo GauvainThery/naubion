@@ -29,14 +29,12 @@ const App: React.FC = () => {
     if (!urlParam) return null;
 
     // Extract other optional parameters with fallbacks
-    const averagePages = parseInt(urlParams.get('averagePages') || '5');
     const interactionLevel =
       (urlParams.get('interactionLevel') as 'minimal' | 'default' | 'thorough') || 'default';
     const deviceType = (urlParams.get('deviceType') as 'desktop' | 'mobile') || 'desktop';
 
     return {
       url: urlParam,
-      averagePages: isNaN(averagePages) ? 5 : averagePages,
       interactionLevel: ['minimal', 'default', 'thorough'].includes(interactionLevel)
         ? interactionLevel
         : 'default',
@@ -47,11 +45,10 @@ const App: React.FC = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const autoAnalyze = urlParams.get('autoAnalyze') === 'true';
-    const hasLegacyUrl = urlParams.has('url'); // Legacy support for 'url' param
     const formDataFromUrl = getFormDataFromUrlParams();
 
     // Auto-analyze if explicitly requested, or if using legacy 'url' parameter for backwards compatibility
-    if (formDataFromUrl && (autoAnalyze || hasLegacyUrl)) {
+    if (formDataFromUrl && autoAnalyze) {
       startAnalysis(formDataFromUrl);
     }
   }, [startAnalysis]);

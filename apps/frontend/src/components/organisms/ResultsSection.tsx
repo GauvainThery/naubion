@@ -4,15 +4,15 @@ import Button from '../atoms/Button';
 import MetricCard from '../molecules/MetricCard';
 import ResourceBreakdownItem from '../molecules/ResourceBreakdownItem';
 import ResourceList from '../molecules/ResourceList';
-import { AnalysisResult } from '../../../../backend/src/domain/models/analysis';
+import { PageAnalysisResult } from '../../../../backend/src/domain/models/analysis/page-analysis';
 import {
   processLargestResources,
   processResourceData,
   roundResourceSize
-} from './../../utils/websiteAnalysisResultProcessors.ts';
+} from './../../utils/websiteAnalysisResultProcessors';
 
 type ResultsSectionProps = {
-  results: AnalysisResult;
+  results: PageAnalysisResult;
   onShare: () => void;
 };
 

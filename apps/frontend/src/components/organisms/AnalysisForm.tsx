@@ -12,7 +12,6 @@ type AnalysisFormProps = {
 
 const DEFAULT_FORM_DATA: AnalysisFormData = {
   url: '',
-  averagePages: 5,
   interactionLevel: 'default',
   deviceType: 'desktop'
 };
@@ -28,14 +27,12 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
     const urlParam = urlParams.get('url') || urlParams.get('websiteUrl');
 
     if (urlParam) {
-      const averagePages = parseInt(urlParams.get('averagePages') || '5');
       const interactionLevel =
         (urlParams.get('interactionLevel') as 'minimal' | 'default' | 'thorough') || 'default';
       const deviceType = (urlParams.get('deviceType') as 'desktop' | 'mobile') || 'desktop';
 
       setFormData({
         url: urlParam,
-        averagePages: isNaN(averagePages) ? 5 : averagePages,
         interactionLevel: ['minimal', 'default', 'thorough'].includes(interactionLevel)
           ? interactionLevel
           : 'default',
@@ -52,10 +49,6 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
       // Only add parameters if they differ from defaults or if URL is provided
       if (formData.url) {
         params.set('websiteUrl', formData.url);
-      }
-
-      if (formData.averagePages !== DEFAULT_FORM_DATA.averagePages) {
-        params.set('averagePages', formData.averagePages.toString());
       }
 
       if (formData.interactionLevel !== DEFAULT_FORM_DATA.interactionLevel) {

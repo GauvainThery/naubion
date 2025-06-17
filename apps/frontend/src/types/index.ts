@@ -1,9 +1,8 @@
-import { AnalysisResult } from './../../../backend/src/domain/models/analysis';
+import { PageAnalysisResult } from '../../../backend/src/domain/models/analysis/page-analysis';
 
 // Frontend-specific types
 export type AnalysisFormData = {
   url: string;
-  averagePages: number;
   interactionLevel: 'minimal' | 'default' | 'thorough';
   deviceType: 'desktop' | 'mobile';
 };
@@ -34,4 +33,4 @@ export type ApiResponse<T> = {
   error?: string;
 };
 
-export type AnalysisApiResponse = ApiResponse<AnalysisResult> | AnalysisResult;
+export type AnalysisApiResponse = ApiResponse<PageAnalysisResult> | PageAnalysisResult;

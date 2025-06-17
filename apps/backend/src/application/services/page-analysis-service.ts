@@ -1,32 +1,29 @@
 /**
- * Website analysis application service
- * Orchestrates the entire website analysis process using DDD components
+ * Page analysis application service
+ * Orchestrates the entire page analysis process using DDD components
  */
 
-import { AnalysisResult } from '../../domain/models/analysis.js';
+import {
+  PageAnalysisOptions,
+  PageAnalysisResult
+} from '../../domain/models/analysis/page-analysis.js';
+import { PageAnalysisDomainService } from '../../domain/services/analysis/page-analysis-service.js';
 import { ResourceService } from '../../domain/services/resource-service.js';
-import { AnalysisDomainService } from '../../domain/services/analysis-service.js';
 import { BrowserManager } from '../../infrastructure/browser/browser-manager.js';
 import { NetworkMonitor } from '../../infrastructure/browser/network-monitor.js';
 import { createUserSimulator } from '../../infrastructure/browser/user-simulator.js';
-import logger from '../../shared/logger.js';
 import { AnalysisError } from '../../shared/errors.js';
+import logger from '../../shared/logger.js';
 
-export interface WebsiteAnalysisOptions {
-  interactionLevel: 'minimal' | 'default' | 'thorough';
-  deviceType: 'desktop' | 'mobile';
-  timeout?: number;
-}
-
-export class WebsiteAnalysisService {
+export class PageAnalysisService {
   private browserManager: BrowserManager;
   private resourceService: ResourceService;
-  private analysisDomainService: AnalysisDomainService;
+  private pageAnalysisDomainService: PageAnalysisDomainService;
 
   constructor(resourceService: ResourceService) {
     this.browserManager = new BrowserManager();
     this.resourceService = resourceService;
-    this.analysisDomainService = new AnalysisDomainService();
+    this.pageAnalysisDomainService = new PageAnalysisDomainService();
   }
 
   /**
@@ -34,12 +31,12 @@ export class WebsiteAnalysisService {
    */
   async analyzeUrl(
     url: string,
-    options: Partial<WebsiteAnalysisOptions> = {}
-  ): Promise<AnalysisResult> {
+    options: Partial<PageAnalysisOptions> = {}
+  ): Promise<PageAnalysisResult> {
     const { interactionLevel = 'default', deviceType = 'desktop', timeout = 60000 } = options;
 
     // Create analysis context using domain service
-    const context = this.analysisDomainService.createAnalysisContext(
+    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
       url,
       interactionLevel,
       deviceType
@@ -47,12 +44,14 @@ export class WebsiteAnalysisService {
     context.options.timeout = timeout;
 
     // Validate prerequisites
-    this.analysisDomainService.validateAnalysisPrerequisites(context);
+    this.pageAnalysisDomainService.validatePageAnalysisPrerequisites(context);
 
     logger.info(`Starting analysis for ${url}`, {
       interactionLevel,
       deviceType,
-      estimatedDuration: this.analysisDomainService.estimateAnalysisDuration(context.options)
+      estimatedDuration: this.pageAnalysisDomainService.estimatePageAnalysisDuration(
+        context.options
+      )
     });
 
     let page;
@@ -98,11 +97,15 @@ export class WebsiteAnalysisService {
         }
       }));
 
-      const result = this.analysisDomainService.createAnalysisResult(context, resourceCollection, {
-        ...pageMetadata,
-        simulation: simulationResult,
-        networkActivity: networkMonitor.getTotalTransferSize()
-      });
+      const result = this.pageAnalysisDomainService.createPageAnalysisResult(
+        context,
+        resourceCollection,
+        {
+          ...pageMetadata,
+          simulation: simulationResult,
+          networkActivity: networkMonitor.getTotalTransferSize()
+        }
+      );
 
       logger.info(`Analysis completed in ${result.duration}ms for ${url}`, {
         resourceCount: resourceCollection.resourceCount,
@@ -131,7 +134,11 @@ export class WebsiteAnalysisService {
     interactionLevel: 'minimal' | 'default' | 'thorough' = 'default',
     deviceType: 'desktop' | 'mobile' = 'desktop'
   ) {
-    return this.analysisDomainService.createAnalysisContext(url, interactionLevel, deviceType);
+    return this.pageAnalysisDomainService.createPageAnalysisContext(
+      url,
+      interactionLevel,
+      deviceType
+    );
   }
 
   /**
@@ -139,12 +146,12 @@ export class WebsiteAnalysisService {
    */
   estimateAnalysisDuration(options: { interactionLevel: string; deviceType: string }) {
     // Create a basic analysis options object for estimation
-    const context = this.analysisDomainService.createAnalysisContext(
+    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
       'https://example.com', // dummy URL for estimation
       options.interactionLevel as 'minimal' | 'default' | 'thorough',
       options.deviceType as 'desktop' | 'mobile'
     );
-    return this.analysisDomainService.estimateAnalysisDuration(context.options);
+    return this.pageAnalysisDomainService.estimatePageAnalysisDuration(context.options);
   }
 
   /**
@@ -153,11 +160,11 @@ export class WebsiteAnalysisService {
   async analyzeUrlWithProgress(
     url: string,
     options: Partial<
-      WebsiteAnalysisOptions & {
+      PageAnalysisOptions & {
         progressCallback?: (progress: number, step: string, message?: string) => void;
       }
     > = {}
-  ): Promise<AnalysisResult> {
+  ): Promise<PageAnalysisResult> {
     const { progressCallback, ...analysisOptions } = options;
 
     // Use existing analyzeUrl method but add progress callbacks
@@ -168,7 +175,7 @@ export class WebsiteAnalysisService {
     } = analysisOptions;
 
     // Create analysis context using domain service
-    const context = this.analysisDomainService.createAnalysisContext(
+    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
       url,
       interactionLevel,
       deviceType
@@ -176,7 +183,7 @@ export class WebsiteAnalysisService {
     context.options.timeout = timeout;
 
     // Validate prerequisites
-    this.analysisDomainService.validateAnalysisPrerequisites(context);
+    this.pageAnalysisDomainService.validatePageAnalysisPrerequisites(context);
 
     // Progress tracking
     const updateProgress = (progress: number, step: string, message?: string) => {
@@ -236,11 +243,15 @@ export class WebsiteAnalysisService {
         }
       }));
 
-      const result = this.analysisDomainService.createAnalysisResult(context, resourceCollection, {
-        ...pageMetadata,
-        simulation: simulationResult,
-        networkActivity: networkMonitor.getTotalTransferSize()
-      });
+      const result = this.pageAnalysisDomainService.createPageAnalysisResult(
+        context,
+        resourceCollection,
+        {
+          ...pageMetadata,
+          simulation: simulationResult,
+          networkActivity: networkMonitor.getTotalTransferSize()
+        }
+      );
 
       updateProgress(95, 'finalizing', 'Finalizing analysis results...');
 

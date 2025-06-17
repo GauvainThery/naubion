@@ -4,10 +4,10 @@
 
 import express from 'express';
 import { AnalysisController } from './controllers/analysis-controller.js';
-import { websiteAnalysisService } from '../di/index.js';
+import { pageAnalysisService } from '../di/index.js';
 
 const router = express.Router();
-const analysisController = new AnalysisController(websiteAnalysisService);
+const analysisController = new AnalysisController(pageAnalysisService);
 
 /**
  * POST /api/analyze
