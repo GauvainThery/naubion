@@ -4,12 +4,12 @@ import Button from '../atoms/Button';
 import MetricCard from '../molecules/MetricCard';
 import ResourceBreakdownItem from '../molecules/ResourceBreakdownItem';
 import ResourceList from '../molecules/ResourceList';
-import { PageAnalysisResult } from '../../../../backend/src/domain/models/analysis/page-analysis.ts';
+import { PageAnalysisResult } from '../../../../backend/src/domain/models/analysis/page-analysis';
 import {
   processLargestResources,
   processResourceData,
   roundResourceSize
-} from './../../utils/websiteAnalysisResultProcessors.ts';
+} from './../../utils/websiteAnalysisResultProcessors';
 
 type ResultsSectionProps = {
   results: PageAnalysisResult;
