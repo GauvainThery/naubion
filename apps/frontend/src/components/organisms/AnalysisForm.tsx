@@ -133,7 +133,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
   );
 
   return (
-    <Card className="p-8">
+    <Card className="p-8 container">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Page Weight Analysis</h2>
         <p className="text-gray-600">

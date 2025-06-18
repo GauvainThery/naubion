@@ -1,13 +1,13 @@
-import { page } from '@naubion/shared';
 import React from 'react';
-import { Link } from 'react-router';
+import { CallToActionSection, FeatureSection, HeroSection, MainLayout } from '../components';
 
 const Home: React.FC = () => {
   return (
-    <div>
-      <p>Hello</p>
-      <Link to={page.pageCarbonFootprint}>Go to Page Carbon Footprint</Link>
-    </div>
+    <MainLayout className="flex flex-col gap-28">
+      <HeroSection />
+      <FeatureSection />
+      <CallToActionSection />
+    </MainLayout>
   );
 };
 

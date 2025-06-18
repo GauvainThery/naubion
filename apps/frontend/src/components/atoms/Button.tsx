@@ -1,3 +1,4 @@
+import { cn } from './../../utils/classnames';
 import React from 'react';
 
 type ButtonProps = {
@@ -21,13 +22,10 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClasses =
-    'font-medium py-3 px-6 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2';
-
   const variants = {
-    primary: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-700 focus:ring-gray-500',
-    outline: 'border-2 border-gray-200 hover:border-gray-300 text-gray-700 focus:ring-gray-500'
+    primary: 'bg-primary',
+    secondary: 'bg-primary', // Not yet implemented
+    outline: 'bg-primary' // Not yet implemented
   };
 
   return (
@@ -35,7 +33,11 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
-      className={`${baseClasses} ${variants[variant]} ${className}`}
+      className={cn(
+        'drop-shadow text-text-light hover:cursor-pointer hover:contrast-125 py-3 px-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2',
+        variants[variant],
+        className
+      )}
       {...props}
     >
       {loading && (
