@@ -1,4 +1,15 @@
+import React from 'react';
+import { useNewsletter } from '../../hooks/useNewsletter';
+import { TextInputWithSubmit } from '../';
+
 const CallToActionSection = () => {
+  const { subscribe, isLoading, error, success } = useNewsletter();
+
+  const handleEmailSubmit = async (email: string) => {
+    await subscribe(email);
+    console.log('Email submitted:', email);
+  };
+
   return (
     <section className="pt-24 pb-16 ">
       <div className="container flex flex-col gap-24 relative z-10">
@@ -12,7 +23,21 @@ const CallToActionSection = () => {
             </p>
           </div>
         </div>
-        input to come
+        <div className="w-full flex justify-center">
+          <div className="max-w-md w-full">
+            <TextInputWithSubmit
+              type="email"
+              placeholder="Enter your email address"
+              buttonText="Join Waitlist"
+              onSubmit={handleEmailSubmit}
+              loading={isLoading}
+              error={error}
+              success={success}
+              successMessage="Thank you and welcome!"
+              required
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

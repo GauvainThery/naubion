@@ -4,10 +4,12 @@
 
 import express from 'express';
 import { AnalysisController } from './controllers/analysis-controller.js';
+import { NewsletterController } from './controllers/newsletter-controller.js';
 import { pageAnalysisService } from '../di/index.js';
 
 const router = express.Router();
 const analysisController = new AnalysisController(pageAnalysisService);
+const newsletterController = new NewsletterController();
 
 /**
  * POST /api/analyze
@@ -32,5 +34,11 @@ router.get('/analysis/:analysisId/result', analysisController.result);
  * API health check endpoint
  */
 router.get('/health', analysisController.healthCheck);
+
+/**
+ * POST /api/newsletter/subscribe
+ * Subscribe to newsletter
+ */
+router.post('/newsletter/subscribe', newsletterController.subscribe);
 
 export default router;
