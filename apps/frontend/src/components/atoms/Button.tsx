@@ -34,7 +34,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       onClick={onClick}
       className={cn(
-        'drop-shadow text-text-light hover:cursor-pointer hover:contrast-125 py-3 px-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2',
+        'drop-shadow text-text-light hover:cursor-pointer hover:contrast-125 py-3 px-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 hover:shadow-md',
         variants[variant],
         className
       )}

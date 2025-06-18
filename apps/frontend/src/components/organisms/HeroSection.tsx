@@ -1,6 +1,16 @@
+import React from 'react';
+import { TextInputWithSubmit } from '../';
+import { useNewsletter } from '../../hooks/useNewsletter';
+
 const HeroSection = () => {
+  const { subscribe, isLoading, error, success } = useNewsletter();
+
+  const handleEmailSubmit = async (email: string) => {
+    await subscribe(email);
+  };
+
   return (
-    <section className="flex flex-col lg:flex-row items-center justify-between container gap-12 pb-20 pt-28">
+    <section className="flex flex-col lg:flex-row items-center justify-between container gap-12 pb-6 pt-28">
       <div className="lg:w-1/2 flex flex-col gap-16">
         <div className="flex flex-col gap-3">
           <h1 className="text-4xl font-bold">Regain control of your app carbon footprint</h1>
@@ -11,12 +21,24 @@ const HeroSection = () => {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-6 text-center justify-center items-center">
           <p className="secondary-font">
             <strong>naubion</strong> is not yet available, but you can join the waiting list and be
             a pioneer in web decarbonation.
           </p>
-          input to come
+          <div className="w-6/8">
+            <TextInputWithSubmit
+              type="email"
+              placeholder="Enter your email address"
+              buttonText="Join Waitlist"
+              onSubmit={handleEmailSubmit}
+              loading={isLoading}
+              error={error}
+              success={success}
+              successMessage="Thank you and welcome!"
+              required
+            />
+          </div>
         </div>
       </div>
       <div className="lg:w-1/2">Design to come</div>
