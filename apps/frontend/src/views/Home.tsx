@@ -1,10 +1,12 @@
 import React from 'react';
-import { HeroSection, MainLayout } from '../components';
+import { FeatureSection, HeroSection, MainLayout } from '../components';
 
 const Home: React.FC = () => {
   return (
-    <MainLayout>
+    <MainLayout className="flex flex-col gap-28">
       <HeroSection />
+      <FeatureSection />
+      <div className="h-36" />
     </MainLayout>
   );
 };
