@@ -5,7 +5,7 @@ import { page } from '@naubion/shared';
 
 const Header: React.FC = () => {
   return (
-    <header className="flex justify-between items-center py-6 container pt-24 lg:pt-6">
+    <header className="flex justify-between items-center py-6 container pt-24 lg:pt-10">
       <div className="lg:w-1/3" />
 
       <div className="lg:w-1/3 flex flex-col items-center justify-center gap-3 text-center">
@@ -20,13 +20,13 @@ const Header: React.FC = () => {
 
       <div className="lg:w-1/3 flex items-center justify-end">
         <Link className="hidden fixed lg:block z-20" to={page.pageCarbonFootprint}>
-          <Button>Measure one page's carbon footprint</Button>
+          <Button>Estimate your web page carbon footprint</Button>
         </Link>
       </div>
 
       {/* Mobile Link */}
       <Link className="fixed top-4 left-4 lg:hidden z-20" to={page.pageCarbonFootprint}>
-        <Button>Measure one page's carbon footprint</Button>
+        <Button>Estimate your web page carbon footprint</Button>
       </Link>
     </header>
   );

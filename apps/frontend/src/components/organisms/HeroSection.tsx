@@ -14,7 +14,7 @@ const HeroSection = () => {
         <div className="flex flex-col gap-3">
           <p className="secondary-font">
             <strong>naubion</strong> is not yet available, but you can join the waiting list and be
-            pioneer in the web decarbonation.
+            a pioneer in web decarbonation.
           </p>
           input to come
         </div>

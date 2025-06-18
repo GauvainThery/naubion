@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '../organisms/Header';
+import { Footer, Header } from '../';
 
 type MainLayoutProps = {
   className?: string;
@@ -12,7 +12,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, className }) => {
       <div className="noise" />
       <Header />
       <main className={className}>{children}</main>
-      <footer className="bg-white border-t border-gray-200 mt-16"></footer>
+      <Footer />
     </div>
   );
 };
