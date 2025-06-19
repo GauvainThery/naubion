@@ -79,3 +79,68 @@
     transform: translateX(100%);
   }
 }
+
+/* Wind animations for the sprout */
+@keyframes gentleWind {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-50%) rotate(0.5deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  75% {
+    transform: translateX(-50%) rotate(-0.5deg);
+  }
+}
+
+@keyframes stemSway {
+  0%,
+  100% {
+    transform: rotate(2deg);
+  }
+  30% {
+    transform: rotate(3deg);
+  }
+  70% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes leafDance {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.02) rotate(1deg);
+  }
+  50% {
+    transform: scale(0.98) rotate(0deg);
+  }
+  75% {
+    transform: scale(1.01) rotate(-0.5deg);
+  }
+}
+
+/* Sprout component styles */
+.sprout-wind {
+  animation: gentleWind 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.stem-sway {
+  animation: stemSway 3s ease-in-out infinite;
+  border-radius: 1px;
+}
+
+.leaf-dance-1 {
+  animation: leafDance 2.5s ease-in-out infinite 0.3s;
+}
+
+.leaf-dance-2 {
+  animation: leafDance 2.8s ease-in-out infinite 0.1s;
+}

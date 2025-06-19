@@ -3,7 +3,7 @@ import { CallToActionSection, FeatureSection, HeroSection, MainLayout } from '..
 
 const Home: React.FC = () => {
   return (
-    <MainLayout className="flex flex-col gap-28">
+    <MainLayout className="flex flex-col">
       <HeroSection />
       <FeatureSection />
       <CallToActionSection />

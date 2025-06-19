@@ -11,7 +11,7 @@ const CallToActionSection = () => {
   };
 
   return (
-    <section className="pt-24 pb-16 ">
+    <section className="pt-48 pb-16">
       <div className="container flex flex-col gap-24 relative z-10">
         <div className="w-full flex justify-center items-center">
           <div className="flex flex-col gap-3 max-w-2xl text-center">
@@ -24,19 +24,17 @@ const CallToActionSection = () => {
           </div>
         </div>
         <div className="w-full flex justify-center">
-          <div className="max-w-md w-full">
-            <TextInputWithSubmit
-              type="email"
-              placeholder="Enter your email address"
-              buttonText="Join Waitlist"
-              onSubmit={handleEmailSubmit}
-              loading={isLoading}
-              error={error}
-              success={success}
-              successMessage="Thank you and welcome!"
-              required
-            />
-          </div>
+          <TextInputWithSubmit
+            type="email"
+            placeholder="Enter your email..."
+            buttonText="Join Waitlist"
+            onSubmit={handleEmailSubmit}
+            loading={isLoading}
+            error={error}
+            success={success}
+            successMessage="Thank you and welcome!"
+            required
+          />
         </div>
       </div>
     </section>

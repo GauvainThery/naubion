@@ -12,7 +12,7 @@ const FeatureSection = () => {
         }}
       />
 
-      <div className="container flex flex-col gap-24 relative z-10">
+      <div className="container flex flex-col gap-18 lg:gap-24 relative z-10">
         <div className="w-full flex justify-center items-center">
           <div className="flex flex-col gap-3 max-w-2xl text-center">
             <h2 className="text-2xl font-bold">Implementation in a heartbeat, impact forever</h2>
@@ -23,7 +23,7 @@ const FeatureSection = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-24">
+        <div className="flex flex-wrap justify-center gap-18 lg:gap-24">
           <IconCard
             icon="code"
             description="Simply add a snippet of code in both the frontend and the backend of your application"
