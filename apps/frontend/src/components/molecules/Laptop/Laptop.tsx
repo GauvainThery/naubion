@@ -6,7 +6,7 @@ const Laptop = () => {
   const laptopRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: laptopRef,
-    offset: ['end center', 'center center']
+    offset: ['start start', 'center center']
   });
   const [screenValue, setScreenValue] = useState({
     rotateX: 88.1
@@ -38,7 +38,7 @@ const Laptop = () => {
     >
       {/* Laptop Screen */}
       <div
-        className="w-[309px] h-[180px] lg:w-[395px] lg:h-[230px] flex items-center justify-center rounded-lg transition-transform duration-900 ring-1 ring-gray-600 border-b-1 border-gray-700 "
+        className="w-[309px] h-[180px] lg:w-[395px] lg:h-[230px] flex items-center justify-center rounded-lg transition-all duration-900 ring-1 ring-gray-600 border-b-1 border-gray-700 "
         style={{
           transformStyle: 'preserve-3d',
           transform: `rotateX(-${screenValue.rotateX}deg)`,
