@@ -18,7 +18,7 @@ const FeatureSection = () => {
             <h2 className="text-2xl font-bold">Implementation in a heartbeat, impact forever</h2>
             <p className="text-text-secondary">
               naubion is designed to be integrated seamlessly into your existing infrastructure and
-              to help you reduce your app's carbon footprint with minimal effort.
+              to help you reduce your application's carbon footprint with minimal effort.
             </p>
           </div>
         </div>
@@ -38,8 +38,8 @@ const FeatureSection = () => {
 
           <IconCard
             icon="charts"
-            description="Reduce the carbon footprint of your app by understanding better your usage and the impact of your code"
-            title="3. Reduce your impact"
+            description="Reduce the carbon footprint of your application by understanding better your usage and the impact of your code"
+            title="3. Reduce your footprint"
           />
 
           <IconCard

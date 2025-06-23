@@ -29,7 +29,7 @@ const Laptop = () => {
   return (
     <div
       ref={laptopRef}
-      className="relative transition-transform duration-700 z-10"
+      className="relative transition-transform duration-700 z-10 lg:translate-y-5"
       style={{
         perspective: '1000px',
         transform: `translateY(${(1 - latest) * 50}%)`,
