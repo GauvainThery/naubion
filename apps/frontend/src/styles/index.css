@@ -80,6 +80,10 @@
   }
 }
 
+.progress-shimmer {
+  animation: shimmer 5s ease-in-out infinite;
+}
+
 /* Wind animations for the sprout */
 @keyframes gentleWind {
   0%,

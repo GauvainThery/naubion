@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { AnalysisFormData } from '../../types';
+import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Input from '../atoms/Input';
-import Button from '../atoms/Button';
 import RadioGroup from '../molecules/RadioGroup';
-import type { AnalysisFormData } from '../../types';
 
 type AnalysisFormProps = {
   onSubmit: (data: AnalysisFormData) => void;
@@ -133,65 +133,60 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
   );
 
   return (
-    <Card className="p-8 container">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Page Weight Analysis</h2>
-        <p className="text-gray-600">
-          Enter a URL to get a comprehensive breakdown of page weight, resource sizes, and
-          optimization opportunities
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
-          <Input
-            type="url"
-            placeholder="https://example.com"
-            value={formData.url}
-            onChange={e => handleInputChange('url', e.target.value)}
-            required
-            icon={searchIcon}
-          />
+    <section className="container pt-24">
+      <Card className="p-8 flex flex-col gap-8">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl font-bold mb-2">Web Page Environnemental Footprint</h2>
+          <p className="text-text-secondary">
+            Enter a URL to get a comprehensive breakdown of page weight, resource sizes, and
+            optimization opportunities
+          </p>
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Visitor Interaction Level
-            </label>
-            <RadioGroup
-              options={interactionLevelOptions}
-              name="interactionLevel"
-              value={formData.interactionLevel}
-              onChange={e => handleInputChange('interactionLevel', e.target.value)}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-12">
+          <div className="flex gap-3 w-full items-center">
+            <Input
+              type="url"
+              placeholder="https://example.com"
+              value={formData.url}
+              onChange={e => handleInputChange('url', e.target.value)}
+              required
+              icon={searchIcon}
             />
+            <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
+              Clear
+            </Button>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">Device Type</label>
-            <RadioGroup
-              options={deviceTypeOptions}
-              name="deviceType"
-              value={formData.deviceType}
-              onChange={e => handleInputChange('deviceType', e.target.value)}
-            />
-          </div>
-        </div>
 
-        <div className="flex space-x-4">
-          <Button
-            type="submit"
-            loading={isLoading}
-            disabled={!formData.url || isLoading}
-            className="flex-1"
-          >
-            Analyze
-          </Button>
-          <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
-            Clear
-          </Button>
-        </div>
-      </form>
-    </Card>
+          <div className="flex flex-col lg:flex-row w-full gap-8">
+            <div className="w-full flex flex-col gap-3">
+              <label className="block text-sm font-bold">Visitor Interaction Level</label>
+              <RadioGroup
+                options={interactionLevelOptions}
+                name="interactionLevel"
+                value={formData.interactionLevel}
+                onChange={e => handleInputChange('interactionLevel', e.target.value)}
+              />
+            </div>
+            <div className="w-full flex flex-col gap-3">
+              <label className="block text-sm font-bold">Device Type</label>
+              <RadioGroup
+                options={deviceTypeOptions}
+                name="deviceType"
+                value={formData.deviceType}
+                onChange={e => handleInputChange('deviceType', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-center w-full">
+            <Button type="submit" loading={isLoading} disabled={!formData.url || isLoading}>
+              Analyze the page
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </section>
   );
 };
 

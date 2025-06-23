@@ -1,10 +1,6 @@
 import React from 'react';
-import Card from '../atoms/Card';
-import Button from '../atoms/Button';
-import MetricCard from '../molecules/MetricCard';
-import ResourceBreakdownItem from '../molecules/ResourceBreakdownItem';
-import ResourceList from '../molecules/ResourceList';
 import { PageAnalysisResult } from '../../../../backend/src/domain/models/analysis/page-analysis';
+import { Button, Card, MetricCard, ResourceBreakdownItem, ResourceList } from './../';
 import {
   processLargestResources,
   processResourceData,
@@ -13,10 +9,9 @@ import {
 
 type ResultsSectionProps = {
   results: PageAnalysisResult;
-  onShare: () => void;
 };
 
-const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => {
+const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
   if (!results) {
     return null;
   }
@@ -42,6 +37,15 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
     </svg>
   );
 
+  const reloadIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M17.65 6.35C16.2 4.9 14.21 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20C15.73 20 18.84 17.45 19.73 14H17.65C16.83 16.33 14.61 18 12 18C8.69 18 6 15.31 6 12C6 8.69 8.69 6 12 6C13.66 6 15.14 6.69 16.22 7.78L13 11H20V4L17.65 6.35Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+
   const resourceTypes = [
     { type: 'html', label: 'HTML Documents', color: 'html' as const, indicator: 'bg-blue-500' },
     { type: 'css', label: 'Stylesheets', color: 'css' as const, indicator: 'bg-purple-500' },
@@ -52,19 +56,24 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
   ];
 
   return (
-    <div className="space-y-8">
-      <Card className="p-8">
-        <div className="flex items-start justify-between mb-8">
+    <section className="container pt-24">
+      <Card className="p-8 flex flex-col gap-12">
+        <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Page Weight Analysis Results</h3>
-            <div className="text-gray-600 break-all">{results.url}</div>
+            <h3 className="text-2xl font-bold">
+              Carbon Footprint for:{' '}
+              <a
+                className="text-primary underline hover:cursor-pointer"
+                target="_blank"
+                href={results.url}
+              >
+                {results.url}
+              </a>
+            </h3>
           </div>
-          <Button variant="outline" onClick={onShare} className="flex-shrink-0">
-            📋 Copy Share Link
-          </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="flex flex-col lg:flex-row w-full gap-6">
           <MetricCard
             icon={totalSizeIcon}
             value={roundResourceSize(results.resources.totalTransferSize)}
@@ -78,8 +87,8 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
           />
         </div>
 
-        <div>
-          <h4 className="text-lg font-semibold text-gray-900 mb-6">Resource Type Analysis</h4>
+        <div className="flex flex-col gap-6">
+          <h4 className="text-lg font-semibold">Resource Type Analysis</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {resourceTypes.map(resource => {
               const data = processResourceData(
@@ -105,9 +114,19 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, onShare }) => 
           </div>
         </div>
 
-        <ResourceList title="Largest Resources" resources={largestResources} className="mt-8" />
+        <ResourceList title="Largest Resources" resources={largestResources} />
+
+        <div className="w-full flex justify-center">
+          <Button
+            className="flex flex-row gap-3 w-full lg:w-1/3 justify-center"
+            onClick={() => window.location.reload()}
+          >
+            <p>Try on another page</p>
+            <div>{reloadIcon}</div>
+          </Button>
+        </div>
       </Card>
-    </div>
+    </section>
   );
 };
 

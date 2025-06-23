@@ -1,3 +1,4 @@
+import { cn } from './../../utils/classnames';
 import React from 'react';
 
 type ResourceItemProps = {
@@ -9,13 +10,13 @@ type ResourceItemProps = {
 
 const ResourceItem: React.FC<ResourceItemProps> = ({ name, type, size, className = '' }) => {
   return (
-    <div className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl ${className}`}>
-      <div className="flex-1">
-        <div className="font-medium text-gray-900">{name}</div>
-        <div className="text-sm text-gray-500">{type}</div>
+    <div className={cn('flex items-center justify-between p-4 bg-gray-50 rounded-xl', className)}>
+      <div className="flex-1 overflow-hidden">
+        <div className="font-medium">{name}</div>
+        <div className="text-sm text-text-secondary">{type}</div>
       </div>
       <div className="text-right ml-4">
-        <div className="font-semibold text-gray-900">{size}</div>
+        <div className="font-semibold">{size}</div>
       </div>
     </div>
   );

@@ -23,23 +23,23 @@ const ResourceBreakdownItem: React.FC<ExtendedResourceBreakdownItemProps> = ({
   indicator
 }) => {
   return (
-    <div className="p-4 bg-gray-50 rounded-xl">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-3">
+    <div className="p-4 bg-gray-50 rounded-xl flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <div className={`w-4 h-4 rounded ${indicator}`} />
-          <span className="font-medium text-gray-900">{label}</span>
+          <span className="font-medium">{label}</span>
         </div>
         <div className="text-right">
-          <div className="font-semibold text-gray-900">{size}</div>
-          <div className="text-sm text-gray-500">({count} files)</div>
+          <div className="font-semibold">{size}</div>
+          <div className="text-sm text-text-secondary">({count} files)</div>
         </div>
       </div>
 
-      <ProgressBar progress={percentage} color={color} className="mb-2" />
+      <ProgressBar progress={percentage} color={color} />
 
       <div className="flex justify-between items-center text-sm">
-        <span className="text-gray-600">{percentage}%</span>
-        <span className="text-gray-500">Avg: {average}</span>
+        <span className="text-text-secondary">{percentage}%</span>
+        <span className="text-text-secondary">Avg: {average}</span>
       </div>
     </div>
   );

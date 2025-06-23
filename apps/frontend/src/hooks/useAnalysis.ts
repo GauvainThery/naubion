@@ -13,7 +13,6 @@ const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [results, setResults] = useState<PageAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [lastFormData, setLastFormData] = useState<AnalysisFormData | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [currentStep, setCurrentStep] = useState<string>('');
   const [estimatedDuration, setEstimatedDuration] = useState<number>(0);
@@ -75,7 +74,6 @@ const useAnalysis = () => {
       setResults(null);
       setProgress(0);
       setCurrentStep('');
-      setLastFormData(formData);
 
       try {
         // Phase 1: Start analysis and get immediate response
@@ -127,22 +125,6 @@ const useAnalysis = () => {
     [fetchFinalResults]
   );
 
-  const shareResults = useCallback(() => {
-    if (results && lastFormData) {
-      const params = new URLSearchParams({
-        url: lastFormData.url,
-        interactionLevel: lastFormData.interactionLevel,
-        deviceType: lastFormData.deviceType,
-        autoAnalyze: 'true' // This tells the app to auto-analyze when the link is opened
-      });
-
-      const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        console.log('Share link copied to clipboard');
-      });
-    }
-  }, [results, lastFormData]);
-
   return {
     isLoading,
     results,
@@ -151,8 +133,7 @@ const useAnalysis = () => {
     progress,
     currentStep,
     estimatedDuration,
-    startAnalysis,
-    shareResults
+    startAnalysis
   };
 };
 

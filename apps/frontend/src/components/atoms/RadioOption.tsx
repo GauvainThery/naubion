@@ -1,3 +1,4 @@
+import { cn } from './../../utils/classnames';
 import React from 'react';
 
 type RadioOptionProps = {
@@ -23,7 +24,11 @@ const RadioOption: React.FC<RadioOptionProps> = ({
 }) => {
   return (
     <label
-      className={`flex items-start space-x-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-300 transition-colors ${checked ? 'border-green-500 bg-green-50' : ''} ${className}`}
+      className={cn(
+        'flex items-start gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-utils-200 transition-colors',
+        checked ? 'border-utils-200 bg-utils-200/5' : '',
+        className
+      )}
     >
       <div className="flex items-center h-6">
         <input
@@ -33,12 +38,12 @@ const RadioOption: React.FC<RadioOptionProps> = ({
           id={id}
           checked={checked}
           onChange={onChange}
-          className="h-4 w-4 text-green-600 border-gray-300 focus:ring-green-500 focus:ring-offset-0"
+          className="h-4 w-4 text-utils-200 border-gray-300 focus:ring-utils-100 focus:ring-offset-0"
         />
       </div>
-      <div className="flex-1">
+      <div className="flex flex-col gap-1">
         <div className="font-medium text-gray-900">{title}</div>
-        {description && <div className="text-sm text-gray-500 mt-1">{description}</div>}
+        {description && <div className="text-sm text-text-secondary">{description}</div>}
       </div>
     </label>
   );

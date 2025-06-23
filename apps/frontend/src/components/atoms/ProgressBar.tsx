@@ -1,3 +1,4 @@
+import { cn } from './../../utils/classnames';
 import React from 'react';
 
 type ProgressBarProps = {
@@ -24,9 +25,9 @@ const ProgressBar: React.FC<ExtendedProgressBarProps> = ({
 
   const colorClasses = {
     primary: {
-      bg: 'bg-gradient-to-r from-emerald-500 to-green-600',
-      glow: 'shadow-emerald-500/50',
-      shimmer: 'from-emerald-400 via-emerald-300 to-emerald-400'
+      bg: 'bg-gradient-to-r from-primary-300 to-primary-500',
+      glow: 'shadow-primary-500/50',
+      shimmer: 'from-primary-300 via-primary to-primary-300'
     },
     html: {
       bg: 'bg-gradient-to-r from-blue-500 to-blue-600',
@@ -65,20 +66,24 @@ const ProgressBar: React.FC<ExtendedProgressBarProps> = ({
   const animationClass = animated ? 'transition-all duration-700 ease-out' : '';
 
   return (
-    <div className={`relative w-full bg-gray-200 rounded-full h-3 overflow-hidden ${className}`}>
+    <div className={cn('relative w-full bg-gray-200 rounded-full h-3 overflow-hidden', className)}>
       {/* Background track with subtle inner shadow */}
       <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full shadow-inner" />
 
       {/* Progress fill */}
       <div
-        className={`relative h-full rounded-full ${currentColor.bg} ${animationClass} ${glowClass}`}
+        className={cn('relative h-full rounded-full', currentColor.bg, animationClass, glowClass)}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       >
         {/* Animated shimmer effect */}
         {animated && value > 0 && value < 100 && (
           <div className="absolute inset-0 overflow-hidden rounded-full">
             <div
-              className={`absolute inset-0 bg-gradient-to-r ${currentColor.shimmer} opacity-30 progress-shimmer`}
+              className={cn(
+                'absolute inset-0 bg-gradient-to-r rounded-full',
+                currentColor.shimmer,
+                'opacity-30 progress-shimmer'
+              )}
             />
           </div>
         )}
