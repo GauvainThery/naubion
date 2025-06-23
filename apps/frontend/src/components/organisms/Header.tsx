@@ -3,7 +3,16 @@ import { Button, Logo } from '..';
 import { Link } from 'react-router';
 import { page } from '@naubion/shared';
 
-const Header: React.FC = () => {
+type HeaderProps = {
+  currentPage: keyof typeof page;
+};
+
+const Header: React.FC<HeaderProps> = ({ currentPage }) => {
+  const navigationLinks: Record<keyof typeof page, [string, string]> = {
+    home: [page.pageCarbonFootprint, 'Estimate your web page carbon footprint'],
+    pageCarbonFootprint: [page.home, 'Join the waitlist!']
+  };
+
   return (
     <header className="flex justify-between items-center py-6 container pt-24 lg:pt-10">
       <div className="lg:w-1/3" />
@@ -19,14 +28,17 @@ const Header: React.FC = () => {
       </div>
 
       <div className="lg:w-1/3 flex items-center justify-end">
-        <Link className="hidden fixed lg:block z-20" to={page.pageCarbonFootprint}>
-          <Button>Estimate your web page carbon footprint</Button>
+        <Link className="hidden fixed lg:block z-20" to={navigationLinks[currentPage][0]}>
+          <Button>{navigationLinks[currentPage][1]}</Button>
         </Link>
       </div>
 
       {/* Mobile Link */}
-      <Link className="fixed top-4 left-4 lg:hidden z-20" to={page.pageCarbonFootprint}>
-        <Button>Estimate your web page carbon footprint</Button>
+      <Link
+        className="fixed top-4 left-4 lg:hidden z-20"
+        to={navigationLinks.pageCarbonFootprint[0]}
+      >
+        <Button>{navigationLinks.pageCarbonFootprint[1]}</Button>
       </Link>
     </header>
   );

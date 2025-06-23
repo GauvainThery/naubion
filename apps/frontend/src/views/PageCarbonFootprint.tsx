@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../components/templates/MainLayout';
 import AnalysisForm from '../components/organisms/AnalysisForm';
 import LoadingSection from '../components/organisms/LoadingSection';
 import ResultsSection from '../components/organisms/ResultsSection';
+import MainLayout from '../components/templates/MainLayout';
 import useAnalysis from '../hooks/useAnalysis';
 import type { AnalysisFormData } from '../types';
 
@@ -54,7 +54,7 @@ const PageCarbonFootprint: React.FC = () => {
   }, [startAnalysis]);
 
   return (
-    <MainLayout>
+    <MainLayout currentPage="pageCarbonFootprint">
       <div className="space-y-12">
         {/* Analysis Form */}
         <section>
