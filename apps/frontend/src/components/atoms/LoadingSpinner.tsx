@@ -1,3 +1,4 @@
+import { cn } from './../../utils/classnames';
 import React from 'react';
 
 type LoadingSpinnerProps = {
@@ -14,7 +15,11 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 'md', className 
 
   return (
     <div
-      className={`${sizes[size]} border-2 border-current border-t-transparent rounded-full animate-spin ${className}`}
+      className={cn(
+        sizes[size],
+        'border-2 border-current border-t-transparent rounded-full animate-spin',
+        className
+      )}
     />
   );
 };
