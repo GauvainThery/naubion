@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../utils/classnames';
 import Card from '../atoms/Card';
 
 type MetricCardProps = {
@@ -25,21 +26,21 @@ const MetricCard: React.FC<ExtendedMetricCardProps> = ({
 }) => {
   return (
     <Card
-      className={`p-6 ${isPrimary ? 'bg-gradient-to-br from-green-500 to-green-600 text-white' : ''} ${className}`}
+      className={cn(
+        'p-6 w-full',
+        isPrimary && 'bg-gradient-to-br from-primary-300 to-primary-500 text-white',
+        className
+      )}
     >
-      <div className="flex items-center space-x-4">
+      <div className={cn('flex items-center gap-4')}>
         <div
-          className={`p-3 rounded-xl ${isPrimary ? 'bg-white/20' : 'bg-green-100 text-green-600'}`}
+          className={cn('p-3 rounded-xl', isPrimary ? 'bg-white/20' : 'bg-primary/10 text-primary')}
         >
           {icon}
         </div>
         <div>
-          <div className={`text-2xl font-bold ${isPrimary ? 'text-white' : 'text-gray-900'}`}>
-            {value}
-          </div>
-          <div className={`text-sm ${isPrimary ? 'text-white/80' : 'text-gray-600'}`}>
-            {label || title}
-          </div>
+          <div className={cn('text-2xl font-bold', isPrimary ? 'text-white' : '')}>{value}</div>
+          <div className={cn('text-sm', isPrimary ? 'text-white/80' : '')}>{label || title}</div>
         </div>
       </div>
     </Card>

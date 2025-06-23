@@ -1,5 +1,5 @@
-import { cn } from './../../utils/classnames';
 import React from 'react';
+import { cn } from './../../utils/classnames';
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -44,7 +44,9 @@ const Button: React.FC<ButtonProps> = ({
       {loading && (
         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       )}
-      <span className={loading ? 'opacity-0' : ''}>{children}</span>
+      <span className={cn('flex gap-3 justify-center items-center', loading ? 'opacity-0' : '')}>
+        {children}
+      </span>
     </button>
   );
 };

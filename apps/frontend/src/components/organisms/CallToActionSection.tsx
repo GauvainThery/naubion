@@ -1,6 +1,6 @@
-import { cn } from './../../utils/classnames';
 import { TextInputWithSubmit } from '../';
 import { useNewsletter } from '../../hooks/useNewsletter';
+import { cn } from './../../utils/classnames';
 
 type CallToActionSectionProps = {
   className?: string;

@@ -24,7 +24,7 @@ export { default as KeyboardDeck } from './molecules/Laptop/KeyboardDeck';
 // Organisms
 export { default as Header } from './organisms/Header';
 export { default as Footer } from './organisms/Footer';
-export { default as AnalysisForm } from './organisms/AnalysisForm';
+export { default as AnalysisForm } from './organisms/AnalysisFormSection';
 export { default as LoadingSection } from './organisms/LoadingSection';
 export { default as ResultsSection } from './organisms/ResultsSection';
 export { default as HeroSection } from './organisms/HeroSection';

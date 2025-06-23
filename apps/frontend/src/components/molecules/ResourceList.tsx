@@ -1,5 +1,6 @@
 import React from 'react';
 import ResourceItem from '../atoms/ResourceItem';
+import { cn } from './../../utils/classnames';
 
 type LargestResource = {
   name: string;
@@ -19,9 +20,9 @@ const ResourceList: React.FC<ResourceListProps> = ({ title, resources, className
   }
 
   return (
-    <div className={className}>
-      <h4 className="text-lg font-semibold text-gray-900 mb-6">{title}</h4>
-      <div className="space-y-3">
+    <div className={cn('flex flex-col gap-6', className)}>
+      <h4 className="text-lg font-semibold">{title}</h4>
+      <div className="flex flex-col gap-4">
         {resources.map((resource, index) => (
           <ResourceItem
             key={index}

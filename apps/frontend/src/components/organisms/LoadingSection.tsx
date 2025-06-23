@@ -56,43 +56,45 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   };
 
   return (
-    <Card className="p-8 container flex flex-col gap-12">
-      <h3 className="text-2xl font-bold">Analyzing your page...</h3>
+    <section className="container pt-24">
+      <Card className="p-8 flex flex-col gap-12">
+        <h3 className="text-2xl font-bold">Analyzing your page...</h3>
 
-      {progress > 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <span className="font-bold">Progress</span>
-            <div className="flex items-center space-x-2">
-              <span className="font-bold transition-all duration-300 transform">
-                {Math.round(progress)}%
-              </span>
-              {remainingSeconds > 0 && (
-                <span className="text-xs text-text-secondary">
-                  (~{formatTime(remainingSeconds)} remaining)
+        {progress > 0 && (
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold">Progress</span>
+              <div className="flex items-center space-x-2">
+                <span className="font-bold transition-all duration-300 transform">
+                  {Math.round(progress)}%
                 </span>
-              )}
+                {remainingSeconds > 0 && (
+                  <span className="text-xs text-text-secondary">
+                    (~{formatTime(remainingSeconds)} remaining)
+                  </span>
+                )}
+              </div>
             </div>
+            <ProgressBar progress={progress} className="h-4" animated={true} showGlow={true} />
           </div>
-          <ProgressBar progress={progress} className="h-4" animated={true} showGlow={true} />
-        </div>
-      )}
+        )}
 
-      <div className="flex flex-col gap-10">
-        {steps.map((step, index) => {
-          const { isActive, isCompleted } = getStepState(step, index);
-          return (
-            <LoadingStep
-              key={step.id}
-              title={step.title}
-              description={step.description}
-              isActive={isActive}
-              isCompleted={isCompleted}
-            />
-          );
-        })}
-      </div>
-    </Card>
+        <div className="flex flex-col gap-10">
+          {steps.map((step, index) => {
+            const { isActive, isCompleted } = getStepState(step, index);
+            return (
+              <LoadingStep
+                key={step.id}
+                title={step.title}
+                description={step.description}
+                isActive={isActive}
+                isCompleted={isCompleted}
+              />
+            );
+          })}
+        </div>
+      </Card>
+    </section>
   );
 };
 
