@@ -5,6 +5,7 @@ import ResultsSection from '../components/organisms/ResultsSection';
 import MainLayout from '../components/templates/MainLayout';
 import useAnalysis from '../hooks/useAnalysis';
 import type { AnalysisFormData } from '../types';
+import { CallToActionSection } from './../components';
 
 const PageCarbonFootprint: React.FC = () => {
   const {
@@ -55,11 +56,13 @@ const PageCarbonFootprint: React.FC = () => {
 
   return (
     <MainLayout currentPage="pageCarbonFootprint">
-      <div className="space-y-12">
+      <div className="lg:pt-18 p-8">
         {/* Analysis Form */}
-        <section>
-          <AnalysisForm onSubmit={startAnalysis} isLoading={isLoading} />
-        </section>
+        {!results && !isLoading && (
+          <section>
+            <AnalysisForm onSubmit={startAnalysis} isLoading={isLoading} />
+          </section>
+        )}
 
         {/* Loading Section */}
         {isLoading && (
@@ -102,6 +105,11 @@ const PageCarbonFootprint: React.FC = () => {
             <ResultsSection results={results} onShare={shareResults} />
           </section>
         )}
+
+        <CallToActionSection
+          className="pt-36 pb-8"
+          subtitle="This tool gives you a first insight on the environnemental impact of a web page but it’s not naubion. Join our waitlist to be the first to know when naubion is live!"
+        />
       </div>
     </MainLayout>
   );

@@ -133,17 +133,17 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
   );
 
   return (
-    <Card className="p-8 container">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Page Weight Analysis</h2>
-        <p className="text-gray-600">
+    <Card className="p-8 flex flex-col gap-8 container">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-2xl font-bold mb-2">Web Page Environnemental Footprint</h2>
+        <p className="text-text-secondary">
           Enter a URL to get a comprehensive breakdown of page weight, resource sizes, and
           optimization opportunities
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-12">
+        <div className="flex gap-3 w-full items-center">
           <Input
             type="url"
             placeholder="https://example.com"
@@ -152,13 +152,14 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
             required
             icon={searchIcon}
           />
+          <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
+            Clear
+          </Button>
         </div>
 
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">
-              Visitor Interaction Level
-            </label>
+        <div className="flex flex-col lg:flex-row w-full gap-8">
+          <div className="w-full flex flex-col gap-3">
+            <label className="block text-sm font-bold">Visitor Interaction Level</label>
             <RadioGroup
               options={interactionLevelOptions}
               name="interactionLevel"
@@ -166,8 +167,8 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
               onChange={e => handleInputChange('interactionLevel', e.target.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-4">Device Type</label>
+          <div className="w-full flex flex-col gap-3">
+            <label className="block text-sm font-bold">Device Type</label>
             <RadioGroup
               options={deviceTypeOptions}
               name="deviceType"
@@ -177,17 +178,9 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
           </div>
         </div>
 
-        <div className="flex space-x-4">
-          <Button
-            type="submit"
-            loading={isLoading}
-            disabled={!formData.url || isLoading}
-            className="flex-1"
-          >
-            Analyze
-          </Button>
-          <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
-            Clear
+        <div className="flex justify-center w-full">
+          <Button type="submit" loading={isLoading} disabled={!formData.url || isLoading}>
+            Analyze the page
           </Button>
         </div>
       </form>

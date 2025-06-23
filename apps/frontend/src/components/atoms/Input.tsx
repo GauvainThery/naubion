@@ -27,10 +27,10 @@ const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-0 transition-colors duration-200 placeholder-gray-400';
+    'w-full px-4 py-3 border-2 border-gray-200 rounded-xl transition-colors duration-200 placeholder-gray-text-secondary focus:outline-primary';
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <input
         type={type}
         placeholder={placeholder}
@@ -43,7 +43,7 @@ const Input: React.FC<InputProps> = ({
         {...props}
       />
       {icon && (
-        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary">
           {icon}
         </div>
       )}

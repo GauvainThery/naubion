@@ -24,7 +24,8 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const variants = {
     primary: 'bg-primary',
-    secondary: 'bg-primary', // Not yet implemented
+    secondary:
+      'border border-utils-700 text-utils-700 rounded-md drop-shadow-none focus:ring-utils-700 focus:ring-1',
     outline: 'bg-primary' // Not yet implemented
   };
 
