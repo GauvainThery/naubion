@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageAnalysisResult } from '../../../../backend/src/domain/models/analysis/page-analysis';
+import { PageAnalysisResult } from '../../../../backend/src/domain/models/page-analysis';
 import { Button, Card, MetricCard, ResourceBreakdownItem, ResourceList } from './../';
 import {
   processLargestResources,
@@ -119,7 +119,9 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
         <div className="w-full flex justify-center">
           <Button
             className="flex flex-row gap-3 w-full lg:w-1/3 justify-center"
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              window.location.href = window.location.pathname;
+            }}
           >
             <p>Try on another page</p>
             <div>{reloadIcon}</div>

@@ -26,7 +26,9 @@ const PageCarbonFootprint: React.FC = () => {
     // Support both 'url' and 'websiteUrl' parameters
     const urlParam = urlParams.get('url') || urlParams.get('websiteUrl');
 
-    if (!urlParam) return null;
+    if (!urlParam) {
+      return null;
+    }
 
     // Extract other optional parameters with fallbacks
     const interactionLevel =

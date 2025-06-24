@@ -11,16 +11,19 @@ import { NetworkMonitor } from '../../infrastructure/browser/network-monitor.js'
 import { createUserSimulator } from '../../infrastructure/browser/user-simulator.js';
 import { AnalysisError } from '../../shared/errors.js';
 import logger from '../../shared/logger.js';
+import { GreenHostingService } from './green-hosting-service.js';
 
 export class PageAnalysisService {
   private browserManager: BrowserManager;
   private resourceService: ResourceService;
   private pageAnalysisDomainService: PageAnalysisDomainService;
+  private greenHostingService: GreenHostingService;
 
-  constructor(resourceService: ResourceService) {
+  constructor(resourceService: ResourceService, greenHostingService: GreenHostingService) {
     this.browserManager = new BrowserManager();
     this.resourceService = resourceService;
     this.pageAnalysisDomainService = new PageAnalysisDomainService();
+    this.greenHostingService = greenHostingService;
   }
 
   /**
@@ -83,7 +86,10 @@ export class PageAnalysisService {
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      // Phase 7: Create final result
+      // Phase 7: Green hosting assessment
+      const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
+
+      // Phase 8: Create final result
       const pageMetadata = await page.evaluate(() => ({
         pageTitle: document.title,
         hasFrames: window.frames.length > 0,
@@ -97,6 +103,7 @@ export class PageAnalysisService {
       const result = this.pageAnalysisDomainService.createPageAnalysisResult(
         context,
         resourceCollection,
+        greenHostingResult,
         {
           ...pageMetadata,
           simulation: simulationResult,
@@ -229,7 +236,12 @@ export class PageAnalysisService {
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      // Phase 7: Create final result
+      updateProgress(95, 'green-hosting', 'Assessing green hosting impact...');
+
+      // Phase 7: Green hosting assessment
+      const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
+
+      // Phase 8: Create final result
       const pageMetadata = await page.evaluate(() => ({
         pageTitle: document.title,
         hasFrames: window.frames.length > 0,
@@ -243,6 +255,7 @@ export class PageAnalysisService {
       const result = this.pageAnalysisDomainService.createPageAnalysisResult(
         context,
         resourceCollection,
+        greenHostingResult,
         {
           ...pageMetadata,
           simulation: simulationResult,

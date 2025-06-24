@@ -2,6 +2,7 @@
  * Page analysis domain model - Core analysis concepts and value objects
  */
 
+import { GreenHostingResult } from './green-hosting';
 import { ResourceCollection } from './resource';
 
 // Analysis configuration value objects
@@ -21,6 +22,7 @@ export interface PageAnalysisResult {
   options: PageAnalysisOptions;
   duration: number;
   resources: ResourceCollection;
+  greenHosting: GreenHostingResult;
   metadata: {
     pageTitle?: string;
     hasFrames: boolean;

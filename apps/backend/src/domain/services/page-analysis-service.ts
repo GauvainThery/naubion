@@ -3,6 +3,7 @@
  */
 
 import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
+import { GreenHostingResult } from '../models/green-hosting.js';
 import {
   createPageAnalysisOptions,
   PageAnalysisOptions,
@@ -52,6 +53,7 @@ export class PageAnalysisDomainService {
   createPageAnalysisResult(
     context: PageAnalysisContext,
     resources: ResourceCollection,
+    greenHosting: GreenHostingResult,
     metadata: {
       hasFrames?: boolean;
       hasServiceWorker?: boolean;
@@ -69,6 +71,7 @@ export class PageAnalysisDomainService {
       options: context.options,
       duration,
       resources,
+      greenHosting,
       metadata: {
         ...metadata,
         hasFrames: metadata.hasFrames || false,

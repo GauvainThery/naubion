@@ -12,7 +12,7 @@ import { GreenHostingService } from '../../application/services/green-hosting-se
 // Create services (dependency injection)
 const resourceService = new ResourceService();
 const greenHostingService = new GreenHostingService();
-const pageAnalysisService = new PageAnalysisService(resourceService);
+const pageAnalysisService = new PageAnalysisService(resourceService, greenHostingService);
 
 // Export all services
 export { resourceService, pageAnalysisService, greenHostingService };
