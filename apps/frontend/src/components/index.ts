@@ -14,6 +14,7 @@ export { default as Leaf } from './molecules/Laptop/Leaf';
 // Molecules
 export { default as RadioGroup } from './molecules/RadioGroup';
 export { default as MetricCard } from './molecules/MetricCard';
+export { default as FactCard } from './molecules/FactCard';
 export { default as ResourceBreakdownItem } from './molecules/ResourceBreakdownItem';
 export { default as LoadingStep } from './molecules/LoadingStep';
 export { default as ResourceList } from './molecules/ResourceList';

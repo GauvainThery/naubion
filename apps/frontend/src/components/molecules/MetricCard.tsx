@@ -3,23 +3,18 @@ import { cn } from '../../utils/classnames';
 import Card from '../atoms/Card';
 
 type MetricCardProps = {
-  title?: string;
   value: string | number;
   unit?: string;
   description?: string;
   className?: string;
-};
-
-type ExtendedMetricCardProps = MetricCardProps & {
   icon?: React.ReactNode;
   label?: string;
   isPrimary?: boolean;
 };
 
-const MetricCard: React.FC<ExtendedMetricCardProps> = ({
+const MetricCard: React.FC<MetricCardProps> = ({
   icon,
   value,
-  title,
   label,
   isPrimary = false,
   className = ''
@@ -40,7 +35,7 @@ const MetricCard: React.FC<ExtendedMetricCardProps> = ({
         </div>
         <div>
           <div className={cn('text-2xl font-bold', isPrimary ? 'text-white' : '')}>{value}</div>
-          <div className={cn('text-sm', isPrimary ? 'text-white/80' : '')}>{label || title}</div>
+          <div className={cn('text-sm', isPrimary ? 'text-white/80' : '')}>{label}</div>
         </div>
       </div>
     </Card>
