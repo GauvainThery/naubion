@@ -12,7 +12,7 @@ export class Co2JSAPIClient {
   convertBytesIntoCo2e(bytes: number, isGreenHosted = false): number {
     try {
       const result = this.client.perByte(bytes, isGreenHosted);
-      return result as number; // Number because using perByt and not perByteTrace
+      return result as number; // Number because using perByte and not perByteTrace
     } catch (error) {
       throw new Error(
         `Failed to convert bytes into CO2e: ${error instanceof Error ? error.message : 'Unknown error'}`
