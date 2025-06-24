@@ -4,6 +4,7 @@
 
 import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
 import { GreenHostingResult } from '../models/green-hosting.js';
+import { HumanReadableImpactResult } from '../models/human-readable-impact.js';
 import {
   createPageAnalysisOptions,
   PageAnalysisOptions,
@@ -54,6 +55,8 @@ export class PageAnalysisDomainService {
     context: PageAnalysisContext,
     resources: ResourceCollection,
     greenHosting: GreenHostingResult,
+    gCo2e: number,
+    humanReadableImpact: HumanReadableImpactResult,
     metadata: {
       hasFrames?: boolean;
       hasServiceWorker?: boolean;
@@ -72,6 +75,8 @@ export class PageAnalysisDomainService {
       duration,
       resources,
       greenHosting,
+      gCo2e,
+      humanReadableImpact,
       metadata: {
         ...metadata,
         hasFrames: metadata.hasFrames || false,

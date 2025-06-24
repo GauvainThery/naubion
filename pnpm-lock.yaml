@@ -72,6 +72,9 @@ importers:
       '@types/node-mailjet':
         specifier: ^4.0.0
         version: 4.0.0
+      '@types/tgwf__co2':
+        specifier: ^0.14.2
+        version: 0.14.2
       '@types/ws':
         specifier: ^8.5.13
         version: 8.18.1
@@ -671,6 +674,9 @@ packages:
 
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
+
+  '@types/tgwf__co2@0.14.2':
+    resolution: {integrity: sha512-kgSh14wLbydB4TwHYVq/1pbOC4ww3EDNgLQ3kZSH6wZyDmBMTRyEaIBqXtCmuhKCotU71QAOpkIO3IHbHTtANA==}
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
@@ -2509,6 +2515,8 @@ snapshots:
       '@types/http-errors': 2.0.4
       '@types/node': 22.15.29
       '@types/send': 0.17.4
+
+  '@types/tgwf__co2@0.14.2': {}
 
   '@types/ws@8.18.1':
     dependencies:

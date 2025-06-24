@@ -3,6 +3,7 @@
  */
 
 import { GreenHostingResult } from './green-hosting';
+import { HumanReadableImpactResult } from './human-readable-impact';
 import { ResourceCollection } from './resource';
 
 // Analysis configuration value objects
@@ -23,6 +24,8 @@ export interface PageAnalysisResult {
   duration: number;
   resources: ResourceCollection;
   greenHosting: GreenHostingResult;
+  gCo2e: number;
+  humanReadableImpact: HumanReadableImpactResult;
   metadata: {
     pageTitle?: string;
     hasFrames: boolean;

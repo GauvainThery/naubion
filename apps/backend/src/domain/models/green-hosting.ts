@@ -1,7 +1,3 @@
-export interface GreenHostingOptions {
-  hostname: string;
-}
-
 export interface GreenHostingResult {
   url: string;
   green: boolean;
