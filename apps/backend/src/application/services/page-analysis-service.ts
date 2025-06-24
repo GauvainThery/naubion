@@ -3,11 +3,8 @@
  * Orchestrates the entire page analysis process using DDD components
  */
 
-import {
-  PageAnalysisOptions,
-  PageAnalysisResult
-} from '../../domain/models/analysis/page-analysis.js';
-import { PageAnalysisDomainService } from '../../domain/services/analysis/page-analysis-service.js';
+import { PageAnalysisOptions, PageAnalysisResult } from '../../domain/models/page-analysis.js';
+import { PageAnalysisDomainService } from '../../domain/services/page-analysis-service.js';
 import { ResourceService } from '../../domain/services/resource-service.js';
 import { BrowserManager } from '../../infrastructure/browser/browser-manager.js';
 import { NetworkMonitor } from '../../infrastructure/browser/network-monitor.js';

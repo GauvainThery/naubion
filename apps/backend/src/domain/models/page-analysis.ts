@@ -2,7 +2,7 @@
  * Page analysis domain model - Core analysis concepts and value objects
  */
 
-import { ResourceCollection } from '../resource.js';
+import { ResourceCollection } from './resource';
 
 // Analysis configuration value objects
 export interface PageAnalysisOptions {

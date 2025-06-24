@@ -2,13 +2,13 @@
  * Page analysis domain service - Core analysis orchestration logic
  */
 
-import { SimulationResult } from '../../../infrastructure/browser/user-simulator.js';
+import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
 import {
   createPageAnalysisOptions,
   PageAnalysisOptions,
   PageAnalysisResult
-} from '../../models/analysis/page-analysis.js';
-import { ResourceCollection } from '../../models/resource.js';
+} from '../models/page-analysis.js';
+import { ResourceCollection } from '../models/resource.js';
 
 export interface PageAnalysisContext {
   url: string;

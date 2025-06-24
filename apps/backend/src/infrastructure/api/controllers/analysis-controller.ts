@@ -5,7 +5,7 @@
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 import { PageAnalysisService } from '../../../application/services/page-analysis-service.js';
-import { PageAnalysisResult } from '../../../domain/models/analysis/page-analysis.js';
+import { PageAnalysisResult } from '../../../domain/models/page-analysis.js';
 import { asyncHandler, validateAnalysisOptions, validateUrl } from '../../../shared/errors.js';
 import logger from '../../../shared/logger.js';
 
