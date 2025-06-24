@@ -4,6 +4,7 @@ import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Input from '../atoms/Input';
 import RadioGroup from '../molecules/RadioGroup';
+import { scrollTopPage } from './../../utils/scrollTopPage';
 
 type AnalysisFormProps = {
   onSubmit: (data: AnalysisFormData) => void;
@@ -131,6 +132,8 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
       <path d="M15.5 14.5L19 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
+
+  scrollTopPage();
 
   return (
     <section className="container pt-24">

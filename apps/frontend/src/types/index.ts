@@ -1,4 +1,4 @@
-import { PageAnalysisResult } from '../../../backend/src/domain/models/analysis/page-analysis';
+import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
 
 // Frontend-specific types
 export type AnalysisFormData = {

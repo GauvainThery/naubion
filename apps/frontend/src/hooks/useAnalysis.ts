@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { AnalysisFormData, LoadingStep } from '../types';
-import { PageAnalysisResult } from '../../../backend/src/domain/models/analysis/page-analysis';
+import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
+import { scrollTopPage } from './../utils/scrollTopPage';
 
 type AnalysisInitResponse = {
   analysisId: string;
@@ -36,6 +37,11 @@ const useAnalysis = () => {
     },
     {
       id: 'step4',
+      title: 'Green hosting',
+      description: 'Assessing green hosting practices'
+    },
+    {
+      id: 'step5',
       title: 'Processing',
       description: 'Processing and categorizing resources'
     }
@@ -105,6 +111,7 @@ const useAnalysis = () => {
           if (progressData.progress >= 100 || progressData.step === 'complete') {
             eventSource.close();
             fetchFinalResults(initData.analysisId);
+            scrollTopPage();
           }
         };
 

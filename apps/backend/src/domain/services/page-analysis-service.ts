@@ -2,13 +2,14 @@
  * Page analysis domain service - Core analysis orchestration logic
  */
 
-import { SimulationResult } from '../../../infrastructure/browser/user-simulator.js';
+import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
+import { GreenHostingResult } from '../models/green-hosting.js';
 import {
   createPageAnalysisOptions,
   PageAnalysisOptions,
   PageAnalysisResult
-} from '../../models/analysis/page-analysis.js';
-import { ResourceCollection } from '../../models/resource.js';
+} from '../models/page-analysis.js';
+import { ResourceCollection } from '../models/resource.js';
 
 export interface PageAnalysisContext {
   url: string;
@@ -52,6 +53,7 @@ export class PageAnalysisDomainService {
   createPageAnalysisResult(
     context: PageAnalysisContext,
     resources: ResourceCollection,
+    greenHosting: GreenHostingResult,
     metadata: {
       hasFrames?: boolean;
       hasServiceWorker?: boolean;
@@ -69,6 +71,7 @@ export class PageAnalysisDomainService {
       options: context.options,
       duration,
       resources,
+      greenHosting,
       metadata: {
         ...metadata,
         hasFrames: metadata.hasFrames || false,

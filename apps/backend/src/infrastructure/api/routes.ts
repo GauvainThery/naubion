@@ -3,13 +3,15 @@
  */
 
 import express from 'express';
+import { greenHostingService, pageAnalysisService } from '../di/index.js';
 import { AnalysisController } from './controllers/analysis-controller.js';
+import { GreenHostingController } from './controllers/green-hosting-controller.js';
 import { NewsletterController } from './controllers/newsletter-controller.js';
-import { pageAnalysisService } from '../di/index.js';
 
 const router = express.Router();
 const analysisController = new AnalysisController(pageAnalysisService);
 const newsletterController = new NewsletterController();
+const greenHostingController = new GreenHostingController(greenHostingService);
 
 /**
  * POST /api/analyze
@@ -28,6 +30,12 @@ router.get('/analysis/:analysisId/progress', analysisController.progress);
  * Get final analysis results
  */
 router.get('/analysis/:analysisId/result', analysisController.result);
+
+/**
+ * GET /api/green-hosting/:url
+ * Assess if a url is green hosted
+ */
+router.get('/green-hosting/:url', greenHostingController.assessGreenHosting);
 
 /**
  * GET /api/health

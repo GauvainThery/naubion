@@ -3,7 +3,7 @@
  */
 
 import { Page } from 'puppeteer';
-import { PageAnalysisOptions } from '../../domain/models/analysis/page-analysis.js';
+import { PageAnalysisOptions } from '../../domain/models/page-analysis.js';
 import { NetworkMonitor } from './network-monitor.js';
 import { ElementFinder, ElementInfo } from './element-finder.js';
 import { InteractionStrategies } from './interaction-strategies.js';

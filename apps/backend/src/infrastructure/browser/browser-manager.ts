@@ -4,10 +4,10 @@
 
 import puppeteer, { Browser, LaunchOptions, Page } from 'puppeteer';
 import {
-  PageAnalysisOptions,
+  DEVICE_CONFIGURATIONS,
   DeviceConfiguration,
-  DEVICE_CONFIGURATIONS
-} from '../../domain/models/analysis/page-analysis.js';
+  PageAnalysisOptions
+} from '../../domain/models/page-analysis.js';
 import logger from '../../shared/logger.js';
 
 export class BrowserManager {
