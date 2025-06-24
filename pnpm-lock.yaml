@@ -35,6 +35,12 @@ importers:
       '@naubion/shared':
         specifier: workspace:*
         version: link:../../libs/shared
+      '@tgwf/co2':
+        specifier: ^0.16.8
+        version: 0.16.8
+      axios:
+        specifier: ^1.10.0
+        version: 1.10.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -592,6 +598,10 @@ packages:
     resolution: {integrity: sha512-Wq2zpapRYLfi4aKxf2Xff0tN+7slj2d4R87WEzqw7ZLsVvO5zwYCIuEGSZYiK41+GlwUo1HiR+GdkLEJnCKTCw==}
     cpu: [x64]
     os: [win32]
+
+  '@tgwf/co2@0.16.8':
+    resolution: {integrity: sha512-o0NPZVaB65Y9Unqi6i+RmwtPrkAf11MhagpCc/b99PPBGNChu7jlgAhlo/B1ZiklPvAL+d0Z719GJYssSWeGBQ==}
+    engines: {node: '>=14.0.0'}
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
@@ -2407,6 +2417,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.41.1':
     optional: true
+
+  '@tgwf/co2@0.16.8': {}
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
