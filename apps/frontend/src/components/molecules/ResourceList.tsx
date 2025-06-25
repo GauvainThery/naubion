@@ -9,19 +9,25 @@ type LargestResource = {
 };
 
 type ResourceListProps = {
-  title: string;
   resources: LargestResource[];
   className?: string;
 };
 
-const ResourceList: React.FC<ResourceListProps> = ({ title, resources, className = '' }) => {
+const ResourceList: React.FC<ResourceListProps> = ({ resources, className = '' }) => {
   if (!resources || resources.length === 0) {
     return null;
   }
 
   return (
     <div className={cn('flex flex-col gap-6', className)}>
-      <h4 className="text-lg font-semibold">{title}</h4>
+      <div className="flex flex-col gap-2">
+        <h4 className="text-lg font-semibold text-center lg:text-left">Largest Resources</h4>
+        <p className="text-text-secondary lg:w-7/8">
+          The largest resources loaded by the page. These resources can significantly impact the
+          page's performance and loading time. Consider optimizing or reducing their size to improve
+          user experience.
+        </p>
+      </div>
       <div className="flex flex-col gap-4">
         {resources.map((resource, index) => (
           <ResourceItem

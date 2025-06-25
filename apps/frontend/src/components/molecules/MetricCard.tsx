@@ -16,6 +16,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
   icon,
   value,
   label,
+  unit = '',
   isPrimary = false,
   className = ''
 }) => {
@@ -23,7 +24,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
     <Card
       className={cn(
         'p-6 w-full',
-        isPrimary && 'bg-gradient-to-br from-primary-300 to-primary-500 text-white',
+        isPrimary
+          ? 'bg-gradient-to-br from-primary-300 to-primary-500 text-white'
+          : 'border-2 border-primary',
         className
       )}
     >
@@ -34,7 +37,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
           {icon}
         </div>
         <div>
-          <div className={cn('text-2xl font-bold', isPrimary ? 'text-white' : '')}>{value}</div>
+          <div className={cn('text-2xl font-bold', isPrimary ? 'text-white' : '')}>
+            {value + (unit ? ` ${unit}` : '')}
+          </div>
           <div className={cn('text-sm', isPrimary ? 'text-white/80' : '')}>{label}</div>
         </div>
       </div>

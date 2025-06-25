@@ -10,6 +10,10 @@ export { default as Slider } from './atoms/Slider';
 export { default as Logo } from './atoms/Logo';
 export { default as IconCard } from './atoms/IconCard';
 export { default as Leaf } from './molecules/Laptop/Leaf';
+export { default as Divider } from './atoms/Divider';
+
+// Icons
+export * from './icons';
 
 // Molecules
 export { default as RadioGroup } from './molecules/RadioGroup';
@@ -19,6 +23,13 @@ export { default as ResourceBreakdownItem } from './molecules/ResourceBreakdownI
 export { default as LoadingStep } from './molecules/LoadingStep';
 export { default as ResourceList } from './molecules/ResourceList';
 export { default as TextInputWithSubmit } from './molecules/TextInputWithSubmit';
+export { default as AnalysisOptionsDisplay } from './molecules/AnalysisOptionsDisplay';
+export { default as ResultsSummary } from './molecules/ResultsSummary';
+export { default as ResultsHeader } from './molecules/ResultsHeader';
+export { default as EnvironmentalImpactSection } from './molecules/EnvironmentalImpactSection';
+export { default as KeyFactsSection } from './molecules/KeyFactsSection';
+export { default as ResourceAnalysisSection } from './molecules/ResourceAnalysisSection';
+export { default as TryAnotherPageSection } from './molecules/TryAnotherPageSection';
 export { default as ScreenContent } from './molecules/Laptop/ScreenContent';
 export { default as KeyboardDeck } from './molecules/Laptop/KeyboardDeck';
 

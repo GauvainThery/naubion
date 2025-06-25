@@ -175,3 +175,64 @@ export function processLargestResources(
     size: roundResourceSize(resource.transferSize)
   }));
 }
+
+/**
+ * Converts CO2e emissions from grams to the most appropriate unit (g, kg, t).
+ * Automatically selects the unit based on the magnitude of the value.
+ *
+ * @param gCo2e - The CO2e emissions in grams
+ * @returns An object with the formatted value and unit
+ *
+ * @example
+ * ```typescript
+ * formatCo2eEmissions(500) // { value: "500", unit: "gCO₂e" }
+ * formatCo2eEmissions(1500) // { value: "1.50", unit: "kgCO₂e" }
+ * formatCo2eEmissions(1500000) // { value: "1.50", unit: "t CO₂e" }
+ * ```
+ */
+export function formatCo2eEmissions(gCo2e: number): { value: string; unit: string } {
+  if (gCo2e < 1000) {
+    return {
+      value: String(Math.round(gCo2e * 100) / 100),
+      unit: 'gCO₂e'
+    };
+  } else if (gCo2e < 1000000) {
+    return {
+      value: (gCo2e / 1000).toFixed(2),
+      unit: 'kgCO₂e'
+    };
+  } else {
+    return {
+      value: (gCo2e / 1000000).toFixed(2),
+      unit: 't CO₂e'
+    };
+  }
+}
+
+/**
+ * Converts distance from meters to the most appropriate unit (m, km).
+ * Automatically selects the unit based on the magnitude of the value.
+ *
+ * @param meters - The distance in meters
+ * @returns An object with the formatted value and unit
+ *
+ * @example
+ * ```typescript
+ * formatDistance(500) // { value: "500", unit: "m" }
+ * formatDistance(1500) // { value: "1.50", unit: "km" }
+ * formatDistance(25000) // { value: "25.00", unit: "km" }
+ * ```
+ */
+export function formatDistance(meters: number): { value: string; unit: string } {
+  if (meters < 1000) {
+    return {
+      value: String(Math.round(meters * 100) / 100),
+      unit: 'm'
+    };
+  } else {
+    return {
+      value: (meters / 1000).toFixed(2),
+      unit: 'km'
+    };
+  }
+}

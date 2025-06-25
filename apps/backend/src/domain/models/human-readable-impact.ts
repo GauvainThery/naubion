@@ -3,5 +3,5 @@ export interface HumanReadableImpactInput {
 }
 
 export interface HumanReadableImpactResult {
-  kmWithGasolineCar: number;
+  meterWithGasolineCar: number;
 }

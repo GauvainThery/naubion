@@ -86,7 +86,6 @@ export class UserSimulator {
       successfulInteractions += interactionResult.successful;
 
       // Phase 4: Advanced interactions (optional)
-      console.log('🔥 ・ simulateUserBehavior ・ this.config:', this.config);
       if (this.config.enableHoverSimulation) {
         await this.performHoverInteractions();
       }

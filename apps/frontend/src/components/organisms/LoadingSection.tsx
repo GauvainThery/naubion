@@ -56,8 +56,8 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   };
 
   return (
-    <section className="container pt-24">
-      <Card className="p-8 flex flex-col gap-12">
+    <section className="container pt-12 lg:pt-20">
+      <Card className="p-12 flex flex-col gap-12">
         <h3 className="text-2xl font-bold">Analyzing your page...</h3>
 
         {progress > 0 && (

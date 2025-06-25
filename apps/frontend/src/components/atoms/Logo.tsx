@@ -10,7 +10,7 @@ const Logo = ({ size = 'md', className = '', hasDropShadow = false }: LogoProps)
   const sizes: Record<LogoProps['size'], string> = {
     sm: 'w-[100px]',
     md: 'w-[256px]',
-    lg: 'w-[324px]'
+    lg: 'w-[296px]'
   };
 
   return (

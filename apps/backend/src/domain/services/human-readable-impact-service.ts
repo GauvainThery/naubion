@@ -35,10 +35,10 @@ export class HumanReadableImpactDomainService {
    */
   createHumanReadableImpactResult(
     context: HumanReadableImpactContext,
-    kmWithGasolineCar: number
+    meterWithGasolineCar: number
   ): HumanReadableImpactResult {
     return {
-      kmWithGasolineCar
+      meterWithGasolineCar
     };
   }
 
@@ -47,10 +47,9 @@ export class HumanReadableImpactDomainService {
    * Pour une voiture à essence, qui émet 200 gCO2e/km, 1 g de CO2e correspond à environ 5 mètres parcourus.
    */
   calculateKmWithGasolineCar(gCo2e: number): number {
-    // 1 g CO2e = 5 meters = 0.005 km
+    // 1 g CO2e = 5 meters
     const metersPerGramCo2e = 5;
-    const kmPerGramCo2e = metersPerGramCo2e / 1000;
 
-    return gCo2e * kmPerGramCo2e;
+    return gCo2e * metersPerGramCo2e;
   }
 }

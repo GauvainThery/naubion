@@ -136,8 +136,8 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
   scrollTopPage();
 
   return (
-    <section className="container pt-24">
-      <Card className="p-8 flex flex-col gap-8">
+    <section className="container pt-12 lg:pt-20">
+      <Card className="p-12 flex flex-col gap-8">
         <div className="flex flex-col gap-1">
           <h2 className="text-2xl font-bold mb-2">Web Page Environnemental Footprint</h2>
           <p className="text-text-secondary">

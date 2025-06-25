@@ -41,7 +41,7 @@ export class HumanReadableImpactService {
       logger.info(
         `Human readable impact conversion completed in ${duration}ms for ${gCo2e} gCO2e`,
         {
-          kmWithGasolineCar: result.kmWithGasolineCar
+          kmWithGasolineCar: result.meterWithGasolineCar
         }
       );
 
