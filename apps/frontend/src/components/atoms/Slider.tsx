@@ -4,106 +4,116 @@ import { cn } from '../../utils/classnames';
 type SliderProps = {
   value: number;
   onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
   label?: string;
   description?: string;
-  formatValue?: (value: number) => string;
   className?: string;
   disabled?: boolean;
-  recommendation?: {
-    value: number;
-    label: string;
-  };
 };
 
 const Slider: React.FC<SliderProps> = ({
   value,
   onChange,
-  min = 0,
-  max = 100,
-  step = 1,
   label,
   description,
-  formatValue = val => val.toString(),
   className,
-  disabled = false,
-  recommendation
+  disabled = false
 }) => {
-  const percentage = ((value - min) / (max - min)) * 100;
-  const recommendationPercentage = recommendation
-    ? ((recommendation.value - min) / (max - min)) * 100
-    : null;
+  // Convert actual value to slider position (0-100)
+  const actualToSlider = (actualValue: number): number => {
+    if (actualValue <= 1) return 1;
+    if (actualValue >= 100000) return 100;
+
+    if (actualValue <= 10000) {
+      // Linear interpolation between 0 and middle point
+      return (actualValue / 10000) * 50;
+    } else {
+      // Linear interpolation between middle point and end
+      return 50 + ((actualValue - 10000) / (100000 - 10000)) * 50;
+    }
+  };
+
+  // Convert slider position (0-100) to actual value
+  const sliderToActual = (sliderValue: number): number => {
+    if (sliderValue <= 1) return 1;
+    if (sliderValue >= 100) return 100000;
+
+    if (sliderValue <= 50) {
+      // Linear interpolation between 0 and middle point
+      return (sliderValue / 50) * 10000;
+    } else {
+      // Linear interpolation between middle point and end
+      return 10000 + ((sliderValue - 50) / 50) * (100000 - 10000);
+    }
+  };
+
+  const sliderValue = actualToSlider(value);
+  const percentage = sliderValue;
 
   return (
-    <div className={cn('space-y-3', className)}>
-      {label && (
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700">{label}</label>
-          <span className="text-sm font-semibold text-blue-600">{formatValue(value)}</span>
-        </div>
-      )}
+    <div className="bg-gray-50 rounded-xl p-6">
+      <div className={cn('flex flex-col gap-3', className)}>
+        {label && (
+          <div className="flex items-center justify-between">
+            <label>{label}</label>
+          </div>
+        )}
 
-      {description && <p className="text-sm text-gray-600">{description}</p>}
+        {description && <p className="text-sm text-text-secondary">{description}</p>}
 
-      <div className="relative">
-        {/* Track */}
-        <div className="h-2 bg-gray-200 rounded-full relative">
-          {/* Progress */}
-          <div
-            className="h-2 bg-blue-500 rounded-full transition-all duration-200 ease-out"
-            style={{ width: `${percentage}%` }}
+        <div className="relative">
+          {/* Track */}
+          <div className="h-3 bg-gray-200 rounded-full relative shadow-inner">
+            {/* Progress */}
+            <div
+              className="h-3 bg-gradient-to-r from-primary-300 to-primary-500 rounded-full transition-all duration-200 ease-out relative overflow-hidden "
+              style={{ width: `${percentage}%` }}
+            >
+              <div
+                className={cn(
+                  'absolute inset-0 bg-gradient-to-r rounded-full from-primary-300 via-primary to-primary-300 opacity-30 progress-shimmer'
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Slider input */}
+          <input
+            type="range"
+            min={1}
+            max={100}
+            step={0.1}
+            value={sliderValue}
+            onChange={e => {
+              const newSliderValue = Number(e.target.value);
+              const newActualValue = Math.round(sliderToActual(newSliderValue));
+              onChange(newActualValue);
+            }}
+            disabled={disabled}
+            className={cn(
+              'absolute top-0 left-0 w-full h-2 opacity-0 cursor-grab active:cursor-grabbing',
+              disabled && 'cursor-not-allowed'
+            )}
           />
 
-          {/* Recommendation marker */}
-          {recommendation && recommendationPercentage !== null && (
-            <div
-              className="absolute top-0 h-2 w-1 bg-green-500 rounded-full"
-              style={{ left: `${recommendationPercentage}%` }}
-              title={`Recommended: ${recommendation.label}`}
-            />
-          )}
+          {/* Thumb */}
+          <div
+            className={cn(
+              'absolute top-1/2 w-5 h-5 bg-white border-2 border-primary rounded-full transform -translate-y-1/2 -translate-x-1/2 shadow-md transition-all duration-200 ease-out pointer-events-none',
+              disabled ? 'border-gray-400 cursor-not-allowed' : 'cursor-grab'
+            )}
+            style={{ left: `${percentage}%` }}
+          />
         </div>
 
-        {/* Slider input */}
-        <input
-          type="range"
-          min={min}
-          max={max}
-          step={step}
-          value={value}
-          onChange={e => onChange(Number(e.target.value))}
-          disabled={disabled}
-          className={cn(
-            'absolute top-0 left-0 w-full h-2 opacity-0 cursor-pointer',
-            disabled && 'cursor-not-allowed'
-          )}
-        />
-
-        {/* Thumb */}
-        <div
-          className={cn(
-            'absolute top-1/2 w-5 h-5 bg-white border-2 border-blue-500 rounded-full transform -translate-y-1/2 -translate-x-1/2 shadow-md transition-all duration-200 ease-out',
-            disabled ? 'border-gray-400 cursor-not-allowed' : 'hover:scale-110 cursor-pointer'
-          )}
-          style={{ left: `${percentage}%` }}
-        />
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Current estimate:{' '}
+            <span className="font-semibold text-primary">
+              {value.toLocaleString()} visit{value === 1 ? '' : 's'}/month
+            </span>
+          </p>
+        </div>
       </div>
-
-      {/* Recommendation info */}
-      {recommendation && (
-        <div className="flex items-center text-xs text-green-600">
-          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Recommended: {recommendation.label}
-        </div>
-      )}
     </div>
   );
 };

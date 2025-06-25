@@ -42,6 +42,11 @@ const useAnalysis = () => {
     },
     {
       id: 'step5',
+      title: 'CO2 conversion',
+      description: 'Convert page resources to CO2e emissions'
+    },
+    {
+      id: 'step6',
       title: 'Processing',
       description: 'Processing and categorizing resources'
     }

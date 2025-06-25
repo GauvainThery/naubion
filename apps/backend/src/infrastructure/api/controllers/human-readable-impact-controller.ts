@@ -28,7 +28,7 @@ export class HumanReadableImpactController {
           });
 
         logger.info(`Human readable impact conversion completed for ${gCo2e} gCO2e`, {
-          kmWithGasolineCar: result.kmWithGasolineCar
+          kmWithGasolineCar: result.meterWithGasolineCar
         });
 
         res.status(200).json(result);
