@@ -3,19 +3,22 @@ import type { LoadingStep as LoadingStepType } from '../../types';
 import Card from '../atoms/Card';
 import LoadingStep from '../molecules/LoadingStep';
 import ProgressBar from '../atoms/ProgressBar';
+import { cn } from './../../utils/classnames';
 
 type LoadingSectionProps = {
   steps: LoadingStepType[];
   progress?: number;
   currentStep?: string;
   estimatedDuration?: number;
+  className?: string;
 };
 
 const LoadingSection: React.FC<LoadingSectionProps> = ({
   steps,
   progress = 0,
   currentStep = '',
-  estimatedDuration = 0
+  estimatedDuration = 0,
+  className
 }) => {
   // Calculate remaining time based on progress and estimated duration
   const calculateRemainingTime = () => {
@@ -56,7 +59,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   };
 
   return (
-    <section className="container pt-12 lg:pt-20">
+    <section className={cn('container', className)}>
       <Card className="p-12 flex flex-col gap-12">
         <h3 className="text-2xl font-bold">Analyzing your page...</h3>
 

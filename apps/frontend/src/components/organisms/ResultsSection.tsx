@@ -17,12 +17,14 @@ import {
   formatCo2eEmissions,
   formatDistance
 } from './../../utils/websiteAnalysisResultProcessors';
+import { cn } from './../../utils/classnames';
 
 type ResultsSectionProps = {
   results: PageAnalysisResult;
+  className?: string;
 };
 
-const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
+const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) => {
   // State for visits multiplier (continuous range)
   const [visitsCount, setVisitsCount] = React.useState(3000); // Default to 3000 visits per month
 
@@ -52,7 +54,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results }) => {
   ];
 
   return (
-    <section className="container pt-12 lg:pt-20">
+    <section className={cn('container', className)}>
       <Card className="p-12 flex flex-col gap-12">
         {/* Header */}
         <ResultsHeader

@@ -5,10 +5,13 @@ import Card from '../atoms/Card';
 import Input from '../atoms/Input';
 import RadioGroup from '../molecules/RadioGroup';
 import { scrollTopPage } from './../../utils/scrollTopPage';
+import { SearchIcon } from '../icons';
+import { cn } from './../../utils/classnames';
 
 type AnalysisFormProps = {
   onSubmit: (data: AnalysisFormData) => void;
   isLoading: boolean;
+  className?: string;
 };
 
 const DEFAULT_FORM_DATA: AnalysisFormData = {
@@ -17,7 +20,7 @@ const DEFAULT_FORM_DATA: AnalysisFormData = {
   deviceType: 'desktop'
 };
 
-const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
+const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, className }) => {
   const [formData, setFormData] = useState<AnalysisFormData>(DEFAULT_FORM_DATA);
 
   // Check for URL parameters on mount and populate form
@@ -123,26 +126,18 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
     setFormData(DEFAULT_FORM_DATA);
   };
 
-  const searchIcon = (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path
-        d="M9 2C5.13 2 2 5.13 2 9C2 12.87 5.13 16 9 16C12.87 16 16 12.87 16 9C16 5.13 12.87 2 9 2ZM9 14C6.24 14 4 11.76 4 9C4 6.24 6.24 4 9 4C11.76 4 14 6.24 14 9C14 11.76 11.76 14 9 14Z"
-        fill="currentColor"
-      />
-      <path d="M15.5 14.5L19 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-
   scrollTopPage();
 
   return (
-    <section className="container pt-12 lg:pt-20">
+    <section className={cn('container', className)}>
       <Card className="p-12 flex flex-col gap-8">
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold mb-2">Web Page Environnemental Footprint</h2>
-          <p className="text-text-secondary">
-            Enter a URL to get a comprehensive breakdown of page weight, resource sizes, and
-            optimization opportunities
+          <h2 className="text-2xl font-bold">Web Page Environnemental Footprint</h2>
+          <p className="text-text-secondary lg:w-7/8">
+            While waiting for the official launch of naubion, you can already measure the
+            environmental impact of your web pages. Enter the URL of a page you want to analyze, and
+            we will provide you with an estimate of its carbon footprint based on the resources it
+            loads and the interactions it requires.
           </p>
         </div>
 
@@ -154,7 +149,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading }) => {
               value={formData.url}
               onChange={e => handleInputChange('url', e.target.value)}
               required
-              icon={searchIcon}
+              icon={<SearchIcon />}
             />
             <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
               Clear

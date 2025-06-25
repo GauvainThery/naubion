@@ -1,8 +1,12 @@
-import React from 'react';
 import { Laptop, TextInputWithSubmit } from '../';
 import { useNewsletter } from '../../hooks/useNewsletter';
+import { cn } from './../../utils/classnames';
 
-const HeroSection = () => {
+type HeroSectionProps = {
+  className?: string;
+};
+
+const HeroSection = ({ className }: HeroSectionProps) => {
   const { subscribe, isLoading, error, success } = useNewsletter();
 
   const handleEmailSubmit = async (email: string) => {
@@ -10,7 +14,12 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="flex flex-col lg:flex-row items-center justify-between container gap-12 pt-24">
+    <section
+      className={cn(
+        'flex flex-col lg:flex-row items-center justify-between container gap-12',
+        className
+      )}
+    >
       <div className="lg:w-1/2 flex flex-col gap-8 lg:gap-16 lg:pb-28 h-[312px] lg:h-[496px]">
         <div className="flex flex-col gap-3 text-center lg:text-left">
           <h1 className="text-3xl lg:text-4xl font-bold">

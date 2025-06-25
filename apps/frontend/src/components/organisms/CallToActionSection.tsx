@@ -11,7 +11,7 @@ const DEFAULT_SUBTITLE =
   "naubion is not yet available, but you can already start reducing your web application's carbon footprint. Join our community to stay updated on our progress and be the first to know when we launch.";
 
 const CallToActionSection = ({
-  className = '',
+  className,
   subtitle = DEFAULT_SUBTITLE
 }: CallToActionSectionProps) => {
   const { subscribe, isLoading, error, success } = useNewsletter();
@@ -22,7 +22,7 @@ const CallToActionSection = ({
   };
 
   return (
-    <section className={cn('pt-48 pb-16', className)}>
+    <section className={cn(className)}>
       <div className="container flex flex-col gap-18 relative z-10">
         <div className="w-full flex justify-center items-center">
           <div className="flex flex-col gap-3 max-w-2xl text-center">

@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
   };
 
   return (
-    <header className="flex justify-between items-center py-6 container pt-24 lg:pt-10">
+    <header className="flex justify-between items-center py-6 max-w-8xl mx-auto px-3 sm:px-5 lg:px-7 pt-24 lg:pt-10">
       <div className="lg:w-1/3" />
 
       <div className="lg:w-1/3 flex flex-col items-center justify-center gap-3 text-center">
@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
           {/* Mobile logo */}
           <Logo size="md" hasDropShadow className="lg:hidden" />
         </Link>
-        <p className="font-bold text-xs">Control the web environmental footprint</p>
+        <p className="font-bold text-xs">Control the environmental impact of your application</p>
       </div>
 
       <div className="lg:w-1/3 flex items-center justify-end">
