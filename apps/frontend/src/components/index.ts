@@ -11,6 +11,8 @@ export { default as Logo } from './atoms/Logo';
 export { default as IconCard } from './atoms/IconCard';
 export { default as Leaf } from './molecules/Laptop/Leaf';
 export { default as Divider } from './atoms/Divider';
+export { default as FAQItem } from './atoms/FAQItem';
+export { default as ErrorAlert } from './atoms/ErrorAlert';
 
 // Icons
 export * from './icons';
@@ -42,6 +44,8 @@ export { default as ResultsSection } from './organisms/ResultsSection';
 export { default as HeroSection } from './organisms/HeroSection';
 export { default as FeatureSection } from './organisms/FeatureSection';
 export { default as CallToActionSection } from './organisms/CallToActionSection';
+export { default as MethodologySection } from './organisms/MethodologySection';
+export { default as FAQSection } from './organisms/FAQSection';
 export { default as Laptop } from './molecules/Laptop/Laptop';
 
 // Templates

@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from 'react';
-import type { AnalysisFormData, LoadingStep } from '../types';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
+import type { AnalysisFormData, LoadingStep } from '../types';
 import { scrollTopPage } from './../utils/scrollTopPage';
 
 type AnalysisInitResponse = {
@@ -43,7 +43,7 @@ const useAnalysis = () => {
     {
       id: 'step5',
       title: 'CO2 conversion',
-      description: 'Convert page resources to CO2e emissions'
+      description: 'Convert page resources to CO₂e emissions'
     },
     {
       id: 'step6',
@@ -59,6 +59,16 @@ const useAnalysis = () => {
       if (response.status === 202) {
         // Still running, wait a bit and try again
         setTimeout(() => fetchFinalResults(analysisId), 2000);
+        return;
+      }
+
+      if (response.status === 500) {
+        // Handle server error with error message
+        const errorData = await response.json();
+        const errorMessage = errorData.error || 'Analysis failed on the server';
+        setError(errorMessage);
+        setIsLoading(false);
+        setProgress(0);
         return;
       }
 
@@ -80,6 +90,12 @@ const useAnalysis = () => {
 
   const startAnalysis = useCallback(
     async (formData: AnalysisFormData) => {
+      // Clean up any existing EventSource connection
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+
       setIsLoading(true);
       setError(null);
       setResults(null);
@@ -97,7 +113,10 @@ const useAnalysis = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Try to get error message from response body
+          const errorData = await response.json().catch(() => ({}));
+          const errorMessage = errorData.error || `HTTP error! status: ${response.status}`;
+          throw new Error(errorMessage);
         }
 
         const initData = (await response.json()) as AnalysisInitResponse;
@@ -112,6 +131,16 @@ const useAnalysis = () => {
           setProgress(progressData.progress);
           setCurrentStep(progressData.step);
 
+          // Handle error state
+          if (progressData.step === 'error' || progressData.status === 'failed') {
+            eventSource.close();
+            const errorMessage = progressData.message || 'Analysis failed';
+            setError(errorMessage);
+            setIsLoading(false);
+            setProgress(0);
+            return;
+          }
+
           // If analysis is complete, fetch final results
           if (progressData.progress >= 100 || progressData.step === 'complete') {
             eventSource.close();
@@ -123,8 +152,10 @@ const useAnalysis = () => {
         eventSource.onerror = error => {
           console.error('SSE Error:', error);
           eventSource.close();
-          // Fallback: try to fetch results anyway
-          fetchFinalResults(initData.analysisId);
+          setError('Connection lost. Please try again.');
+          setIsLoading(false);
+          setProgress(0);
+          // Don't try fetchFinalResults on connection error as it might be a network issue
         };
       } catch (err) {
         const errorMessage =
@@ -136,6 +167,16 @@ const useAnalysis = () => {
     },
     [fetchFinalResults]
   );
+
+  // Cleanup EventSource on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, []);
 
   return {
     isLoading,

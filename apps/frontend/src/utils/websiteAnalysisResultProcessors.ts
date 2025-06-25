@@ -177,10 +177,10 @@ export function processLargestResources(
 }
 
 /**
- * Converts CO2e emissions from grams to the most appropriate unit (g, kg, t).
+ * Converts CO₂e emissions from grams to the most appropriate unit (g, kg, t).
  * Automatically selects the unit based on the magnitude of the value.
  *
- * @param gCo2e - The CO2e emissions in grams
+ * @param gCo2e - The CO₂e emissions in grams
  * @returns An object with the formatted value and unit
  *
  * @example
