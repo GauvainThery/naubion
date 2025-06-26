@@ -47,127 +47,7 @@ export class PageAnalysisService {
     url: string,
     options: Partial<PageAnalysisOptions> = {}
   ): Promise<PageAnalysisResult> {
-    const { interactionLevel = 'default', deviceType = 'desktop', timeout = 60000 } = options;
-
-    // Create analysis context using domain service
-    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
-      url,
-      interactionLevel,
-      deviceType
-    );
-    context.options.timeout = timeout;
-
-    // Validate prerequisites
-    this.pageAnalysisDomainService.validatePageAnalysisPrerequisites(context);
-
-    // Check cache first
-    const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
-    if (cachedResult) {
-      logger.info('Returning cached analysis result', {
-        url: context.url,
-        cacheAge: Date.now() - new Date(cachedResult.timestamp).getTime()
-      });
-      return cachedResult;
-    }
-
-    logger.info(`Starting fresh analysis for ${url}`, {
-      interactionLevel,
-      deviceType,
-      estimatedDuration: this.pageAnalysisDomainService.estimatePageAnalysisDuration(
-        context.options
-      )
-    });
-
-    let page;
-
-    try {
-      // Phase 1: Setup browser environment
-      await this.browserManager.launch(context.options);
-      page = await this.browserManager.createPage(context.options);
-
-      // Phase 2: Setup monitoring and simulation
-      const client = await page.createCDPSession();
-      const networkMonitor = new NetworkMonitor(client, page);
-      const userSimulator = createUserSimulator(page, context.options);
-
-      // Connect components
-      userSimulator.setNetworkMonitor(networkMonitor);
-      await networkMonitor.setupListeners();
-
-      // Phase 3: Navigate and analyze
-      await page.goto(context.url, {
-        waitUntil: 'networkidle2',
-        timeout: context.options.timeout
-      });
-
-      // Phase 4: Simulate user behavior
-      const simulationResult = await userSimulator.simulateUserBehavior();
-
-      // Phase 5: Process any pending cross-origin requests
-      await networkMonitor.processPendingCrossOriginRequests();
-
-      // Phase 6: Process results
-      const resources = networkMonitor.getResources();
-      const resourceCollection = this.resourceService.processResources(resources);
-
-      // Phase 7: Green hosting assessment
-      const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
-
-      // Phase 8: Convert bytes into gCO2e
-      const co2eBytesConverisonResults = this.co2eBytesConversionService.convertBytesIntoCo2e({
-        bytes: resourceCollection.totalTransferSize,
-        isGreenHosted: greenHostingResult.green
-      });
-
-      // Phase 9: Create human-readable impact report
-      const humanReadableImpact = this.humanReadableImpactService.convertToHumanReadableImpact({
-        gCo2e: co2eBytesConverisonResults.value // always in g for now but be careful here!!
-      });
-
-      // Phase 10: Create final result
-      const pageMetadata = await page.evaluate(() => ({
-        pageTitle: document.title,
-        hasFrames: window.frames.length > 0,
-        hasServiceWorker: 'serviceWorker' in navigator,
-        pageSize: {
-          width: document.body.scrollWidth,
-          height: document.body.scrollHeight
-        }
-      }));
-
-      const result = this.pageAnalysisDomainService.createPageAnalysisResult(
-        context,
-        resourceCollection,
-        greenHostingResult,
-        co2eBytesConverisonResults.value, // always in g for now but be careful here!!
-        humanReadableImpact,
-        {
-          ...pageMetadata,
-          simulation: simulationResult,
-          networkActivity: networkMonitor.getTotalTransferSize()
-        }
-      );
-
-      logger.info(`Analysis completed in ${result.duration}ms for ${url}`, {
-        resourceCount: resourceCollection.resourceCount,
-        totalSize: resourceCollection.totalTransferSize,
-        interactions: simulationResult.successfulInteractions
-      });
-
-      // Cache the result for future use
-      await this.cacheService.cacheAnalysis(result);
-
-      return result;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error(`Analysis failed for ${url}`, { error: errorMessage });
-      throw new AnalysisError(`Failed to analyze ${url}: ${errorMessage}`, url);
-    } finally {
-      // Clean up resources
-      if (this.browserManager.isActive()) {
-        await this.browserManager.close();
-      }
-    }
+    return this.analyzeUrlWithProgress(url, options);
   }
 
   /**
@@ -247,6 +127,14 @@ export class PageAnalysisService {
       updateProgress(100, 'complete', 'Retrieved from cache');
       return cachedResult;
     }
+
+    logger.info(`Starting fresh analysis for ${url}`, {
+      interactionLevel,
+      deviceType,
+      estimatedDuration: this.pageAnalysisDomainService.estimatePageAnalysisDuration(
+        context.options
+      )
+    });
 
     updateProgress(10, 'setup', 'Setting up browser environment...');
 
@@ -332,7 +220,7 @@ export class PageAnalysisService {
         }
       );
 
-      updateProgress(95, 'finalizing', 'Finalizing analysis results...');
+      updateProgress(98, 'finalizing', 'Finalizing analysis results...');
 
       logger.info(`Analysis completed in ${result.duration}ms for ${url}`, {
         resourceCount: resourceCollection.resourceCount,
