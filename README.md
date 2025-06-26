@@ -1,65 +1,121 @@
 # naubion
 
-A TypeScript monorepo for analyzing website resource usage and environmental impact using automated browser testing.
+Website environmental impact analyzer - TypeScript monorepo
 
 ## Quick Start
 
 ```bash
-# Install dependencies
-pnpm install
+# Clone and setup
+git clone <repository-url>
+cd naubion
+./setup.sh
 
-# Set up environment
-cp apps/backend/.env.example apps/backend/.env
-
-# Start development (both frontend and backend)
+# Start development
 pnpm dev
 ```
 
 **Development URLs:**
 
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
+- Backend: http://localhost:3001
+- Health Check: http://localhost:3001/api/health
 
-## Architecture
+## Prerequisites
 
-This is a pnpm workspace monorepo with three main packages:
+- **Node.js 18+** and **pnpm**
+- **PostgreSQL 14+**
 
-- **`apps/frontend`** - React + TypeScript web application
-- **`apps/backend`** - Express + TypeScript API server with Puppeteer
-- **`libs/shared`** - Shared TypeScript types and utilities
+### Install Prerequisites
 
-## Available Commands
+**macOS:**
 
 ```bash
-# Development
+brew install node pnpm postgresql@15
+brew services start postgresql@15
+```
+
+**Ubuntu/Debian:**
+
+```bash
+# Node.js & pnpm
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+npm install -g pnpm
+
+# PostgreSQL
+sudo apt update && sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql && sudo systemctl enable postgresql
+```
+
+## Database Setup
+
+```bash
+# Create database and user
+createdb naubion
+psql naubion -c "CREATE USER naubion WITH ENCRYPTED PASSWORD 'naubion_password';"
+psql naubion -c "GRANT ALL PRIVILEGES ON DATABASE naubion TO naubion;"
+psql naubion -c "GRANT ALL ON SCHEMA public TO naubion;"
+
+# Configure environment
+cp apps/backend/.env.example apps/backend/.env
+# Update .env with database settings (see Environment section below)
+```
+
+## Project Structure
+
+- **`apps/frontend`** - React + TypeScript + Vite
+- **`apps/backend`** - Express + TypeScript + Puppeteer + PostgreSQL
+- **`libs/shared`** - Shared TypeScript types
+
+## Development Commands
+
+```bash
 pnpm dev              # Start both frontend and backend
 pnpm build            # Build all packages
-pnpm start            # Start production backend
-pnpm type-check       # TypeScript validation across all packages
+pnpm type-check       # TypeScript validation
+pnpm lint             # Code linting
+pnpm format           # Code formatting
+pnpm clean            # Clean build outputs
+```
+
+## Environment Variables
+
+Create `apps/backend/.env`:
+
+```bash
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=naubion
+DB_PASSWORD=naubion_password
+DB_DATABASE=naubion
+DB_SYNCHRONIZE=true
+
+# Cache
+CACHE_ANALYSIS_RESULTS=true
+CACHE_TTL_HOURS=24
+
+# Server
+PORT=3001
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:3000
 ```
 
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS
-- **Backend**: Express.js, TypeScript, Puppeteer
-- **Tooling**: pnpm workspaces, ESLint, shared type definitions
+- **Backend**: Express.js, TypeScript, Puppeteer, TypeORM, PostgreSQL
+- **Tools**: pnpm workspaces, ESLint, Prettier
 
-## Development
+## Production Deployment
 
-For detailed setup and development instructions, see the individual app READMEs:
+```bash
+# Build
+pnpm run build
 
-- [Frontend README](./apps/frontend/README.md) - React app architecture, components, and development
-- [Backend README](./apps/backend/README.md) - API architecture, services, and deployment
+# Configure production environment
+# Set DB_SYNCHRONIZE=false, NODE_ENV=production in .env
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/name`)
-3. Make changes and ensure TypeScript builds pass (`pnpm type-check`)
-4. Commit changes (`git commit -m 'Add feature'`)
-5. Push to branch (`git push origin feature/name`)
-6. Open a Pull Request
-
-## License
-
-ISC License - see LICENSE file for details.
+# Start
+pnpm start
+```
