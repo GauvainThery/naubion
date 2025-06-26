@@ -13,6 +13,7 @@ export { default as Leaf } from './molecules/Laptop/Leaf';
 export { default as Divider } from './atoms/Divider';
 export { default as FAQItem } from './atoms/FAQItem';
 export { default as ErrorAlert } from './atoms/ErrorAlert';
+export { default as Tooltip } from './atoms/Tooltip';
 
 // Icons
 export * from './icons';

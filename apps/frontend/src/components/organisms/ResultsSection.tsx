@@ -25,6 +25,7 @@ type ResultsSectionProps = {
 };
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) => {
+  console.log('🔥 ・ results:', results);
   // State for visits multiplier (continuous range)
   const [visitsCount, setVisitsCount] = React.useState(3000); // Default to 3000 visits per month
 
@@ -61,6 +62,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) =
           url={results.url}
           deviceType={results.options.deviceType}
           interactionLevel={results.options.interactionLevel}
+          analysisDate={results.timestamp}
         />
 
         {/* Summary */}
