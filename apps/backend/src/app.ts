@@ -4,9 +4,11 @@
  * Implemented with Domain-Driven Design architecture
  */
 
+import 'reflect-metadata'; // Required for TypeORM decorators
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { getConfig, validateConfig } from './config/index.js';
+import { initializeDatabase, closeDatabase } from './infrastructure/database/data-source.js';
 import apiRoutes from './infrastructure/api/routes.js';
 import { errorHandler, notFoundHandler } from './shared/errors.js';
 import logger from './shared/logger.js';
@@ -96,7 +98,16 @@ function createApp(): Application {
 /**
  * Start the server
  */
-function startServer(): void {
+async function startServer(): Promise<void> {
+  try {
+    // Initialize database connection
+    await initializeDatabase();
+    logger.success('Database initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize database', { error });
+    process.exit(1);
+  }
+
   const app = createApp();
   const port = getConfig<number>('port');
 
@@ -121,16 +132,18 @@ function startServer(): void {
   });
 
   // Graceful shutdown
-  process.on('SIGTERM', () => {
+  process.on('SIGTERM', async () => {
     logger.info('SIGTERM received, shutting down gracefully');
+    await closeDatabase();
     server.close(() => {
       logger.info('Server closed');
       process.exit(0);
     });
   });
 
-  process.on('SIGINT', () => {
+  process.on('SIGINT', async () => {
     logger.info('SIGINT received, shutting down gracefully');
+    await closeDatabase();
     server.close(() => {
       logger.info('Server closed');
       process.exit(0);

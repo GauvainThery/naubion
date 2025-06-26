@@ -11,6 +11,7 @@ import { NetworkMonitor } from '../../infrastructure/browser/network-monitor.js'
 import { createUserSimulator } from '../../infrastructure/browser/user-simulator.js';
 import { AnalysisError } from '../../shared/errors.js';
 import logger from '../../shared/logger.js';
+import { AnalysisCacheService } from './analysis-cache-service.js';
 import { Co2eBytesConversionService } from './co2e-bytes-conversion-service.js';
 import { GreenHostingService } from './green-hosting-service.js';
 import { HumanReadableImpactService } from './human-readable-impact-service.js';
@@ -22,6 +23,7 @@ export class PageAnalysisService {
   private greenHostingService: GreenHostingService;
   private co2eBytesConversionService: Co2eBytesConversionService;
   private humanReadableImpactService: HumanReadableImpactService;
+  private cacheService: AnalysisCacheService;
 
   constructor(
     resourceService: ResourceService,
@@ -35,6 +37,7 @@ export class PageAnalysisService {
     this.greenHostingService = greenHostingService;
     this.co2eBytesConversionService = co2eBytesConversionService;
     this.humanReadableImpactService = humanReadableImpactService;
+    this.cacheService = new AnalysisCacheService();
   }
 
   /**
@@ -57,7 +60,17 @@ export class PageAnalysisService {
     // Validate prerequisites
     this.pageAnalysisDomainService.validatePageAnalysisPrerequisites(context);
 
-    logger.info(`Starting analysis for ${url}`, {
+    // Check cache first
+    const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
+    if (cachedResult) {
+      logger.info('Returning cached analysis result', {
+        url: context.url,
+        cacheAge: Date.now() - new Date(cachedResult.timestamp).getTime()
+      });
+      return cachedResult;
+    }
+
+    logger.info(`Starting fresh analysis for ${url}`, {
       interactionLevel,
       deviceType,
       estimatedDuration: this.pageAnalysisDomainService.estimatePageAnalysisDuration(
@@ -323,5 +336,44 @@ export class PageAnalysisService {
         await this.browserManager.close();
       }
     }
+  }
+
+  /**
+   * Get cache statistics
+   */
+  async getCacheStats(): Promise<{
+    enabled: boolean;
+    ttlHours: number;
+    totalAnalyses: number;
+    uniqueUrls: number;
+    oldestAnalysis: Date | null;
+    newestAnalysis: Date | null;
+  }> {
+    return await this.cacheService.getCacheStats();
+  }
+
+  /**
+   * Clean up old cached analyses
+   */
+  async cleanupCache(olderThanDays: number = 30): Promise<number> {
+    return await this.cacheService.cleanupOldCache(olderThanDays);
+  }
+
+  /**
+   * Check if analysis result exists in cache
+   */
+  async hasCachedAnalysis(
+    url: string,
+    options: Partial<PageAnalysisOptions> = {}
+  ): Promise<boolean> {
+    const { interactionLevel = 'default', deviceType = 'desktop' } = options;
+    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
+      url,
+      interactionLevel,
+      deviceType
+    );
+
+    const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
+    return cachedResult !== null;
   }
 }

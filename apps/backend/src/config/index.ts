@@ -32,6 +32,21 @@ const DEFAULT_CONFIG: Config = {
     maxConcurrent: parseInt(process.env.MAX_CONCURRENT_ANALYSIS || '3'),
     timeout: parseInt(process.env.ANALYSIS_TIMEOUT || '120000'),
     retries: parseInt(process.env.ANALYSIS_RETRIES || '2')
+  },
+
+  database: {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    username: process.env.DB_USERNAME || 'naubion',
+    password: process.env.DB_PASSWORD || 'naubion_password',
+    database: process.env.DB_DATABASE || 'naubion',
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
+    logging: process.env.DB_LOGGING === 'true'
+  },
+
+  cache: {
+    analysisResults: process.env.CACHE_ANALYSIS_RESULTS === 'true',
+    ttlHours: parseInt(process.env.CACHE_TTL_HOURS || '24')
   }
 };
 

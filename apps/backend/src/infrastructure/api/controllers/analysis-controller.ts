@@ -4,6 +4,7 @@
 
 import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
+import { CachedPageAnalysisService } from '../../../application/services/cached-page-analysis-service.js';
 import { PageAnalysisService } from '../../../application/services/page-analysis-service.js';
 import { PageAnalysisResult } from '../../../domain/models/page-analysis.js';
 import { asyncHandler, validateAnalysisOptions, validateUrl } from '../../../shared/errors.js';
@@ -54,7 +55,7 @@ function broadcastProgress(analysisId: string, progress: number, step: string, m
 }
 
 export class AnalysisController {
-  constructor(private pageAnalysisService: PageAnalysisService) {}
+  constructor(private pageAnalysisService: PageAnalysisService | CachedPageAnalysisService) {}
 
   /**
    * Start analysis and return immediate response with estimation

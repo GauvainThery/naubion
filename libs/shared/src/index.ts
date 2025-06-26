@@ -19,6 +19,19 @@ export interface Config {
     timeout: number;
     retries: number;
   };
+  database: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    database: string;
+    synchronize: boolean;
+    logging: boolean;
+  };
+  cache: {
+    analysisResults: boolean;
+    ttlHours: number;
+  };
 }
 
 // Utility types
