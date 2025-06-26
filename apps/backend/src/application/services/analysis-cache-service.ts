@@ -51,10 +51,7 @@ export class AnalysisCacheService {
         });
 
         // Update the timestamp to current time for the response
-        return {
-          ...cachedResult,
-          timestamp: new Date().toISOString()
-        };
+        return cachedResult;
       } else {
         logger.debug('Cache miss - no valid cached analysis found', {
           url,
