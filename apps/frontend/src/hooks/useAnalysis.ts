@@ -22,18 +22,18 @@ const useAnalysis = () => {
   const steps: LoadingStep[] = [
     {
       id: 'step1',
+      title: 'Cache',
+      description: 'Checking if url analysis has already been performed recently'
+    },
+    {
+      id: 'step2',
       title: 'Setup',
       description: 'Setting up browser environment'
     },
     {
-      id: 'step2',
-      title: 'Navigation',
-      description: 'Navigating to target website'
-    },
-    {
       id: 'step3',
-      title: 'Simulation',
-      description: 'Simulating user interactions'
+      title: 'Navigation and simulation',
+      description: 'Navigating to target website and simulating user interactions'
     },
     {
       id: 'step4',
@@ -42,7 +42,7 @@ const useAnalysis = () => {
     },
     {
       id: 'step5',
-      title: 'CO2 conversion',
+      title: 'CO₂e Conversion',
       description: 'Convert page resources to CO₂e emissions'
     },
     {

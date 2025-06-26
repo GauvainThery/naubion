@@ -154,6 +154,9 @@ export class PageAnalysisService {
         interactions: simulationResult.successfulInteractions
       });
 
+      // Cache the result for future use
+      await this.cacheService.cacheAnalysis(result);
+
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -232,6 +235,18 @@ export class PageAnalysisService {
         progressCallback(progress, step, message);
       }
     };
+
+    // Check cache first
+    const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
+    if (cachedResult) {
+      logger.info('Returning cached analysis result', {
+        url: context.url,
+        cacheAge: Date.now() - new Date(cachedResult.timestamp).getTime()
+      });
+      // Still provide progress callbacks for cached results
+      updateProgress(100, 'complete', 'Retrieved from cache');
+      return cachedResult;
+    }
 
     updateProgress(10, 'setup', 'Setting up browser environment...');
 
@@ -325,6 +340,11 @@ export class PageAnalysisService {
         interactions: simulationResult.successfulInteractions
       });
 
+      // Cache the result for future use
+      await this.cacheService.cacheAnalysis(result);
+
+      updateProgress(100, 'complete', 'Analysis completed successfully');
+
       return result;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -336,44 +356,5 @@ export class PageAnalysisService {
         await this.browserManager.close();
       }
     }
-  }
-
-  /**
-   * Get cache statistics
-   */
-  async getCacheStats(): Promise<{
-    enabled: boolean;
-    ttlHours: number;
-    totalAnalyses: number;
-    uniqueUrls: number;
-    oldestAnalysis: Date | null;
-    newestAnalysis: Date | null;
-  }> {
-    return await this.cacheService.getCacheStats();
-  }
-
-  /**
-   * Clean up old cached analyses
-   */
-  async cleanupCache(olderThanDays: number = 30): Promise<number> {
-    return await this.cacheService.cleanupOldCache(olderThanDays);
-  }
-
-  /**
-   * Check if analysis result exists in cache
-   */
-  async hasCachedAnalysis(
-    url: string,
-    options: Partial<PageAnalysisOptions> = {}
-  ): Promise<boolean> {
-    const { interactionLevel = 'default', deviceType = 'desktop' } = options;
-    const context = this.pageAnalysisDomainService.createPageAnalysisContext(
-      url,
-      interactionLevel,
-      deviceType
-    );
-
-    const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
-    return cachedResult !== null;
   }
 }

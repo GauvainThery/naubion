@@ -10,12 +10,6 @@ import {
   pageAnalysisService
 } from '../di/index.js';
 import { AnalysisController } from './controllers/analysis-controller.js';
-import {
-  getCacheStats,
-  checkCacheStatus,
-  getRecentAnalyses,
-  cleanupCache
-} from './controllers/cache-controller.js';
 import { Co2eBytesConversionController } from './controllers/co2e-bytes-conversion-controller.js';
 import { GreenHostingController } from './controllers/green-hosting-controller.js';
 import { HumanReadableImpactController } from './controllers/human-readable-impact-controller.js';
@@ -78,33 +72,5 @@ router.get('/health', analysisController.healthCheck);
  * Subscribe to newsletter
  */
 router.post('/newsletter/subscribe', newsletterController.subscribe);
-
-/**
- * Cache management endpoints
- */
-
-/**
- * GET /api/cache/stats
- * Get cache statistics
- */
-router.get('/cache/stats', getCacheStats);
-
-/**
- * GET /api/cache/check
- * Check if URL has cached analysis
- */
-router.get('/cache/check', checkCacheStatus);
-
-/**
- * GET /api/cache/recent/:url
- * Get recent analyses for a URL
- */
-router.get('/cache/recent/:url', getRecentAnalyses);
-
-/**
- * POST /api/cache/cleanup
- * Clean up old cached analyses
- */
-router.post('/cache/cleanup', cleanupCache);
 
 export default router;
