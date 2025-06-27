@@ -10,8 +10,10 @@ import express, { Application, NextFunction, Request, Response } from 'express';
 import { getConfig, validateConfig } from './config/index.js';
 import { initializeDatabase, closeDatabase } from './infrastructure/database/data-source.js';
 import apiRoutes from './infrastructure/api/routes.js';
+import adminRoutes from './infrastructure/api/admin.routes.js';
 import { errorHandler, notFoundHandler } from './shared/errors.js';
 import logger from './shared/logger.js';
+import path from 'path';
 
 /**
  * Create and configure Express application
@@ -85,6 +87,14 @@ function createApp(): Application {
 
   // API routes
   app.use('/api', apiRoutes);
+
+  // Admin routes
+  app.use('/api/admin', adminRoutes);
+
+  // Serve admin page
+  app.get('/admin', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
+  });
 
   // 404 handler (must be before error handler)
   app.use(notFoundHandler);

@@ -33,3 +33,5 @@ public/screenshots/
 # Ignore lock files (optional, if you want reproducible installs, remove these lines)
 package-lock.json
 yarn.lock
+
+naubion.session.sql

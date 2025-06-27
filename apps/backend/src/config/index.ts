@@ -3,8 +3,8 @@
  * Centralizes all configuration settings for easier maintenance
  */
 
+import { Config } from '@naubion/shared';
 import dotenv from 'dotenv';
-import { Config } from '../../../../libs/shared/dist';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -46,7 +46,11 @@ const DEFAULT_CONFIG: Config = {
 
   cache: {
     analysisResults: process.env.CACHE_ANALYSIS_RESULTS === 'true',
-    ttlHours: parseInt(process.env.CACHE_TTL_HOURS || '24')
+    ttlHours: parseInt(process.env.CACHE_TTL_HOURS || '240')
+  },
+
+  admin: {
+    password: process.env.ADMIN_PASSWORD || 'admin123'
   }
 };
 

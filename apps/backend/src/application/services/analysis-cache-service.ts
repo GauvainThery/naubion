@@ -76,14 +76,15 @@ export class AnalysisCacheService {
 
     try {
       const startTime = Date.now();
-      await this.repository.saveAnalysis(result);
+      await this.repository.saveAnalysis(result, this.ttlHours);
       const duration = Date.now() - startTime;
 
       logger.info('Analysis result cached successfully', {
         url: result.url,
         duration: result.duration,
         saveDuration: duration,
-        resourceCount: result.resources.resourceCount
+        resourceCount: result.resources.resourceCount,
+        ttlHours: this.ttlHours
       });
     } catch (error) {
       logger.error('Error caching analysis result', { error, url: result.url });
@@ -99,8 +100,6 @@ export class AnalysisCacheService {
     ttlHours: number;
     totalAnalyses: number;
     uniqueUrls: number;
-    oldestAnalysis: Date | null;
-    newestAnalysis: Date | null;
   }> {
     const dbStats = await this.repository.getAnalysisStats();
 
@@ -131,6 +130,58 @@ export class AnalysisCacheService {
     } catch (error) {
       logger.error('Error during cache cleanup', { error, olderThanDays });
       return 0;
+    }
+  }
+
+  /**
+   * Clean up expired cache entries based on explicit expiration dates
+   */
+  async cleanupExpiredCache(): Promise<number> {
+    if (!this.cacheEnabled) {
+      logger.debug('Cache disabled, skipping expired cache cleanup');
+      return 0;
+    }
+
+    try {
+      const deletedCount = await this.repository.cleanupExpiredCache();
+
+      if (deletedCount > 0) {
+        logger.info('Expired cache cleanup completed', { deletedCount });
+      }
+
+      return deletedCount;
+    } catch (error) {
+      logger.error('Error during expired cache cleanup', { error });
+      return 0;
+    }
+  }
+
+  /**
+   * Set custom expiration for specific analysis (useful for testing or special cases)
+   */
+  async setCacheExpiration(
+    url: string,
+    options: PageAnalysisOptions,
+    expiresAt: Date
+  ): Promise<boolean> {
+    if (!this.cacheEnabled) {
+      logger.debug('Cache disabled, cannot set expiration', { url });
+      return false;
+    }
+
+    try {
+      // This would require additional repository method - for now, log the intention
+      logger.info('Custom cache expiration requested', {
+        url,
+        expiresAt: expiresAt.toISOString(),
+        options: JSON.stringify(options)
+      });
+
+      // TODO: Implement repository method to update expiration date
+      return true;
+    } catch (error) {
+      logger.error('Error setting cache expiration', { error, url });
+      return false;
     }
   }
 

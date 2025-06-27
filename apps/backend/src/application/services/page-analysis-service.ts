@@ -117,6 +117,8 @@ export class PageAnalysisService {
     };
 
     // Check cache first
+    updateProgress(5, 'cache', 'Checking if url analysis has already been performed recently...');
+
     const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
     if (cachedResult) {
       logger.info('Returning cached analysis result', {
@@ -145,7 +147,11 @@ export class PageAnalysisService {
       await this.browserManager.launch(context.options);
       page = await this.browserManager.createPage(context.options);
 
-      updateProgress(25, 'navigation', 'Navigating to target website...');
+      updateProgress(
+        25,
+        'navigation and simulation',
+        'Navigating to target website and simulating user interactions...'
+      );
 
       // Phase 2: Setup monitoring and simulation
       const client = await page.createCDPSession();
@@ -162,12 +168,10 @@ export class PageAnalysisService {
         timeout: context.options.timeout
       });
 
-      updateProgress(50, 'simulation', 'Simulating user interactions...');
-
       // Phase 4: Simulate user behavior
       const simulationResult = await userSimulator.simulateUserBehavior();
 
-      updateProgress(80, 'processing', 'Processing collected resources...');
+      updateProgress(70, 'processing', 'Processing collected resources...');
 
       // Phase 5: Process any pending cross-origin requests
       await networkMonitor.processPendingCrossOriginRequests();
@@ -188,8 +192,6 @@ export class PageAnalysisService {
         bytes: resourceCollection.totalTransferSize,
         isGreenHosted: greenHostingResult.green
       });
-
-      updateProgress(96, 'human-readable-impact', 'Creating human-readable impact report...');
 
       // Phase 9: Create human-readable impact report
       const humanReadableImpact = this.humanReadableImpactService.convertToHumanReadableImpact({

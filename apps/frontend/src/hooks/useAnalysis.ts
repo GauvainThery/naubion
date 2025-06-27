@@ -37,18 +37,18 @@ const useAnalysis = () => {
     },
     {
       id: 'step4',
+      title: 'Processing',
+      description: 'Processing and categorizing resources'
+    },
+    {
+      id: 'step5',
       title: 'Green hosting',
       description: 'Assessing green hosting practices'
     },
     {
-      id: 'step5',
+      id: 'step6',
       title: 'CO₂e Conversion',
       description: 'Convert page resources to CO₂e emissions'
-    },
-    {
-      id: 'step6',
-      title: 'Processing',
-      description: 'Processing and categorizing resources'
     }
   ];
 

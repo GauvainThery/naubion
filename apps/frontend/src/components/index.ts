@@ -14,6 +14,8 @@ export { default as Divider } from './atoms/Divider';
 export { default as FAQItem } from './atoms/FAQItem';
 export { default as ErrorAlert } from './atoms/ErrorAlert';
 export { default as Tooltip } from './atoms/Tooltip';
+export { default as StatCard } from './atoms/StatCard';
+export { default as Alert } from './atoms/Alert';
 
 // Icons
 export * from './icons';
@@ -35,6 +37,9 @@ export { default as ResourceAnalysisSection } from './molecules/ResourceAnalysis
 export { default as TryAnotherPageSection } from './molecules/TryAnotherPageSection';
 export { default as ScreenContent } from './molecules/Laptop/ScreenContent';
 export { default as KeyboardDeck } from './molecules/Laptop/KeyboardDeck';
+export { default as LoginForm } from './molecules/LoginForm';
+export { default as CacheStats } from './molecules/CacheStats';
+export { default as AdminActions } from './molecules/AdminActions';
 
 // Organisms
 export { default as Header } from './organisms/Header';
@@ -48,6 +53,8 @@ export { default as CallToActionSection } from './organisms/CallToActionSection'
 export { default as MethodologySection } from './organisms/MethodologySection';
 export { default as FAQSection } from './organisms/FAQSection';
 export { default as Laptop } from './molecules/Laptop/Laptop';
+export { default as AdminDashboard } from './organisms/AdminDashboard';
 
 // Templates
 export { default as MainLayout } from './templates/MainLayout';
+export { default as AdminLayout } from './templates/AdminLayout';

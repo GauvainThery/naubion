@@ -20,6 +20,7 @@ import { ResourceCollection } from '../../../domain/models/resource.js';
 @Index(['url', 'optionsHash'], { unique: false })
 @Index(['url'])
 @Index(['createdAt'])
+@Index(['expiresAt']) // Index on expiration date for efficient cleanup
 export class PageAnalysisEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -32,6 +33,9 @@ export class PageAnalysisEntity {
 
   @Column({ type: 'timestamp' })
   analysisTimestamp!: Date;
+
+  @Column({ type: 'timestamp' })
+  expiresAt!: Date; // Explicit expiration timestamp
 
   @Column({ type: 'integer' })
   duration!: number; // Analysis duration in milliseconds
@@ -75,6 +79,7 @@ export class PageAnalysisEntity {
     return {
       url: this.url,
       timestamp: this.analysisTimestamp.toISOString(),
+      expiresAt: this.expiresAt.toISOString(),
       options: this.options,
       duration: this.duration,
       resources: this.resources,
@@ -92,7 +97,11 @@ export class PageAnalysisEntity {
   /**
    * Create entity from domain model
    */
-  static fromDomainModel(result: PageAnalysisResult, optionsHash: string): PageAnalysisEntity {
+  static fromDomainModel(
+    result: PageAnalysisResult,
+    optionsHash: string,
+    ttlHours: number = 24
+  ): PageAnalysisEntity {
     const entity = new PageAnalysisEntity();
     entity.url = result.url;
     entity.optionsHash = optionsHash;
@@ -105,6 +114,9 @@ export class PageAnalysisEntity {
     entity.humanReadableImpact = result.humanReadableImpact;
     entity.metadata = result.metadata;
 
+    // Set explicit expiration date based on TTL
+    entity.expiresAt = new Date(Date.now() + ttlHours * 60 * 60 * 1000);
+
     return entity;
   }
 
@@ -115,5 +127,27 @@ export class PageAnalysisEntity {
     const now = new Date();
     const ttlMs = ttlHours * 60 * 60 * 1000;
     return now.getTime() - this.createdAt.getTime() < ttlMs;
+  }
+
+  /**
+   * Check if the analysis result has expired based on explicit expiration date
+   */
+  isExpired(): boolean {
+    return new Date() > this.expiresAt;
+  }
+
+  /**
+   * Check if the analysis result is still valid (not expired and within TTL)
+   */
+  isValid(ttlHours?: number): boolean {
+    if (this.isExpired()) {
+      return false;
+    }
+
+    if (ttlHours) {
+      return this.isFresh(ttlHours);
+    }
+
+    return true;
   }
 }

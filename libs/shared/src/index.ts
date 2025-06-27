@@ -32,6 +32,9 @@ export interface Config {
     analysisResults: boolean;
     ttlHours: number;
   };
+  admin: {
+    password: string;
+  };
 }
 
 // Utility types

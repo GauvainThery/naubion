@@ -38,7 +38,7 @@ export class PageAnalysisRepository {
   async findCachedAnalysis(
     url: string,
     options: PageAnalysisOptions,
-    ttlHours: number = 24
+    ttlHours: number = 24 * 10
   ): Promise<PageAnalysisResult | null> {
     try {
       const optionsHash = this.generateOptionsHash(url, options);
@@ -58,8 +58,20 @@ export class PageAnalysisRepository {
         return null;
       }
 
+      // Check if the entry has expired using explicit expiration date
+      if (entity.isExpired()) {
+        logger.debug('Cached analysis expired (explicit expiration)', {
+          url,
+          optionsHash,
+          expiresAt: entity.expiresAt.toISOString(),
+          now: new Date().toISOString()
+        });
+        return null;
+      }
+
+      // Optional: Also check TTL for backwards compatibility
       if (!entity.isFresh(ttlHours)) {
-        logger.debug('Cached analysis expired', {
+        logger.debug('Cached analysis expired (TTL check)', {
           url,
           optionsHash,
           age: Date.now() - entity.createdAt.getTime()
@@ -83,10 +95,10 @@ export class PageAnalysisRepository {
   /**
    * Save analysis result to cache
    */
-  async saveAnalysis(result: PageAnalysisResult): Promise<void> {
+  async saveAnalysis(result: PageAnalysisResult, ttlHours: number = 24 * 10): Promise<void> {
     try {
       const optionsHash = this.generateOptionsHash(result.url, result.options);
-      const entity = PageAnalysisEntity.fromDomainModel(result, optionsHash);
+      const entity = PageAnalysisEntity.fromDomainModel(result, optionsHash, ttlHours);
 
       await this.repository.save(entity);
 
@@ -94,7 +106,8 @@ export class PageAnalysisRepository {
         url: result.url,
         optionsHash,
         resourceCount: result.resources.resourceCount,
-        totalSize: result.resources.totalTransferSize
+        totalSize: result.resources.totalTransferSize,
+        expiresAt: entity.expiresAt.toISOString()
       });
     } catch (error) {
       logger.error('Error saving analysis to cache', { error, url: result.url });
@@ -108,39 +121,25 @@ export class PageAnalysisRepository {
   async getAnalysisStats(): Promise<{
     totalAnalyses: number;
     uniqueUrls: number;
-    oldestAnalysis: Date | null;
-    newestAnalysis: Date | null;
   }> {
     try {
-      const [totalAnalyses, uniqueUrls, oldestResult, newestResult] = await Promise.all([
+      const [totalAnalyses, uniqueUrls] = await Promise.all([
         this.repository.count(),
         this.repository
           .createQueryBuilder('analysis')
-          .select('COUNT(DISTINCT analysis.url)', 'count')
-          .getRawOne(),
-        this.repository.findOne({
-          select: ['createdAt'],
-          order: { createdAt: 'ASC' }
-        }),
-        this.repository.findOne({
-          select: ['createdAt'],
-          order: { createdAt: 'DESC' }
-        })
+          .select('COUNT(DISTINCT url)', 'count')
+          .getRawOne()
       ]);
 
       return {
         totalAnalyses,
-        uniqueUrls: parseInt(uniqueUrls?.count || '0'),
-        oldestAnalysis: oldestResult?.createdAt || null,
-        newestAnalysis: newestResult?.createdAt || null
+        uniqueUrls: uniqueUrls.count || 0 // Replace with actual unique URL count if implemented
       };
     } catch (error) {
       logger.error('Error getting analysis stats', { error });
       return {
         totalAnalyses: 0,
-        uniqueUrls: 0,
-        oldestAnalysis: null,
-        newestAnalysis: null
+        uniqueUrls: 0
       };
     }
   }
@@ -191,6 +190,35 @@ export class PageAnalysisRepository {
     } catch (error) {
       logger.error('Error finding recent analyses', { error, url });
       return [];
+    }
+  }
+
+  /**
+   * Clean up analyses that have exceeded their explicit expiration date
+   */
+  async cleanupExpiredCache(): Promise<number> {
+    try {
+      const now = new Date();
+
+      const result = await this.repository
+        .createQueryBuilder()
+        .delete()
+        .where('expiresAt < :now', { now })
+        .execute();
+
+      const deletedCount = result.affected || 0;
+
+      if (deletedCount > 0) {
+        logger.info('Cleaned up expired analyses', {
+          deletedCount,
+          expiredBefore: now.toISOString()
+        });
+      }
+
+      return deletedCount;
+    } catch (error) {
+      logger.error('Error cleaning up expired analyses', { error });
+      return 0;
     }
   }
 }
