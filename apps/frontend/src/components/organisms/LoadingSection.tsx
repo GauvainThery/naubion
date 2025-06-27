@@ -31,26 +31,24 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
 
   // Format time display
   const formatTime = (seconds: number) => {
-    if (seconds <= 0) return '';
-    if (seconds < 60) return `${seconds}s`;
+    if (seconds <= 0) {
+      return '';
+    }
+
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
   };
 
   // Determine step states based on current progress and step
-  const getStepState = (step: LoadingStepType, index: number) => {
-    const stepNames = ['setup', 'navigation', 'simulation', 'processing'];
-    const currentStepIndex = stepNames.indexOf(currentStep.toLowerCase());
-
-    if (currentStepIndex === -1) {
-      // If we can't match the step name, use progress percentage
-      const stepProgress = (index + 1) * 25; // Each step is roughly 25%
-      return {
-        isCompleted: progress > stepProgress,
-        isActive: progress >= stepProgress - 25 && progress <= stepProgress
-      };
-    }
+  const getStepState = (index: number) => {
+    const currentStepIndex = steps
+      .map(step => step.title.toLowerCase())
+      .indexOf(currentStep.toLowerCase());
 
     return {
       isCompleted: index < currentStepIndex,
@@ -84,7 +82,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
 
         <div className="flex flex-col gap-10">
           {steps.map((step, index) => {
-            const { isActive, isCompleted } = getStepState(step, index);
+            const { isActive, isCompleted } = getStepState(index);
             return (
               <LoadingStep
                 key={step.id}

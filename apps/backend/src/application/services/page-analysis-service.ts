@@ -180,12 +180,12 @@ export class PageAnalysisService {
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      updateProgress(92, 'green-hosting', 'Assessing green hosting impact...');
+      updateProgress(92, 'green hosting', 'Assessing green hosting impact...');
 
       // Phase 7: Green hosting assessment
       const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
 
-      updateProgress(94, 'co2e-bytes-conversion', 'Converting bytes into gCO2e...');
+      updateProgress(94, 'co₂e conversion', 'Converting bytes into gCO₂e...');
 
       // Phase 8: Convert bytes into gCO2e
       const co2eBytesConverisonResults = this.co2eBytesConversionService.convertBytesIntoCo2e({
@@ -221,8 +221,6 @@ export class PageAnalysisService {
           networkActivity: networkMonitor.getTotalTransferSize()
         }
       );
-
-      updateProgress(98, 'finalizing', 'Finalizing analysis results...');
 
       logger.info(`Analysis completed in ${result.duration}ms for ${url}`, {
         resourceCount: resourceCollection.resourceCount,

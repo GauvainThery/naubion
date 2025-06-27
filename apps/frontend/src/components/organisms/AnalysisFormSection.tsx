@@ -3,9 +3,8 @@ import type { AnalysisFormData } from '../../types';
 import Button from '../atoms/Button';
 import Card from '../atoms/Card';
 import Input from '../atoms/Input';
-import RadioGroup from '../molecules/RadioGroup';
-import { scrollTopPage } from './../../utils/scrollTopPage';
 import { SearchIcon } from '../icons';
+import RadioGroup from '../molecules/RadioGroup';
 import { cn } from './../../utils/classnames';
 
 type AnalysisFormProps = {
@@ -125,8 +124,6 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
   const handleClear = () => {
     setFormData(DEFAULT_FORM_DATA);
   };
-
-  scrollTopPage();
 
   return (
     <section className={cn('container', className)}>

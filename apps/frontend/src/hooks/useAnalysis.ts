@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
 import type { AnalysisFormData, LoadingStep } from '../types';
-import { scrollTopPage } from './../utils/scrollTopPage';
 
 type AnalysisInitResponse = {
   analysisId: string;
@@ -49,6 +48,11 @@ const useAnalysis = () => {
       id: 'step6',
       title: 'CO₂e Conversion',
       description: 'Convert page resources to CO₂e emissions'
+    },
+    {
+      id: 'step7',
+      title: 'Complete',
+      description: 'Finalizing analysis results'
     }
   ];
 
@@ -145,7 +149,6 @@ const useAnalysis = () => {
           if (progressData.progress >= 100 || progressData.step === 'complete') {
             eventSource.close();
             fetchFinalResults(initData.analysisId);
-            scrollTopPage();
           }
         };
 
