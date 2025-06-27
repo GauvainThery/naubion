@@ -1,0 +1,112 @@
+# Production Docker Compose
+version: '3.8'
+
+services:
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
+    ports:
+      - '80:8080'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - naubion-network
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.frontend.rule=Host(`${FRONTEND_DOMAIN}`)'
+      - 'traefik.http.routers.frontend.tls=true'
+      - 'traefik.http.routers.frontend.tls.certresolver=letsencrypt'
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:latest
+    ports:
+      - '8080:8080'
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - DATABASE_URL=${DATABASE_URL}
+      - MAILJET_API_KEY=${MAILJET_API_KEY}
+      - MAILJET_SECRET_KEY=${MAILJET_SECRET_KEY}
+      - REDIS_URL=redis://redis:6379
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - naubion-network
+    volumes:
+      - backend-data:/app/data
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.backend.rule=Host(`${BACKEND_DOMAIN}`)'
+      - 'traefik.http.routers.backend.tls=true'
+      - 'traefik.http.routers.backend.tls.certresolver=letsencrypt'
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=naubion
+      - POSTGRES_USER=naubion
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backups:/backups
+    networks:
+      - naubion-network
+    labels:
+      - 'traefik.enable=false'
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    networks:
+      - naubion-network
+    labels:
+      - 'traefik.enable=false'
+    command: redis-server --appendonly yes
+
+  # Reverse proxy and SSL termination
+  traefik:
+    image: traefik:v3.0
+    command:
+      - '--api.dashboard=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+      - '--certificatesresolvers.letsencrypt.acme.tlschallenge=true'
+      - '--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}'
+      - '--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json'
+      - '--global.checknewversion=false'
+      - '--global.sendanonymoususage=false'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8090:8080' # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-data:/letsencrypt
+    networks:
+      - naubion-network
+    restart: unless-stopped
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)'
+      - 'traefik.http.routers.traefik.tls=true'
+      - 'traefik.http.routers.traefik.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.traefik.service=api@internal'
+
+volumes:
+  postgres-data:
+  redis-data:
+  backend-data:
+  traefik-data:
+
+networks:
+  naubion-network:
+    driver: bridge

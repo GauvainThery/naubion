@@ -2,6 +2,20 @@
 
 Website environmental impact analyzer - TypeScript monorepo
 
+## 🚀 Production Deployment
+
+**Deploy to production with Docker and GitHub Actions:**
+
+```bash
+# Quick production deployment
+git push origin main  # Triggers automatic deployment
+
+# Manual deployment
+./scripts/deploy.sh latest
+```
+
+**📖 [Complete Deployment Guide](DEPLOYMENT.md)** - Docker, GitHub Actions, SSL, monitoring, and more.
+
 ## Quick Start
 
 ```bash
