@@ -85,7 +85,7 @@ const PageCarbonFootprint: React.FC = () => {
       {/* FAQ Section */}
       <FAQSection className="pt-12" />
 
-      <CallToActionSection subtitle="This tool gives you a first insight on the environnemental impact of a web page but it’s not naubion. Join our waitlist to be the first to know when naubion is live!" />
+      <CallToActionSection subtitle="This tool gives you a first insight on the environnemental impact of a web page but it's not naubion. Join our waitlist to be the first to know when naubion is live!" />
     </MainLayout>
   );
 };

@@ -20,6 +20,7 @@ export interface PageAnalysisOptions {
 export interface PageAnalysisResult {
   url: string;
   timestamp: string;
+  expiresAt?: string; // When this cached result expires
   options: PageAnalysisOptions;
   duration: number;
   resources: ResourceCollection;

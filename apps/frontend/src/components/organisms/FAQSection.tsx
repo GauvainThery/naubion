@@ -47,6 +47,11 @@ const FAQSection: React.FC<FAQSectionProps> = ({ className }) => {
       question: "What's the difference between desktop and mobile analysis?",
       answer:
         'Desktop and mobile analyses simulate different device types and screen sizes:\n\n• Desktop: 1920x1080 viewport, simulates traditional computer usage\n• Mobile: 375x667 viewport with touch simulation, represents smartphone usage\n\nMobile analysis often shows different resource loading patterns and may reveal mobile-specific optimizations or issues.'
+    },
+    {
+      question: 'Is the analysis ran every time I submit a URL?',
+      answer:
+        'No, the analysis is not run every time you submit a URL. We cache the results of previous analyses and reuse them when the same URL is submitted again with the same options. This helps improve performance and reduce the environmental impact of repeated analyses.'
     }
   ];
 

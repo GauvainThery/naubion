@@ -16,6 +16,8 @@ const resourceService = new ResourceService();
 const greenHostingService = new GreenHostingService();
 const co2eBytesConversionService = new Co2eBytesConversionService();
 const humanReadableImpactService = new HumanReadableImpactService();
+
+// Create page analysis service (with built-in caching)
 const pageAnalysisService = new PageAnalysisService(
   resourceService,
   greenHostingService,

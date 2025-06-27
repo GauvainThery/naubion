@@ -16,5 +16,18 @@
       "path": ".",
       "name": "Monorepo"
     }
-  ]
+  ],
+  "settings": {
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5432,
+        "driver": "PostgreSQL",
+        "name": "naubion",
+        "database": "naubion",
+        "username": "naubion"
+      }
+    ]
+  }
 }

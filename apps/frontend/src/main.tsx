@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { page } from '@naubion/shared';
 import PageCarbonFootprint from './views/PageCarbonFootprint';
 import Home from './views/Home';
+import AdminPage from './views/AdminPage';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path={page.home} element={<Home />} />
         <Route path={page.pageCarbonFootprint} element={<PageCarbonFootprint />} />
+        <Route path={page.admin} element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

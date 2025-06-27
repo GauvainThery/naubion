@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
 import type { AnalysisFormData, LoadingStep } from '../types';
-import { scrollTopPage } from './../utils/scrollTopPage';
 
 type AnalysisInitResponse = {
   analysisId: string;
@@ -22,33 +21,38 @@ const useAnalysis = () => {
   const steps: LoadingStep[] = [
     {
       id: 'step1',
+      title: 'Cache',
+      description: 'Checking if url analysis has already been performed recently'
+    },
+    {
+      id: 'step2',
       title: 'Setup',
       description: 'Setting up browser environment'
     },
     {
-      id: 'step2',
-      title: 'Navigation',
-      description: 'Navigating to target website'
-    },
-    {
       id: 'step3',
-      title: 'Simulation',
-      description: 'Simulating user interactions'
+      title: 'Navigation and simulation',
+      description: 'Navigating to target website and simulating user interactions'
     },
     {
       id: 'step4',
+      title: 'Processing',
+      description: 'Processing and categorizing resources'
+    },
+    {
+      id: 'step5',
       title: 'Green hosting',
       description: 'Assessing green hosting practices'
     },
     {
-      id: 'step5',
-      title: 'CO2 conversion',
+      id: 'step6',
+      title: 'CO₂e Conversion',
       description: 'Convert page resources to CO₂e emissions'
     },
     {
-      id: 'step6',
-      title: 'Processing',
-      description: 'Processing and categorizing resources'
+      id: 'step7',
+      title: 'Complete',
+      description: 'Finalizing analysis results'
     }
   ];
 
@@ -145,7 +149,6 @@ const useAnalysis = () => {
           if (progressData.progress >= 100 || progressData.step === 'complete') {
             eventSource.close();
             fetchFinalResults(initData.analysisId);
-            scrollTopPage();
           }
         };
 

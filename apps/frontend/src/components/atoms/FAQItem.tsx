@@ -25,8 +25,8 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer, isOpen = false, onT
   return (
     <div
       className={cn(
-        'rounded-xl bg-white focus:outline-none',
-        isExpanded ? 'ring-2 ring-primary ring-offset-2' : 'border border-gray-200'
+        'rounded-xl bg-white focus:outline-none drop-shadow',
+        isExpanded ? 'ring-2 ring-primary ring-offset-2' : ''
       )}
     >
       <button

@@ -192,9 +192,6 @@ export class AnalysisController {
     options: { interactionLevel: string; deviceType: string }
   ) {
     try {
-      // Update progress: Setup (0-10%)
-      this.updateProgress(analysisId, 5, 'setup', 'Setting up browser environment...');
-
       // Enhanced analysis service call with progress callbacks
       const result = await this.pageAnalysisService.analyzeUrlWithProgress(url, {
         interactionLevel: options.interactionLevel as 'minimal' | 'default' | 'thorough',
@@ -203,9 +200,6 @@ export class AnalysisController {
           this.updateProgress(analysisId, progress, step, message);
         }
       });
-
-      // Final update
-      this.updateProgress(analysisId, 100, 'complete', 'Analysis completed successfully');
 
       const analysis = ongoingAnalyses.get(analysisId);
       if (analysis) {

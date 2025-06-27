@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageAnalysisResult } from '../../../../backend/src/domain/models/page-analysis';
 import {
   Card,
@@ -18,6 +18,7 @@ import {
   formatDistance
 } from './../../utils/websiteAnalysisResultProcessors';
 import { cn } from './../../utils/classnames';
+import { scrollTopPage } from './../../utils/scrollTopPage';
 
 type ResultsSectionProps = {
   results: PageAnalysisResult;
@@ -27,6 +28,11 @@ type ResultsSectionProps = {
 const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) => {
   // State for visits multiplier (continuous range)
   const [visitsCount, setVisitsCount] = React.useState(3000); // Default to 3000 visits per month
+
+  useEffect(() => {
+    // Scroll to top when results are loaded
+    scrollTopPage();
+  }, []);
 
   const multiplier = visitsCount;
 
@@ -61,6 +67,7 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) =
           url={results.url}
           deviceType={results.options.deviceType}
           interactionLevel={results.options.interactionLevel}
+          analysisDate={results.timestamp}
         />
 
         {/* Summary */}
