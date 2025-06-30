@@ -62,7 +62,7 @@ const PageCarbonFootprint: React.FC = () => {
 
       {/* Analysis Form */}
       {!results && !isLoading && (
-        <AnalysisForm className="pt-24" onSubmit={startAnalysis} isLoading={isLoading} />
+        <AnalysisForm className="pt-12" onSubmit={startAnalysis} isLoading={isLoading} />
       )}
 
       {/* Loading Section */}
