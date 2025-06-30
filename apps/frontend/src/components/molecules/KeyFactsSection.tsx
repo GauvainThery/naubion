@@ -1,6 +1,6 @@
 import React from 'react';
 import { MetricCard, FactCard, TotalSizeIcon, ResourceCountIcon, ServerIcon } from '../';
-import { GreenHostingResult } from '../../../../backend/src/domain/models/green-hosting';
+import { GreenHostingResult } from '@naubion/shared';
 
 type KeyFactsSectionProps = {
   totalWeight: string;

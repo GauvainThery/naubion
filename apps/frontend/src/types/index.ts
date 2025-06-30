@@ -1,4 +1,4 @@
-import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
+import { PageAnalysisResult, ApiResponse } from '@naubion/shared';
 
 // Frontend-specific types
 export type AnalysisFormData = {
@@ -24,13 +24,6 @@ export type LargestResource = {
   name: string;
   type: string;
   size: string;
-};
-
-// API Response types
-export type ApiResponse<T> = {
-  success: boolean;
-  data?: T;
-  error?: string;
 };
 
 export type AnalysisApiResponse = ApiResponse<PageAnalysisResult> | PageAnalysisResult;

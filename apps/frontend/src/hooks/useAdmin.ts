@@ -1,25 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { CacheStats, AdminApiResponse } from '@naubion/shared';
 
 type FetchOptions = {
   method?: string;
   headers?: Record<string, string>;
   body?: string;
-};
-
-export type CacheStats = {
-  totalAnalyses: number;
-  uniqueUrls: number;
-  ttlHours: number;
-  enabled: boolean;
-  oldestAnalysis?: string;
-  newestAnalysis?: string;
-};
-
-export type AdminApiResponse<T = unknown> = {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
 };
 
 export const useAdminAuth = () => {

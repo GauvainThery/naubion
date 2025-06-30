@@ -1,14 +1,11 @@
-const API_BASE_URL = '/api';
+import { NewsletterResponse } from '@naubion/shared';
 
-export interface NewsletterSubscriptionResponse {
-  success: boolean;
-  message: string;
-}
+const API_BASE_URL = '/api';
 
 export const subscribeToNewsletter = async (
   email: string,
   name?: string
-): Promise<NewsletterSubscriptionResponse> => {
+): Promise<NewsletterResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/newsletter/subscribe`, {
       method: 'POST',
@@ -18,7 +15,7 @@ export const subscribeToNewsletter = async (
       body: JSON.stringify({ email, name })
     });
 
-    const data: NewsletterSubscriptionResponse = await response.json();
+    const data: NewsletterResponse = await response.json();
 
     if (!response.ok) {
       throw new Error(data.message || 'Failed to subscribe to newsletter');

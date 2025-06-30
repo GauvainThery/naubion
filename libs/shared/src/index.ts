@@ -46,3 +46,6 @@ export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 // Page routes
 export { page, Page } from './page';
+
+// API types for frontend-backend communication
+export * from './api-types';

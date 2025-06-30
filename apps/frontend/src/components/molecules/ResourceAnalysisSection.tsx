@@ -1,7 +1,7 @@
 import React from 'react';
 import { ResourceBreakdownItem } from '../';
 import { processResourceData } from '../../utils/websiteAnalysisResultProcessors';
-import { Resource } from '../../../../backend/src/domain/models/resource';
+import { Resource } from '@naubion/shared';
 
 type ResourceType = {
   type: string;

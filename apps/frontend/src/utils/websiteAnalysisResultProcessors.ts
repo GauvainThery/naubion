@@ -1,10 +1,10 @@
-import { Resource } from '../../../backend/src/domain/models/resource';
-
 /**
  * @fileoverview Utility functions for processing and formatting website analysis results.
  * This module provides functions to format resource data, calculate statistics,
  * and process results from website performance analysis.
  */
+
+import { Resource } from '@naubion/shared';
 
 /**
  * Converts a size in bytes to a human-readable string format.

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { PageAnalysisResult } from '../../../../backend/src/domain/models/page-analysis';
 import {
   Card,
   ResourceList,
@@ -19,6 +18,7 @@ import {
 } from './../../utils/websiteAnalysisResultProcessors';
 import { cn } from './../../utils/classnames';
 import { scrollTopPage } from './../../utils/scrollTopPage';
+import { PageAnalysisResult } from '@naubion/shared';
 
 type ResultsSectionProps = {
   results: PageAnalysisResult;

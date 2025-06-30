@@ -1,13 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PageAnalysisResult } from '../../../backend/src/domain/models/page-analysis';
+import { PageAnalysisResult, AnalysisInitResponse } from '@naubion/shared';
 import type { AnalysisFormData, LoadingStep } from '../types';
-
-type AnalysisInitResponse = {
-  analysisId: string;
-  estimatedDuration: number;
-  status: 'started';
-  message: string;
-};
 
 const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
