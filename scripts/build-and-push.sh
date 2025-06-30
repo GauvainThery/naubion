@@ -40,11 +40,11 @@ echo ""
 
 # Build and tag backend image
 echo "🏗️  Building backend image..."
-docker build -f apps/backend/Dockerfile -t "${BACKEND_IMAGE}" .
+docker build -f Dockerfile.backend -t "${BACKEND_IMAGE}" .
 
 # Build and tag frontend image
 echo "🏗️  Building frontend image..."
-docker build -f apps/frontend/Dockerfile -t "${FRONTEND_IMAGE}" .
+docker build -f Dockerfile.frontend -t "${FRONTEND_IMAGE}" .
 
 echo "✅ Images built successfully"
 echo ""

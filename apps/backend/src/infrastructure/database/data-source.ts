@@ -39,6 +39,19 @@ export const initializeDatabase = async (): Promise<void> => {
   try {
     await AppDataSource.initialize();
     console.log('✅ Database connection established successfully');
+
+    // Run migrations if needed (when synchronize is disabled)
+    if (!dbConfig.synchronize) {
+      const { checkMigrationsNeeded, runMigrations } = await import('./migration-runner.js');
+      const needsMigrations = await checkMigrationsNeeded();
+
+      if (needsMigrations) {
+        console.log('📊 Running database migrations...');
+        await runMigrations();
+      } else {
+        console.log('✅ Database schema is up to date');
+      }
+    }
   } catch (error) {
     console.error('❌ Error during database initialization:', error);
     throw error;

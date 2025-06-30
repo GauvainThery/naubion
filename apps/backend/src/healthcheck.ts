@@ -7,7 +7,7 @@ import http from 'http';
 
 const options = {
   hostname: 'localhost',
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3001,
   path: '/health',
   method: 'GET',
   timeout: 2000

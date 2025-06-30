@@ -1,8 +1,19 @@
-# Backend Dockerfile
+# Backend Dockerfile for Naubion Monorepo
 FROM node:lts-alpine AS base
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Install pnpm globally (only once)
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Install Chromium and dependencies for Puppeteer
+RUN apk add --no-cache \
+      chromium \
+      nss \
+      freetype \
+      freetype-dev \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+      && rm -rf /var/cache/apk/*
 
 # Dependencies stage
 FROM base AS deps
@@ -20,15 +31,16 @@ RUN pnpm install --frozen-lockfile --prod=false
 FROM base AS builder
 WORKDIR /app
 
-# Copy node_modules from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/backend/node_modules ./apps/backend/node_modules
-COPY --from=deps /app/libs/shared/node_modules ./libs/shared/node_modules
-
-# Copy source code
+# Copy source code and package files
 COPY libs/shared ./libs/shared
 COPY apps/backend ./apps/backend
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy node_modules from deps stage and ensure workspace linking
+COPY --from=deps /app/node_modules ./node_modules
+
+# Ensure workspace dependencies are properly linked
+RUN pnpm install --frozen-lockfile --offline
 
 # Build shared library first
 RUN pnpm --filter "@naubion/shared" build
@@ -37,11 +49,19 @@ RUN pnpm --filter "@naubion/shared" build
 RUN pnpm --filter "@naubion/backend" build
 
 # Production stage
-FROM node:lts-alpine AS production
+FROM base AS production
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install Chromium and dependencies for Puppeteer in production stage too
+RUN apk add --no-cache \
+      chromium \
+      nss \
+      freetype \
+      freetype-dev \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+      && rm -rf /var/cache/apk/*
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
@@ -61,6 +81,10 @@ COPY --from=builder --chown=naubion:nodejs /app/libs/shared/dist ./libs/shared/d
 
 # Switch to non-root user
 USER naubion
+
+# Set Puppeteer executable path
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Expose port
 EXPOSE 8080

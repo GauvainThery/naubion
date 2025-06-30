@@ -1,13 +1,12 @@
 import { NewsletterResponse } from '@naubion/shared';
-
-const API_BASE_URL = '/api';
+import { getApiUrl } from './api';
 
 export const subscribeToNewsletter = async (
   email: string,
   name?: string
 ): Promise<NewsletterResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/newsletter/subscribe`, {
+    const response = await fetch(getApiUrl('/api/newsletter/subscribe'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

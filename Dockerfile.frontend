@@ -1,0 +1,83 @@
+# Frontend Dockerfile for Naubion Monorepo
+FROM node:lts-alpine AS base
+
+# Install pnpm globally (only once)
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Dependencies stage
+FROM base AS deps
+WORKDIR /app
+
+# Copy package files for the monorepo
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/frontend/package.json ./apps/frontend/
+COPY libs/shared/package.json ./libs/shared/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile --prod=false
+
+# Builder stage
+FROM base AS builder
+WORKDIR /app
+
+# Accept build arguments for environment variables
+ARG VITE_API_URL
+ARG VITE_APP_NAME
+ARG VITE_ENABLE_ANALYTICS
+
+# Set environment variables for build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_APP_NAME=$VITE_APP_NAME
+ENV VITE_ENABLE_ANALYTICS=$VITE_ENABLE_ANALYTICS
+
+# Copy source code and package files
+COPY libs/shared ./libs/shared
+COPY apps/frontend ./apps/frontend
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Copy node_modules from deps stage and ensure workspace linking
+COPY --from=deps /app/node_modules ./node_modules
+
+# Ensure workspace dependencies are properly linked
+RUN pnpm install --frozen-lockfile --offline
+
+# Build shared library first
+RUN pnpm --filter "@naubion/shared" build
+
+# Build frontend with environment variables
+RUN pnpm --filter "@naubion/frontend" build
+
+# Production stage
+FROM nginx:alpine AS production
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nginx-custom
+RUN adduser --system --uid 1001 naubion
+
+# Copy built application from builder stage
+COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
+
+# Copy nginx configuration and modify for non-root container
+COPY apps/frontend/nginx.conf /tmp/nginx.conf
+RUN sed '/^user /d' /tmp/nginx.conf | \
+    sed 's|/var/run/nginx.pid|/tmp/nginx.pid|g' > /etc/nginx/nginx.conf
+
+# Create necessary directories and set permissions
+RUN mkdir -p /var/cache/nginx /var/log/nginx /tmp && \
+    chown -R naubion:nginx-custom /usr/share/nginx/html && \
+    chown -R naubion:nginx-custom /var/cache/nginx && \
+    chown -R naubion:nginx-custom /var/log/nginx && \
+    chown -R naubion:nginx-custom /tmp
+
+# Switch to non-root user
+USER naubion
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

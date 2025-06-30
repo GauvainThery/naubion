@@ -19,13 +19,17 @@ export class BrowserManager {
   async launch(options: PageAnalysisOptions): Promise<Browser> {
     const launchOptions: LaunchOptions = {
       browser: 'chrome',
-      executablePath: process.env.CHROME_EXECUTABLE_PATH || '',
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
       headless: true,
       args: [
         '--disable-extensions',
         '--disable-plugins',
         '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-feature=WebFontsCacheAwareTimeoutAdaption'
+        '--disable-feature=WebFontsCacheAwareTimeoutAdaption',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
       ]
     };
 

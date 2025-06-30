@@ -75,6 +75,7 @@ export function getAllConfig(): Config {
  */
 export function validateConfig(): boolean {
   const errors: string[] = [];
+  const isProduction = process.env.NODE_ENV === 'production';
 
   // Validate port
   const port = getConfig<number>('port');
@@ -86,6 +87,49 @@ export function validateConfig(): boolean {
   const analysisTimeout = getConfig<number>('analysis.timeout');
   if (analysisTimeout < 1000) {
     errors.push('Analysis timeout too low (minimum 1000ms)');
+  }
+
+  // Production-specific validations
+  if (isProduction) {
+    // Database credentials must be set
+    if (!process.env.DB_PASSWORD || process.env.DB_PASSWORD === 'naubion_password') {
+      errors.push('Production database password must be set and not use default value');
+    }
+
+    if (!process.env.DB_USERNAME || process.env.DB_USERNAME === 'naubion') {
+      errors.push('Production database username should not use default value');
+    }
+
+    // Admin password must be secure
+    if (
+      !process.env.ADMIN_PASSWORD ||
+      process.env.ADMIN_PASSWORD === 'admin123' ||
+      process.env.ADMIN_PASSWORD === 'admin_password'
+    ) {
+      errors.push('Production admin password must be set and not use default value');
+    }
+
+    // Database synchronization should be disabled
+    if (process.env.DB_SYNCHRONIZE === 'true') {
+      errors.push(
+        'Database synchronization should be disabled in production (DB_SYNCHRONIZE=false)'
+      );
+    }
+
+    // External services should be configured
+    if (
+      !process.env.MAILJET_API_KEY ||
+      process.env.MAILJET_API_KEY === 'your_mailjet_api_key_here'
+    ) {
+      errors.push('MailJet API key must be configured in production');
+    }
+
+    if (
+      !process.env.MAILJET_API_SECRET ||
+      process.env.MAILJET_API_SECRET === 'your_mailjet_api_secret_here'
+    ) {
+      errors.push('MailJet API secret must be configured in production');
+    }
   }
 
   if (errors.length > 0) {

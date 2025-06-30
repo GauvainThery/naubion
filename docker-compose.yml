@@ -1,34 +1,140 @@
-version: '3.8'
-
+# Docker Compose for Naubion
 services:
   backend:
     image: ghcr.io/gauvainthery/naubion-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     container_name: naubion-backend
     ports:
-      - '8080:8080'
+      - '${BACKEND_PORT:-8080}:8080'
     environment:
-      - NODE_ENV=production
+      # Core application settings - Production defaults
+      - NODE_ENV=${NODE_ENV:-production}
       - PORT=8080
-    volumes:
-      # Mount environment file if it exists
-      - .env:/app/.env:ro
+      - HOST=0.0.0.0
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
+
+      # CORS configuration
+      - CORS_ORIGIN=${CORS_ORIGIN}
+
+      # Database configuration
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_SYNCHRONIZE=${DB_SYNCHRONIZE:-false}
+      - DB_LOGGING=false
+
+      # Cache configuration
+      - CACHE_ANALYSIS_RESULTS=${CACHE_ANALYSIS_RESULTS:-true}
+      - CACHE_TTL_HOURS=${CACHE_TTL_HOURS:-240}
+
+      # Puppeteer configuration
+      - PUPPETEER_EXECUTABLE_PATH=${PUPPETEER_EXECUTABLE_PATH}
+      - BROWSER_HEADLESS=true
+      - BROWSER_TIMEOUT=${BROWSER_TIMEOUT:-120000}
+
+      # Analysis Configuration
+      - MAX_CONCURRENT_ANALYSIS=${MAX_CONCURRENT_ANALYSIS:-10}
+      - ANALYSIS_TIMEOUT=${ANALYSIS_TIMEOUT:-300000}
+      - ANALYSIS_RETRIES=${ANALYSIS_RETRIES:-3}
+
+      # External services
+      - MAILJET_API_KEY=${MAILJET_API_KEY}
+      - MAILJET_API_SECRET=${MAILJET_API_SECRET}
+      - MAILJET_CONTACT_LIST_ID=${MAILJET_CONTACT_LIST_ID}
+
+      # Admin configuration
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+
+    env_file:
+      - .env
+
+    # Production resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+    # Production security hardening
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/logs
     networks:
       - naubion-network
     healthcheck:
-      test: ['CMD', 'node', 'dist/healthcheck.js']
+      test: ['CMD', 'node', 'apps/backend/dist/healthcheck.js']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    depends_on:
+      - database
+
+  database:
+    image: postgres:15-alpine
+    container_name: naubion-database
+    environment:
+      - POSTGRES_DB=${DB_DATABASE:-naubion}
+      - POSTGRES_USER=${DB_USERNAME:-naubion}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-naubion_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - naubion-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME:-naubion} -d ${DB_DATABASE:-naubion}']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
 
   frontend:
     image: ghcr.io/gauvainthery/naubion-frontend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_APP_NAME=${VITE_APP_NAME:-Naubion}
+        - VITE_ENABLE_ANALYTICS=${VITE_ENABLE_ANALYTICS:-true}
     container_name: naubion-frontend
     ports:
-      - '3000:80'
-    environment:
-      - VITE_API_URL=http://localhost:8080
+      - '${FRONTEND_PORT:-3000}:80'
+
+    # Production resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Production security hardening
+    security_opt:
+      - no-new-privileges:true
+    # read_only: true  # Disabled for nginx compatibility
+    # tmpfs:
+    #   - /tmp:uid=1001,gid=1001
+    #   - /var/cache/nginx:uid=1001,gid=1001
+    #   - /var/run:uid=1001,gid=1001
     networks:
       - naubion-network
     healthcheck:
@@ -52,6 +158,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+      database:
+        condition: service_healthy
 
 networks:
   naubion-network:
@@ -59,3 +167,4 @@ networks:
 
 volumes:
   node_modules:
+  postgres_data:
