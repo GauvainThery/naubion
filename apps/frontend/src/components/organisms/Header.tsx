@@ -10,7 +10,8 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ currentPage }) => {
   const navigationLinks: Record<keyof typeof page, [string, string]> = {
     home: [page.pageCarbonFootprint, 'Estimate your web page carbon footprint'],
-    pageCarbonFootprint: [page.home, 'Join the waitlist!']
+    pageCarbonFootprint: [page.home, 'Join the waitlist!'],
+    admin: [page.home, 'ADmin']
   };
 
   return (

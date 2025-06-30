@@ -186,13 +186,51 @@ jobs:
     environment: production
 
     steps:
-      - name: Deploy to production
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment package
         run: |
-          echo "Deploying to production environment"
-          echo "Frontend image: ${{ needs.build.outputs.frontend-image }}"
-          echo "Backend image: ${{ needs.build.outputs.backend-image }}"
-          # Add your production deployment logic here
-          # This could be updating a Kubernetes deployment, Docker Compose, etc.
+          mkdir -p deployment
+          cp docker-compose.prod.yml deployment/
+          cp scripts/deploy.sh deployment/
+          cp .env.production.example deployment/
+
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USER }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          script: |
+            # Navigate to application directory
+            cd /opt/naubion
+
+            # Pull latest repository changes
+            git pull origin main
+
+            # Create .env file if it doesn't exist
+            if [ ! -f .env ]; then
+              cp .env.production.example .env
+              echo "⚠️  Please configure .env file with your settings"
+            fi
+
+            # Load environment variables
+            export GITHUB_REPOSITORY="${{ github.repository }}"
+            export POSTGRES_PASSWORD="${{ secrets.POSTGRES_PASSWORD }}"
+            export MAILJET_API_KEY="${{ secrets.MAILJET_API_KEY }}"
+            export MAILJET_SECRET_KEY="${{ secrets.MAILJET_SECRET_KEY }}"
+            export FRONTEND_DOMAIN="${{ secrets.FRONTEND_DOMAIN }}"
+            export BACKEND_DOMAIN="${{ secrets.BACKEND_DOMAIN }}"
+            export TRAEFIK_DOMAIN="${{ secrets.TRAEFIK_DOMAIN }}"
+            export ACME_EMAIL="${{ secrets.ACME_EMAIL }}"
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Run deployment script
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh latest
 
   # Job 6: Container security scanning
   container-security:
