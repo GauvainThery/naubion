@@ -6,6 +6,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { getConfig } from '../../config/index.js';
 import { PageAnalysisEntity } from './entities/page-analysis.entity.js';
+import { checkMigrationsNeeded, runMigrations } from './migration-runner.js';
 
 // Get database configuration
 const dbConfig = getConfig<{
@@ -28,9 +29,10 @@ export const AppDataSource = new DataSource({
   synchronize: dbConfig.synchronize,
   logging: dbConfig.logging,
   entities: [PageAnalysisEntity],
-  migrations: ['dist/infrastructure/database/migrations/*.js'],
-  migrationsTableName: 'typeorm_migrations',
-  migrationsRun: false, // We'll run them manually for better control
+  migrations: [
+    // Always use compiled JavaScript files for migrations
+    'dist/infrastructure/database/migrations/*.js'
+  ],
   subscribers: []
 });
 
@@ -44,7 +46,6 @@ export const initializeDatabase = async (): Promise<void> => {
 
     // Run migrations if needed (when synchronize is disabled)
     if (!dbConfig.synchronize) {
-      const { checkMigrationsNeeded, runMigrations } = await import('./migration-runner.js');
       const needsMigrations = await checkMigrationsNeeded();
 
       if (needsMigrations) {

@@ -1,8 +1,6 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class CreatePageAnalysesTable1735689600000 implements MigrationInterface {
-  name = 'CreatePageAnalysesTable1735689600000';
-
+export class CreatePageAnalysesTable1751376204498 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create the page_analyses table
     await queryRunner.createTable(

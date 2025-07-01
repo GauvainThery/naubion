@@ -52,32 +52,15 @@ RUN pnpm --filter "@naubion/backend" build
 FROM base AS production
 WORKDIR /app
 
-# Install Chromium and dependencies for Puppeteer in production stage too
-RUN apk add --no-cache \
-      chromium \
-      nss \
-      freetype \
-      freetype-dev \
-      harfbuzz \
-      ca-certificates \
-      ttf-freefont \
-      && rm -rf /var/cache/apk/*
-
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 naubion
 
-# Copy package files for production dependencies
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/package.json ./apps/backend/
-COPY libs/shared/package.json ./libs/shared/
-
-# Install only production dependencies
-RUN pnpm install --frozen-lockfile --prod=true
-
-# Copy built applications from builder stage (now includes SQL files)
+# Copy built applications and their dependencies from builder stage
 COPY --from=builder --chown=naubion:nodejs /app/apps/backend/dist ./apps/backend/dist
 COPY --from=builder --chown=naubion:nodejs /app/libs/shared/dist ./libs/shared/dist
+COPY --from=builder --chown=naubion:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=naubion:nodejs /app/package.json ./package.json
 
 # Switch to non-root user
 USER naubion

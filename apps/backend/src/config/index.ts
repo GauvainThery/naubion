@@ -5,9 +5,16 @@
 
 import { Config } from '@naubion/shared';
 import dotenv from 'dotenv';
+import path from 'path';
 
-// Load environment variables from .env file
-dotenv.config();
+// Load environment variables from .env file at monorepo root
+// In development: process.cwd() is apps/backend, so go up 2 levels
+// In production (Docker): process.cwd() is monorepo root, so use .env directly
+const envPath =
+  process.env.NODE_ENV === 'production'
+    ? path.resolve(process.cwd(), '.env')
+    : path.resolve(process.cwd(), '../../.env');
+dotenv.config({ path: envPath });
 
 // Default configuration values
 const DEFAULT_CONFIG: Config = {
