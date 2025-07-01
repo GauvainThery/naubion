@@ -28,6 +28,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'pnpm'
+
+      - name: Validate monorepo structure
+        run: |
+          echo "Validating monorepo structure..."
+          ls -la
+          echo "Backend package.json:"
+          cat apps/backend/package.json | jq '.name'
+          echo "Frontend package.json:"
+          cat apps/frontend/package.json | jq '.name'
+          echo "Shared package.json:"
+          cat libs/shared/package.json | jq '.name'
+
       - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
@@ -83,6 +105,6 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
           build-args: |
-            VITE_API_URL=${{ vars.VITE_API_URL || 'https://api.example.com' }}
-            VITE_APP_NAME=${{ vars.VITE_APP_NAME || 'Naubion' }}
+            VITE_API_URL=${{ vars.VITE_API_URL || 'https://naubion.com' }}
+            VITE_APP_NAME=${{ vars.VITE_APP_NAME || 'naubion' }}
             VITE_ENABLE_ANALYTICS=${{ vars.VITE_ENABLE_ANALYTICS || 'true' }}
