@@ -6,13 +6,18 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc && npm run copy-assets",
-    "copy-assets": "cp -r src/infrastructure/database/migrations dist/infrastructure/database/ 2>/dev/null || mkdir -p dist/infrastructure/database && cp -r src/infrastructure/database/migrations dist/infrastructure/database/",
+    "build": "tsc",
     "start": "node dist/app.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "typeorm": "typeorm-ts-node-esm -d src/infrastructure/database/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:create": "npm run typeorm -- migration:create",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
+    "migration:show": "npm run typeorm -- migration:show"
   },
   "dependencies": {
     "@naubion/shared": "workspace:*",

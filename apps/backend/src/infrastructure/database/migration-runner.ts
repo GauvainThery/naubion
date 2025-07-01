@@ -1,32 +1,31 @@
 /**
- * Database migration runner
- * Executes SQL migrations to set up database schema
+ * Database migration runner using TypeORM
+ * Manages database schema evolution through TypeORM migrations
  */
 
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { AppDataSource } from './data-source.js';
 import logger from '../../shared/logger.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 /**
- * Run database migrations
+ * Run pending database migrations using TypeORM
  */
 export async function runMigrations(): Promise<void> {
   try {
-    logger.info('Starting database migrations...');
+    logger.info('Starting TypeORM database migrations...');
 
-    // Read the migration SQL file
-    const migrationPath = join(__dirname, 'migrations', '001-create-page-analyses-table.sql');
-    const migrationSQL = readFileSync(migrationPath, 'utf8');
+    // Get pending migrations
+    const pendingMigrations = await AppDataSource.showMigrations();
 
-    // Execute the migration
-    await AppDataSource.query(migrationSQL);
+    if (pendingMigrations) {
+      logger.info(`Found ${pendingMigrations} pending migration(s)`);
 
-    logger.info('✅ Database migrations completed successfully');
+      // Run all pending migrations
+      await AppDataSource.runMigrations();
+
+      logger.info('✅ Database migrations completed successfully');
+    } else {
+      logger.info('✅ No pending migrations found');
+    }
   } catch (error) {
     logger.error('❌ Error running database migrations:', { error: String(error) });
     throw error;
@@ -38,20 +37,11 @@ export async function runMigrations(): Promise<void> {
  */
 export async function checkMigrationsNeeded(): Promise<boolean> {
   try {
-    // Check if page_analyses table exists
-    const result = await AppDataSource.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name = 'page_analyses'
-      );
-    `);
-
-    return !result[0].exists;
+    const pendingMigrations = await AppDataSource.showMigrations();
+    return pendingMigrations;
   } catch (error) {
-    logger.warn('Could not check migration status, assuming migrations needed:', {
-      error: String(error)
-    });
+    logger.error('❌ Error checking migration status:', { error: String(error) });
+    // If we can't check, assume migrations are needed for safety
     return true;
   }
 }

@@ -28,8 +28,10 @@ export const AppDataSource = new DataSource({
   synchronize: dbConfig.synchronize,
   logging: dbConfig.logging,
   entities: [PageAnalysisEntity],
-  migrations: ['src/infrastructure/database/migrations/*.ts'],
-  subscribers: ['src/infrastructure/database/subscribers/*.ts']
+  migrations: ['dist/infrastructure/database/migrations/*.js'],
+  migrationsTableName: 'typeorm_migrations',
+  migrationsRun: false, // We'll run them manually for better control
+  subscribers: []
 });
 
 /**
