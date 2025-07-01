@@ -14,6 +14,8 @@ services:
       - PORT=8080
       - HOST=0.0.0.0
       - LOG_LEVEL=${LOG_LEVEL:-warn}
+      # Node.js memory optimization for low-memory systems
+      - NODE_OPTIONS=--max-old-space-size=400
 
       # CORS configuration
       - CORS_ORIGIN=${CORS_ORIGIN}
@@ -56,11 +58,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 2G
+          cpus: '0.7'
+          memory: 500M
         reservations:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '0.3'
+          memory: 200M
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -92,8 +94,24 @@ services:
       - POSTGRES_DB=${DB_DATABASE:-naubion}
       - POSTGRES_USER=${DB_USERNAME:-naubion}
       - POSTGRES_PASSWORD=${DB_PASSWORD:-naubion_password}
+      # Memory optimization for low-memory systems
+      - POSTGRES_SHARED_BUFFERS=32MB
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=64MB
+      - POSTGRES_WORK_MEM=2MB
+      - POSTGRES_MAINTENANCE_WORK_MEM=16MB
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    # Memory limits for database
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
     networks:
       - naubion-network
     healthcheck:
@@ -121,11 +139,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
+          cpus: '0.3'
+          memory: 200M
         reservations:
-          cpus: '0.25'
-          memory: 128M
+          cpus: '0.1'
+          memory: 64M
 
     # Production security hardening
     security_opt:
