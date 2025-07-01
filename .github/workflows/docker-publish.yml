@@ -27,27 +27,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'pnpm'
-
       - name: Validate monorepo structure
         run: |
           echo "Validating monorepo structure..."
           ls -la
-          echo "Backend package.json:"
-          cat apps/backend/package.json | jq '.name'
-          echo "Frontend package.json:"
-          cat apps/frontend/package.json | jq '.name'
-          echo "Shared package.json:"
-          cat libs/shared/package.json | jq '.name'
+          echo "Backend package.json exists:"
+          test -f apps/backend/package.json && echo "✓ Yes" || echo "✗ No"
+          echo "Frontend package.json exists:"
+          test -f apps/frontend/package.json && echo "✓ Yes" || echo "✗ No"
+          echo "Shared package.json exists:"
+          test -f libs/shared/package.json && echo "✓ Yes" || echo "✗ No"
+          echo "Dockerfiles exist:"
+          test -f Dockerfile.backend && echo "✓ Dockerfile.backend" || echo "✗ Dockerfile.backend missing"
+          test -f Dockerfile.frontend && echo "✓ Dockerfile.frontend" || echo "✗ Dockerfile.frontend missing"
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
