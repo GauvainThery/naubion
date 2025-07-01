@@ -6,7 +6,8 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "cp -r src/infrastructure/database/migrations dist/infrastructure/database/ 2>/dev/null || mkdir -p dist/infrastructure/database && cp -r src/infrastructure/database/migrations dist/infrastructure/database/",
     "start": "node dist/app.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src",

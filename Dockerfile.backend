@@ -75,7 +75,7 @@ COPY libs/shared/package.json ./libs/shared/
 # Install only production dependencies
 RUN pnpm install --frozen-lockfile --prod=true
 
-# Copy built applications from builder stage
+# Copy built applications from builder stage (now includes SQL files)
 COPY --from=builder --chown=naubion:nodejs /app/apps/backend/dist ./apps/backend/dist
 COPY --from=builder --chown=naubion:nodejs /app/libs/shared/dist ./libs/shared/dist
 
