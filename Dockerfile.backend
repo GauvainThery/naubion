@@ -1,71 +1,50 @@
-# Backend Dockerfile for Naubion Monorepo
-FROM node:lts-alpine AS base
+# Simple Backend Dockerfile for Naubion
+FROM node:lts-alpine
 
-# Install pnpm globally (only once)
+# Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install Chromium and dependencies for Puppeteer
+# Install Chromium for Puppeteer
 RUN apk add --no-cache \
       chromium \
       nss \
       freetype \
-      freetype-dev \
       harfbuzz \
       ca-certificates \
-      ttf-freefont \
-      && rm -rf /var/cache/apk/*
+      ttf-freefont
 
-# Dependencies stage
-FROM base AS deps
+# Set working directory
 WORKDIR /app
 
-# Copy package files for the monorepo
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/backend/package.json ./apps/backend/
-COPY libs/shared/package.json ./libs/shared/
+# Copy all source files and package configuration
+COPY . .
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile --prod=false
+# Install all dependencies
+RUN pnpm install --frozen-lockfile
 
-# Builder stage
-FROM base AS builder
-WORKDIR /app
-
-# Copy source code and package files
-COPY libs/shared ./libs/shared
-COPY apps/backend ./apps/backend
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# Copy node_modules from deps stage and ensure workspace linking
-COPY --from=deps /app/node_modules ./node_modules
-
-# Ensure workspace dependencies are properly linked
-RUN pnpm install --frozen-lockfile --offline
-
-# Build shared library first
+# Build the shared library first
 RUN pnpm --filter "@naubion/shared" build
 
-# Build backend
+# Build the backend
 RUN pnpm --filter "@naubion/backend" build
 
-# Production stage
-FROM base AS production
-WORKDIR /app
+# Install production dependencies specifically for the backend
+RUN cd apps/backend && pnpm install --frozen-lockfile --prod
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 naubion
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 naubion
 
-# Copy built applications and their dependencies from builder stage
-COPY --from=builder --chown=naubion:nodejs /app/apps/backend/dist ./apps/backend/dist
-COPY --from=builder --chown=naubion:nodejs /app/libs/shared/dist ./libs/shared/dist
-COPY --from=builder --chown=naubion:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=naubion:nodejs /app/package.json ./package.json
+# Change ownership
+RUN chown -R naubion:nodejs /app
 
 # Switch to non-root user
 USER naubion
 
-# Set Puppeteer executable path
+# Set working directory to backend for proper module resolution
+WORKDIR /app/apps/backend
+
+# Set Puppeteer environment
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
@@ -74,7 +53,7 @@ EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node apps/backend/dist/healthcheck.js
+  CMD node dist/healthcheck.js
 
 # Start the application
-CMD ["node", "apps/backend/dist/app.js"]
+CMD ["node", "dist/app.js"]

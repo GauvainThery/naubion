@@ -38,24 +38,20 @@ fi
 echo "✅ Successfully authenticated with GHCR"
 echo ""
 
+# Setup buildx for multi-platform builds
+echo "🔧 Setting up Docker Buildx..."
+docker buildx create --use --name multiarch || docker buildx use multiarch
+echo ""
+
 # Build and tag backend image
 echo "🏗️  Building backend image..."
-docker build -f Dockerfile.backend -t "${BACKEND_IMAGE}" .
+docker buildx build --platform linux/amd64 -f Dockerfile.backend -t "${BACKEND_IMAGE}" --push .
 
 # Build and tag frontend image
 echo "🏗️  Building frontend image..."
-docker build -f Dockerfile.frontend -t "${FRONTEND_IMAGE}" .
+docker buildx build --platform linux/amd64 -f Dockerfile.frontend -t "${FRONTEND_IMAGE}" --push .
 
-echo "✅ Images built successfully"
-echo ""
-
-# Push images to GHCR
-echo "📤 Pushing backend image to GHCR..."
-docker push "${BACKEND_IMAGE}"
-
-echo "📤 Pushing frontend image to GHCR..."
-docker push "${FRONTEND_IMAGE}"
-
+echo "✅ Images built and pushed successfully"
 echo ""
 echo "🎉 Successfully pushed images to GHCR!"
 echo "   Backend:  ${BACKEND_IMAGE}"

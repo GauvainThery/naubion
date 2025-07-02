@@ -1,7 +1,6 @@
+import { AnalysisInitResponse, PageAnalysisResult } from '@naubion/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PageAnalysisResult, AnalysisInitResponse } from '@naubion/shared';
 import type { AnalysisFormData, LoadingStep } from '../types';
-import { getApiUrl } from '../utils/api';
 
 const useAnalysis = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,7 +51,7 @@ const useAnalysis = () => {
 
   const fetchFinalResults = useCallback(async (analysisId: string) => {
     try {
-      const response = await fetch(getApiUrl(`/api/analysis/${analysisId}/result`));
+      const response = await fetch(`/api/analysis/${analysisId}/result`);
 
       if (response.status === 202) {
         // Still running, wait a bit and try again
@@ -102,7 +101,7 @@ const useAnalysis = () => {
 
       try {
         // Phase 1: Start analysis and get immediate response
-        const response = await fetch(getApiUrl('/api/analyze'), {
+        const response = await fetch('/api/analyze', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -121,9 +120,7 @@ const useAnalysis = () => {
         setEstimatedDuration(initData.estimatedDuration);
 
         // Phase 2: Set up Server-Sent Events for progress updates
-        const eventSource = new EventSource(
-          getApiUrl(`/api/analysis/${initData.analysisId}/progress`)
-        );
+        const eventSource = new EventSource(`/api/analysis/${initData.analysisId}/progress`);
         eventSourceRef.current = eventSource;
 
         eventSource.onmessage = event => {

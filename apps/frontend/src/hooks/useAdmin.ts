@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { CacheStats, AdminApiResponse } from '@naubion/shared';
-import { getApiUrl } from '../utils/api';
+import { AdminApiResponse, CacheStats } from '@naubion/shared';
+import { useCallback, useEffect, useState } from 'react';
 
 type FetchOptions = {
   method?: string;
@@ -21,7 +20,7 @@ export const useAdminAuth = () => {
   }, []);
 
   const login = async (password: string): Promise<void> => {
-    const response = await fetch(getApiUrl('/api/admin/login'), {
+    const response = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
@@ -53,7 +52,7 @@ export const useAdminApi = () => {
 
   const apiCall = useCallback(
     async <T>(endpoint: string, options: FetchOptions = {}): Promise<T> => {
-      const response = await fetch(getApiUrl(`/api/admin${endpoint}`), {
+      const response = await fetch(`/api/admin${endpoint}`, {
         ...options,
         headers: {
           'Content-Type': 'application/json',

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -16,7 +16,9 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["node"]
+    "types": ["node"],
+    "declaration": false,
+    "removeComments": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -4,16 +4,16 @@
  * Implemented with Domain-Driven Design architecture
  */
 
-import 'reflect-metadata'; // Required for TypeORM decorators
 import cors from 'cors';
 import express, { Application, NextFunction, Request, Response } from 'express';
+import path from 'path';
+import 'reflect-metadata'; // Required for TypeORM decorators
 import { getConfig, validateConfig } from './config/index.js';
-import { initializeDatabase, closeDatabase } from './infrastructure/database/data-source.js';
-import apiRoutes from './infrastructure/api/routes.js';
 import adminRoutes from './infrastructure/api/admin.routes.js';
+import apiRoutes from './infrastructure/api/routes.js';
+import { closeDatabase, initializeDatabase } from './infrastructure/database/data-source.js';
 import { errorHandler, notFoundHandler } from './shared/errors.js';
 import logger from './shared/logger.js';
-import path from 'path';
 
 /**
  * Create and configure Express application
@@ -106,15 +106,15 @@ function createApp(): Application {
 }
 
 /**
- * Start the server
+ * Start the server with database retry logic
  */
 async function startServer(): Promise<void> {
+  // Initialize database connection (has built-in retry mechanism)
   try {
-    // Initialize database connection
     await initializeDatabase();
     logger.success('Database initialized successfully');
   } catch (error) {
-    logger.error('Failed to initialize database', { error });
+    logger.error('Failed to initialize database after all retries', { error });
     process.exit(1);
   }
 

@@ -28,13 +28,13 @@ export class PageAnalysisEntity {
   @Column({ type: 'varchar', length: 2048 })
   url!: string;
 
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ name: 'options_hash', type: 'varchar', length: 64 })
   optionsHash!: string; // Hash of analysis options for caching lookup
 
-  @Column({ type: 'timestamp' })
+  @Column({ name: 'analysis_timestamp', type: 'timestamp' })
   analysisTimestamp!: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column({ name: 'expires_at', type: 'timestamp' })
   expiresAt!: Date; // Explicit expiration timestamp
 
   @Column({ type: 'integer' })
@@ -46,13 +46,13 @@ export class PageAnalysisEntity {
   @Column({ type: 'jsonb' })
   resources!: ResourceCollection;
 
-  @Column({ type: 'jsonb' })
+  @Column({ name: 'green_hosting', type: 'jsonb' })
   greenHosting!: GreenHostingResult;
 
-  @Column({ type: 'decimal', precision: 10, scale: 4 })
+  @Column({ name: 'g_co2e', type: 'decimal', precision: 10, scale: 4 })
   gCo2e!: number; // CO2 equivalent in grams
 
-  @Column({ type: 'jsonb' })
+  @Column({ name: 'human_readable_impact', type: 'jsonb' })
   humanReadableImpact!: HumanReadableImpactResult;
 
   @Column({ type: 'jsonb', nullable: true })
@@ -66,10 +66,10 @@ export class PageAnalysisEntity {
     };
   };
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   /**

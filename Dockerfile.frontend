@@ -20,16 +20,6 @@ RUN pnpm install --frozen-lockfile --prod=false
 FROM base AS builder
 WORKDIR /app
 
-# Accept build arguments for environment variables
-ARG VITE_API_URL
-ARG VITE_APP_NAME
-ARG VITE_ENABLE_ANALYTICS
-
-# Set environment variables for build
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_APP_NAME=$VITE_APP_NAME
-ENV VITE_ENABLE_ANALYTICS=$VITE_ENABLE_ANALYTICS
-
 # Copy source code and package files
 COPY libs/shared ./libs/shared
 COPY apps/frontend ./apps/frontend

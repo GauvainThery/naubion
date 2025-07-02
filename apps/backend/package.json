@@ -34,7 +34,6 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.15.29",
-    "@types/node-mailjet": "^4.0.0",
     "@types/pg": "^8.15.4",
     "@types/tgwf__co2": "^0.14.2",
     "@types/ws": "^8.5.13",
