@@ -4,14 +4,22 @@ FROM node:lts-alpine
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Install Chromium for Puppeteer
+# Install Chromium and dependencies for Puppeteer
 RUN apk add --no-cache \
       chromium \
       nss \
       freetype \
+      freetype-dev \
       harfbuzz \
       ca-certificates \
-      ttf-freefont
+      ttf-freefont \
+      ttf-liberation \
+      wqy-zenhei \
+      # Additional packages for better browser stability
+      dbus \
+      udev \
+      # Clean up
+      && rm -rf /var/cache/apk/*
 
 # Set working directory
 WORKDIR /app
@@ -44,9 +52,16 @@ USER naubion
 # Set working directory to backend for proper module resolution
 WORKDIR /app/apps/backend
 
-# Set Puppeteer environment
+# Set Puppeteer environment variables
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV CHROME_BIN=/usr/bin/chromium-browser
+ENV CHROME_PATH=/usr/bin/chromium-browser
+ENV DISPLAY=:99
+
+# Additional Chrome/Puppeteer environment variables for Docker
+ENV NO_SANDBOX=true
+ENV DISABLE_DEV_SHM_USAGE=true
 
 # Expose port
 EXPOSE 8080

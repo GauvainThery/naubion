@@ -36,14 +36,18 @@ services:
       - CACHE_TTL_HOURS=${CACHE_TTL_HOURS:-240}
 
       # Puppeteer configuration
-      - PUPPETEER_EXECUTABLE_PATH=${PUPPETEER_EXECUTABLE_PATH}
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
       - BROWSER_HEADLESS=true
       - BROWSER_TIMEOUT=${BROWSER_TIMEOUT:-120000}
 
-      # Chrome configuration (legacy - not used with remote browser)
+      # Chrome configuration optimized for Docker
       - CHROME_BIN=/usr/bin/chromium-browser
       - CHROME_PATH=/usr/bin/chromium-browser
       - CHROME_CRASHPAD_DISABLED=1
+      - DISPLAY=:99
+      - NO_SANDBOX=true
+      - DISABLE_DEV_SHM_USAGE=true
 
       # Analysis Configuration
       - MAX_CONCURRENT_ANALYSIS=${MAX_CONCURRENT_ANALYSIS:-10}
@@ -61,27 +65,31 @@ services:
     env_file:
       - .env
 
-    # Production resource limits
+    # Production resource limits - Increased memory for Puppeteer
     deploy:
       resources:
         limits:
-          cpus: '0.7'
-          memory: 500M
+          cpus: '1.0'
+          memory: 1G
         reservations:
           cpus: '0.3'
-          memory: 200M
+          memory: 300M
       restart_policy:
         condition: on-failure
         delay: 5s
         max_attempts: 3
 
-    # Production security hardening
+    # Security and performance optimizations for Puppeteer
     security_opt:
       - no-new-privileges:true
+    cap_add:
+      - SYS_ADMIN # Required for Chrome in some cases
+    shm_size: '256m' # Increase shared memory for Chrome
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:size=512M,exec
       - /app/logs
+      - /dev/shm:size=256M # Additional shared memory for Chrome
     networks:
       - naubion-network
     healthcheck:
