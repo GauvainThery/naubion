@@ -45,6 +45,8 @@ services:
       - CHROME_BIN=/usr/bin/chromium-browser
       - CHROME_PATH=/usr/bin/chromium-browser
       - CHROME_CRASHPAD_DISABLED=1
+      - CHROME_CACHE_DIR=/home/naubion/.cache/chromium
+      - CHROME_CONFIG_DIR=/home/naubion/.config/chromium
       - DISPLAY=:99
       - NO_SANDBOX=true
       - DISABLE_DEV_SHM_USAGE=true
@@ -90,6 +92,8 @@ services:
       - /tmp:size=512M,exec
       - /app/logs
       - /dev/shm:size=256M # Additional shared memory for Chrome
+      - /home/naubion/.cache:size=256M,uid=1001,gid=1001 # Chrome cache directory (increased size)
+      - /home/naubion/.config:size=128M,uid=1001,gid=1001 # Chrome config directory
     networks:
       - naubion-network
     healthcheck:
