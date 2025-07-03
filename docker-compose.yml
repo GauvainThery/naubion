@@ -151,7 +151,7 @@ services:
         - VITE_ENABLE_ANALYTICS=true
     container_name: naubion-frontend
     ports:
-      - '${FRONTEND_PORT:-3000}:80'
+      - '${FRONTEND_PORT:-80}:80'
 
     # Production resource limits
     deploy:

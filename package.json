@@ -19,7 +19,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css,scss,html}\"",
     "type-check": "pnpm --recursive type-check",
     "clean": "pnpm --recursive --filter \"./apps/*\" clean",
-    "install-deps": "pnpm install"
+    "install-deps": "pnpm install",
+    "reset-db": "./scripts/reset-db.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
