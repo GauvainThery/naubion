@@ -50,7 +50,7 @@ const HeroSection = ({ className }: HeroSectionProps) => {
           />
         </div>
       </div>
-      <div className="lg:w-1/2 w-full h-full flex justify-center items-end">
+      <div className="lg:w-1/2 w-full h-full flex justify-center items-end mt-18 sm:mt-0">
         <Laptop />
       </div>
     </section>

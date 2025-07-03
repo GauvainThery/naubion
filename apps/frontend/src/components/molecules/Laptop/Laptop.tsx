@@ -38,7 +38,7 @@ const Laptop = () => {
     >
       {/* Laptop Screen */}
       <div
-        className="w-[309px] h-[180px] lg:w-[395px] lg:h-[230px] flex items-center justify-center rounded-lg transition-all duration-900 ring-1 ring-gray-600 border-b-1 border-gray-700 "
+        className="w-[250px] sm:w-[309px] lg:w-[395px] h-[150px] sm:h-[180px] lg:h-[230px] flex items-center justify-center rounded-lg transition-all duration-900 ring-1 ring-gray-600 border-b-1 border-gray-700 "
         style={{
           transformStyle: 'preserve-3d',
           transform: `rotateX(-${screenValue.rotateX}deg)`,
@@ -71,7 +71,7 @@ const Laptop = () => {
 
       {/* Laptop Keyboard */}
       <div
-        className="w-[309px] h-[180px] lg:w-[395px] lg:h-[230px] bg-gradient-to-b from-gray-600 to-gray-500 rounded-lg relative transition-all duration-900"
+        className="w-[250px] sm:w-[309px] lg:w-[395px] h-[150px] sm:h-[180px] lg:h-[230px] bg-gradient-to-b from-gray-600 to-gray-500 rounded-lg relative transition-all duration-900"
         style={{
           transformStyle: 'preserve-3d',
           transform: `rotateX(${keyboardValue.rotateX}deg)`,

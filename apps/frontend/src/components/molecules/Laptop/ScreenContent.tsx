@@ -41,7 +41,7 @@ const screenContent = () => {
         <div className="relative">
           {/* Pot body using clip-path for tapered effect */}
           <div
-            className="noise w-20 h-14 lg:w-26 lg:h-20 bg-gradient-to-b from-orange-600 to-orange-800 relative shadow-lg"
+            className="transition-all duration-900 noise w-14 sm:w-20 lg:w-26 h-8 sm:h-14 lg:h-20 bg-gradient-to-b from-orange-600 to-orange-800 relative shadow-lg"
             style={{
               clipPath: 'polygon(5% 0%, 95% 0%, 85% 100%, 15% 100%)'
             }}
@@ -51,11 +51,11 @@ const screenContent = () => {
           </div>
 
           {/* Pot rim */}
-          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-22 lg:w-28 h-4 bg-gradient-to-b from-orange-500 to-orange-600 rounded-lg shadow-md z-10" />
+          <div className="transition-all duration-900 absolute -top-2 left-1/2 transform -translate-x-1/2 w-14 sm:w-22 lg:w-28 h-3 sm:h-4 bg-gradient-to-b from-orange-500 to-orange-600 rounded-lg shadow-md z-10" />
         </div>
 
         {/* Pot base/saucer */}
-        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-15 lg:w-21 h-2 bg-gradient-to-b from-orange-800 to-orange-950 rounded-full" />
+        <div className="transition-all duration-900 absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-12 sm:w-15 lg:w-21 h-2 bg-gradient-to-b from-orange-800 to-orange-950 rounded-full" />
       </div>
     </div>
   );
