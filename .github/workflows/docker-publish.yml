@@ -103,3 +103,54 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
+
+  deploy:
+    needs: build-and-push
+    name: deploy image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: install ssh keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+
+      - name: Copy docker-compose.yml to server
+        run: |
+          scp docker-compose.yml ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}/
+
+      - name: Ensure .env file exists on server
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.WORK_DIR }}
+            if [ ! -f .env ]; then
+              echo 'Warning: .env file does not exist. Please create it with your environment variables.'
+              if [ -f .env.example ]; then
+                echo 'You can use .env.example as a template.'
+              fi
+            fi
+          "
+
+      - name: Pull images and deploy
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.WORK_DIR }} && \
+            docker compose pull && \
+            docker compose up -d --remove-orphans && \
+            docker image prune -f
+          "
+
+      - name: Verify deployment
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd ${{ secrets.WORK_DIR }} && \
+            docker compose ps && \
+            docker compose logs --tail=10
+          "
+
+      - name: cleanup
+        run: rm -rf ~/.ssh
