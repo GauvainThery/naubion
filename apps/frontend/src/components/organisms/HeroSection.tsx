@@ -40,7 +40,7 @@ const HeroSection = ({ className }: HeroSectionProps) => {
           <TextInputWithSubmit
             type="email"
             placeholder="Enter your email..."
-            buttonText="Join Waitlist"
+            buttonText="Join!"
             onSubmit={handleEmailSubmit}
             loading={isLoading}
             error={error}

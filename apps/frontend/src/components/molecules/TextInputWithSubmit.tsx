@@ -75,7 +75,7 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
               'px-6 py-3 bg-primary text-text-light font-medium rounded-full transition-all duration-200',
               'hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              'flex items-center gap-2 min-w-fit shrink-0',
+              'flex items-center gap-2',
               loading && 'cursor-wait',
               success && 'bg-utils-100 hover:bg-utils-100'
             )}
