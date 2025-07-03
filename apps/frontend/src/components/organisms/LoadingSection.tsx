@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { LoadingStep as LoadingStepType } from '../../types';
 import Card from '../atoms/Card';
 import LoadingStep from '../molecules/LoadingStep';
@@ -20,10 +20,41 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   estimatedDuration = 0,
   className
 }) => {
-  // Calculate remaining time based on progress and estimated duration
+  const [smoothProgress, setSmoothProgress] = useState(0);
+  const [startTime, setStartTime] = useState<number | null>(null);
+
+  // Start timer when analysis begins or when estimatedDuration changes
+  useEffect(() => {
+    if (estimatedDuration > 0) {
+      setStartTime(Date.now());
+      setSmoothProgress(0); // Reset progress when we get a new duration
+    }
+  }, [estimatedDuration]); // Remove startTime dependency to allow reset
+
+  // Smooth time-based progress
+  useEffect(() => {
+    if (!startTime || !estimatedDuration) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const timeProgress = (elapsed / estimatedDuration) * 100;
+
+      // Add the backend progress to the time-based progress for a combined calculation
+      const targetProgress = Math.min(progress + timeProgress, 100);
+      setSmoothProgress(targetProgress);
+    }, 100); // Update every 100ms for smooth animation
+
+    return () => clearInterval(interval);
+  }, [startTime, estimatedDuration, progress]);
+
+  // Calculate remaining time based on smooth progress and estimated duration
   const calculateRemainingTime = () => {
-    if (!estimatedDuration || progress >= 100) return 0;
-    const remainingProgress = (100 - progress) / 100;
+    if (!estimatedDuration || smoothProgress >= 100) {
+      return 0;
+    }
+    const remainingProgress = (100 - smoothProgress) / 100;
     return Math.ceil((estimatedDuration * remainingProgress) / 1000); // Convert to seconds
   };
 
@@ -61,13 +92,13 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
       <Card className="p-12 flex flex-col gap-12">
         <h3 className="text-2xl font-bold">Analyzing your page...</h3>
 
-        {progress > 0 && (
+        {smoothProgress > 0 && (
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <span className="font-bold">Progress</span>
               <div className="flex items-center space-x-2">
                 <span className="font-bold transition-all duration-300 transform">
-                  {Math.round(progress)}%
+                  {Math.round(smoothProgress)}%
                 </span>
                 {remainingSeconds > 0 && (
                   <span className="text-xs text-text-secondary">
@@ -76,7 +107,12 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
                 )}
               </div>
             </div>
-            <ProgressBar progress={progress} className="h-4" animated={true} showGlow={true} />
+            <ProgressBar
+              progress={smoothProgress}
+              className="h-4"
+              animated={true}
+              showGlow={true}
+            />
           </div>
         )}
 
