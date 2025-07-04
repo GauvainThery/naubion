@@ -149,7 +149,7 @@ export class PageAnalysisDomainService {
     const complexityScore = this.calculatePageAnalysisComplexityScore(options);
 
     // Scale duration based on complexity
-    return baseTime + complexityScore * 5000; // +5s per complexity point
+    return baseTime + complexityScore * 10000; // +10s per complexity point
   }
 
   /**

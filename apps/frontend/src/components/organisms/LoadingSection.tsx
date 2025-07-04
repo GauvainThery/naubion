@@ -42,7 +42,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
       const timeProgress = (elapsed / estimatedDuration) * 100;
 
       // Add the backend progress to the time-based progress for a combined calculation
-      const targetProgress = Math.min(progress + timeProgress, 100);
+      const targetProgress = Math.min(progress + timeProgress, progress);
       setSmoothProgress(targetProgress);
     }, 100); // Update every 100ms for smooth animation
 
