@@ -157,6 +157,7 @@ services:
       # Mount SSL certificates
       - ./ssl/certs:/etc/ssl/certs:ro
       - ./ssl/private:/etc/ssl/private:ro
+    user: '0:0' # Run as root to access SSL certificates
 
     # Production resource limits
     deploy:
