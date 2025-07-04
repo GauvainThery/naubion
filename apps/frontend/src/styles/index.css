@@ -43,7 +43,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url('./assets/noise.svg');
+  background-image: url('/assets/noise.svg');
   background-repeat: repeat;
   background-size: 176px;
   pointer-events: none;
@@ -59,7 +59,7 @@
 }
 
 .grass {
-  background-image: url('./assets/grass.svg');
+  background-image: url('/assets/grass.svg');
   background-repeat: repeat;
   background-size: 112px;
   @apply absolute w-full h-[13px] -top-[9px] left-0;
