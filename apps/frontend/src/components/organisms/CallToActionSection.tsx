@@ -33,6 +33,7 @@ const CallToActionSection = ({
         <div className="w-full flex justify-center">
           <TextInputWithSubmit
             type="email"
+            className="w-auto min-w-[330px]"
             placeholder="Enter your email..."
             buttonText="Join!"
             onSubmit={handleEmailSubmit}

@@ -32,7 +32,7 @@ const HeroSection = ({ className }: HeroSectionProps) => {
           </p>
         </div>
 
-        <div className="flex flex-col gap-6 text-center justify-center items-center">
+        <div className="flex flex-col gap-6 text-center justify-center items-center w-full">
           <p className="secondary-font">
             <strong>naubion</strong> is coming soon! Join our waiting list and be at the forefront
             of web decarbonization.
@@ -40,6 +40,7 @@ const HeroSection = ({ className }: HeroSectionProps) => {
           <TextInputWithSubmit
             type="email"
             placeholder="Enter your email..."
+            className="w-auto min-w-[330px]"
             buttonText="Join!"
             onSubmit={handleEmailSubmit}
             loading={isLoading}

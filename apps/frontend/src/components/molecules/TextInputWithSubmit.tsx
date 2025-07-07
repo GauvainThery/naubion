@@ -56,7 +56,7 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
   const isSubmitDisabled = disabled || loading || !value.trim() || (required && !value.trim());
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn(className)}>
       <form onSubmit={handleSubmit}>
         <div className="flex items-center bg-white rounded-full focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500 transition-colors duration-200 drop-shadow hover:shadow-md">
           <input
