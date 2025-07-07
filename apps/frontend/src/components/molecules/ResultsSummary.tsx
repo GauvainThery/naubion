@@ -27,10 +27,10 @@ const ResultsSummary: React.FC<ResultsSummaryProps> = ({
     <div className="bg-gradient-to-r from-primary to-primary-300 p-6 rounded-lg shadow-md text-gray-200">
       <div className="flex gap-4 items-center">
         <p className="text-2xl">💡</p>
-        <p className="leading-relaxed">
+        <p className="leading-relaxed break-words">
           The page{' '}
           <a
-            className="text-text-light underline hover:cursor-pointer font-medium"
+            className="text-text-light underline hover:cursor-pointer font-medium break-all"
             target="_blank"
             href={url}
           >

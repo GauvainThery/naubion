@@ -42,7 +42,11 @@ const ResultsHeader: React.FC<ResultsHeaderProps> = ({
         </div>
         <h3 className="text-2xl font-bold">
           Carbon Footprint for:{' '}
-          <a className="text-primary underline hover:cursor-pointer" target="_blank" href={url}>
+          <a
+            className="text-primary underline hover:cursor-pointer break-all"
+            target="_blank"
+            href={url}
+          >
             {url}
           </a>
         </h3>
