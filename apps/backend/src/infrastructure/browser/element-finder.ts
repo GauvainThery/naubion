@@ -3,6 +3,7 @@
  */
 
 import { Page } from 'puppeteer';
+import { ElementInfo } from './interaction-strategies';
 
 // Type definitions for browser helper functions
 interface FindElementsConfig {
@@ -31,30 +32,6 @@ interface WindowWithHelpers extends Window {
   _getDataAttributes: (element: HTMLElement) => string;
   _isNavigationElement: (element: HTMLElement) => boolean;
   _isElementInteractive: (element: HTMLElement) => boolean;
-}
-
-export interface ElementInfo {
-  id: string;
-  type: string;
-  text: string;
-  selector: string;
-  tagName: string;
-  className: string;
-  elementId: string;
-  isVisible: boolean;
-  position: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  dataAttributes: string;
-  isDisabled: boolean;
-  hasClickHandler: boolean;
-  ariaLabel: string;
-  role: string;
-  isInteractive: boolean;
-  confidence?: number;
 }
 
 export class ElementFinder {

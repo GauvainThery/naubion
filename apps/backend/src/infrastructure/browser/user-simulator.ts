@@ -5,8 +5,8 @@
 import { Page } from 'puppeteer';
 import { PageAnalysisOptions } from '../../domain/models/page-analysis.js';
 import { NetworkMonitor } from './network-monitor.js';
-import { ElementFinder, ElementInfo } from './element-finder.js';
-import { InteractionStrategies } from './interaction-strategies.js';
+import { ElementFinder } from './element-finder.js';
+import { ElementInfo, InteractionStrategies } from './interaction-strategies.js';
 import { BehaviorSimulator } from './behavior-simulator.js';
 import logger from '../../shared/logger.js';
 
@@ -49,7 +49,7 @@ export class UserSimulator {
     // Initialize strategy classes
     this.elementFinder = new ElementFinder(page);
     this.interactionStrategies = new InteractionStrategies(page, null);
-    this.behaviorSimulator = new BehaviorSimulator(page, null);
+    this.behaviorSimulator = new BehaviorSimulator(page);
   }
 
   /**
@@ -61,7 +61,7 @@ export class UserSimulator {
       this.elementFinder['page'],
       networkMonitor
     );
-    this.behaviorSimulator = new BehaviorSimulator(this.elementFinder['page'], networkMonitor);
+    this.behaviorSimulator = new BehaviorSimulator(this.elementFinder['page']);
   }
 
   /**
@@ -92,10 +92,6 @@ export class UserSimulator {
 
       if (this.config.enableFormInteraction) {
         await this.performFormInteractions();
-      }
-
-      if (this.config.enableResponsiveTesting) {
-        await this.performResponsiveTests();
       }
 
       // Phase 5: Final network settlement
@@ -292,19 +288,6 @@ export class UserSimulator {
         error: error instanceof Error ? error.message : String(error)
       });
     }
-  }
-
-  private async performResponsiveTests(): Promise<void> {
-    logger.debug('📱 Performing responsive tests...');
-
-    await this.behaviorSimulator.simulateViewportChanges({
-      viewports: [
-        { width: 375, height: 667 }, // Mobile
-        { width: 768, height: 1024 }, // Tablet
-        { width: 1920, height: 1080 } // Desktop
-      ],
-      pauseBetweenChanges: 1000
-    });
   }
 
   private async attemptElementInteraction(element: ElementInfo): Promise<boolean> {

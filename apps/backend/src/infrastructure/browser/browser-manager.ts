@@ -5,6 +5,7 @@
  * - Uses system-installed Chromium from Alpine packages
  * - Configured for Docker/Alpine environment with appropriate flags
  * - Follows Puppeteer Alpine troubleshooting guide: https://pptr.dev/troubleshooting#running-on-alpine
+ *
  */
 
 import puppeteer, { Browser, LaunchOptions, Page } from 'puppeteer';
@@ -15,332 +16,287 @@ import {
 } from '../../domain/models/page-analysis.js';
 import logger from '../../shared/logger.js';
 
-export class BrowserManager {
-  private browser: Browser | null = null;
-  private userDataDir: string | null = null;
+// Global browser pool for reuse across analyses
+class BrowserPool {
+  private static instance: BrowserPool;
+  private browsers: Map<string, { browser: Browser; lastUsed: number; inUse: boolean }> = new Map();
+  private readonly maxPoolSize = 3;
+  private readonly maxIdleTime = 30000; // 30 seconds
 
-  /**
-   * Launch browser with analysis options
-   *
-   * Alpine-specific configuration:
-   * - Uses system Chromium from Alpine packages
-   * - Includes Alpine-optimized launch arguments
-   */
-  async launch(options: PageAnalysisOptions): Promise<Browser> {
-    // Generate unique user data directory to avoid singleton conflicts
-    this.userDataDir = `${process.env.CHROME_CONFIG_DIR || '/home/naubion/.config/chromium'}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  static getInstance(): BrowserPool {
+    if (!BrowserPool.instance) {
+      BrowserPool.instance = new BrowserPool();
+    }
+    return BrowserPool.instance;
+  }
+
+  async getBrowser(options: PageAnalysisOptions): Promise<Browser> {
+    const poolKey = `${options.deviceType}_${options.interactionLevel}`;
+
+    // Clean up idle browsers
+    await this.cleanupIdleBrowsers();
+
+    // Check if we have an available browser
+    const pooledBrowser = this.browsers.get(poolKey);
+    if (pooledBrowser && !pooledBrowser.inUse && pooledBrowser.browser.isConnected()) {
+      pooledBrowser.inUse = true;
+      pooledBrowser.lastUsed = Date.now();
+      logger.debug('Reusing pooled browser', { poolKey });
+      return pooledBrowser.browser;
+    }
+
+    // Create new browser if pool has space
+    if (this.browsers.size < this.maxPoolSize) {
+      const browser = await this.createOptimizedBrowser(options);
+      this.browsers.set(poolKey, {
+        browser,
+        lastUsed: Date.now(),
+        inUse: true
+      });
+      logger.debug('Created new pooled browser', { poolKey, poolSize: this.browsers.size });
+      return browser;
+    }
+
+    // Pool is full, create temporary browser
+    logger.debug('Pool full, creating temporary browser', { poolKey });
+    return await this.createOptimizedBrowser(options);
+  }
+
+  releaseBrowser(browser: Browser): void {
+    for (const [key, pooledBrowser] of this.browsers.entries()) {
+      if (pooledBrowser.browser === browser) {
+        pooledBrowser.inUse = false;
+        pooledBrowser.lastUsed = Date.now();
+        logger.debug('Released browser back to pool', { poolKey: key });
+        return;
+      }
+    }
+  }
+
+  private async cleanupIdleBrowsers(): Promise<void> {
+    const now = Date.now();
+    const toRemove: string[] = [];
+
+    for (const [key, pooledBrowser] of this.browsers.entries()) {
+      if (!pooledBrowser.inUse && now - pooledBrowser.lastUsed > this.maxIdleTime) {
+        toRemove.push(key);
+      }
+    }
+
+    for (const key of toRemove) {
+      const pooledBrowser = this.browsers.get(key);
+      if (pooledBrowser) {
+        try {
+          await pooledBrowser.browser.close();
+        } catch (error) {
+          logger.debug('Error closing idle browser', { error });
+        }
+        this.browsers.delete(key);
+        logger.debug('Removed idle browser from pool', { poolKey: key });
+      }
+    }
+  }
+
+  private async createOptimizedBrowser(options: PageAnalysisOptions): Promise<Browser> {
+    const userDataDir = `${process.env.CHROME_CONFIG_DIR || '/tmp/chrome'}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const launchOptions: LaunchOptions = {
-      browser: 'chrome',
       // Use system Chromium from Alpine package
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
       headless: true,
+      // Optimized args for performance and reliability
       args: [
-        '--disable-extensions',
-        '--disable-plugins',
-        '--disable-features=IsolateOrigins,site-per-process',
-        '--disable-feature=WebFontsCacheAwareTimeoutAdaption',
-        // Essential for Alpine/Docker environments
+        // Essential Docker/Alpine flags
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
-        // Additional Docker-optimized flags
-        '--disable-background-timer-throttling',
-        '--disable-backgrounding-occluded-windows',
-        '--disable-renderer-backgrounding',
-        '--disable-features=TranslateUI',
-        '--disable-ipc-flooding-protection',
-        '--memory-pressure-off',
-        '--max_old_space_size=512',
-        // Connection stability improvements
-        '--disable-backgrounding-occluded-windows',
-        '--disable-renderer-backgrounding',
-        '--disable-background-timer-throttling',
-        '--force-color-profile=srgb',
-        '--disable-features=TranslateUI,BlinkGenPropertyTrees',
+
+        // Performance optimizations
+        '--disable-extensions',
+        '--disable-plugins',
         '--disable-default-apps',
         '--disable-sync',
-        '--metrics-recording-only',
-        '--no-first-run',
-        // Disable crashpad to prevent "--database is required" error
-        '--disable-crashpad',
-        '--no-crash-upload',
-        // Set unique data directory for each browser instance to avoid singleton conflicts
-        `--user-data-dir=${this.userDataDir}`,
-        `--disk-cache-dir=${process.env.CHROME_CACHE_DIR || '/home/naubion/.cache/chromium'}`,
+        '--disable-translate',
+        '--disable-features=TranslateUI,VizDisplayCompositor,Translate',
+
+        // Memory optimizations
+        '--memory-pressure-off',
+        '--max_old_space_size=512',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+
+        // Network optimizations
         '--disable-background-networking',
-        // Security flags for container environments (must come after user-data-dir)
+        '--disable-client-side-phishing-detection',
+        '--disable-component-extensions-with-background-pages',
+        '--disable-hang-monitor',
+
+        // Stability improvements
+        '--disable-ipc-flooding-protection',
+        '--disable-prompt-on-repost',
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
-        // Process management flags
-        '--disable-dev-shm-usage',
-        '--disable-extensions-file-access-check',
-        '--disable-plugins-discovery',
-        // Timeout and stability flags
-        '--timeout=60000',
-        '--disable-hang-monitor'
+
+        // Directory settings
+        `--user-data-dir=${userDataDir}`,
+        `--disk-cache-dir=${process.env.CHROME_CACHE_DIR || '/tmp/chrome-cache'}`,
+
+        // Disable unnecessary features
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--disable-crashpad',
+        '--disable-logging',
+        '--silent'
       ]
     };
 
-    // Add mobile-specific optimizations
+    // Add device-specific optimizations
     if (options.deviceType === 'mobile') {
-      launchOptions.args?.push(
-        '--enable-features=NetworkService,NetworkServiceLogging',
-        '--force-device-scale-factor=1'
+      launchOptions.args?.push('--enable-features=NetworkService', '--force-device-scale-factor=1');
+    }
+
+    const browser = await puppeteer.launch(launchOptions);
+
+    // Verify browser is working
+    const version = await browser.version();
+    logger.debug('Browser launched successfully', {
+      deviceType: options.deviceType,
+      version: version.substring(0, 50), // Truncate long version strings
+      userDataDir
+    });
+
+    return browser;
+  }
+
+  async closeAll(): Promise<void> {
+    const promises: Promise<void>[] = [];
+
+    for (const [key, pooledBrowser] of this.browsers.entries()) {
+      promises.push(
+        pooledBrowser.browser.close().catch(error => {
+          logger.debug('Error closing pooled browser', { error, key });
+        })
       );
     }
 
-    this.browser = await puppeteer.launch(launchOptions);
+    await Promise.allSettled(promises);
+    this.browsers.clear();
+    logger.debug('Closed all pooled browsers');
+  }
+}
 
-    // Verify browser launched successfully
-    if (!this.browser) {
-      throw new Error('Failed to launch browser');
-    }
+export class BrowserManager {
+  private browser: Browser | null = null;
+  private browserPool = BrowserPool.getInstance();
+  private isPooledBrowser = false;
 
-    // Test browser connection
+  /**
+   * Launch browser with analysis options - now uses browser pooling
+   */
+  async launch(options: PageAnalysisOptions): Promise<Browser> {
     try {
-      const version = await this.browser.version();
-      logger.debug('Browser launched successfully', {
+      this.browser = await this.browserPool.getBrowser(options);
+      this.isPooledBrowser = true;
+
+      logger.debug('Browser ready for analysis', {
         deviceType: options.deviceType,
-        version,
-        userDataDir: this.userDataDir
+        interactionLevel: options.interactionLevel
       });
+
+      return this.browser;
     } catch (error) {
-      logger.error('Browser launched but connection test failed', {
+      logger.error('Failed to launch browser', {
         error: error instanceof Error ? error.message : String(error)
       });
-      await this.browser.close();
-      this.browser = null;
       throw error;
     }
-
-    return this.browser;
   }
 
   /**
-   * Create and configure a new page
+   * Create and configure a new page - optimized for speed and reliability
    */
   async createPage(options: PageAnalysisOptions): Promise<Page> {
     if (!this.browser) {
       throw new Error('Browser not launched. Call launch() first.');
     }
 
-    const maxRetries = 3;
-    let lastError: Error | null = null;
+    try {
+      logger.debug('Creating new browser page...');
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        logger.debug(`Creating new browser page (attempt ${attempt}/${maxRetries})...`);
-
-        // Check browser is still connected before creating page
-        if (!this.browser.isConnected()) {
-          throw new Error('Browser is not connected - cannot create page');
-        }
-
-        const page = await this.browser.newPage();
-
-        // Check if page was created successfully
-        if (!page || page.isClosed()) {
-          throw new Error('Failed to create browser page or page was immediately closed');
-        }
-
-        // Add a small delay to ensure page is fully initialized
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Double-check page is still valid after delay
-        if (page.isClosed()) {
-          throw new Error('Page was closed immediately after creation');
-        }
-
-        const deviceConfig = DEVICE_CONFIGURATIONS[options.deviceType];
-
-        // Configure device settings with enhanced error handling
-        await this.configurePageDevice(page, deviceConfig, options);
-
-        // Set additional page configurations for stability
-        await page.setDefaultNavigationTimeout(options.timeout || 60000);
-        await page.setDefaultTimeout(30000);
-
-        // Set request interception for better control
-        await page.setRequestInterception(false); // Disable to avoid conflicts
-
-        logger.debug('Page created and configured successfully', {
-          deviceType: options.deviceType,
-          viewport: deviceConfig.viewport,
-          timeout: options.timeout,
-          attempt
-        });
-
-        return page;
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-
-        logger.warn(`Failed to create page on attempt ${attempt}/${maxRetries}`, {
-          error: lastError.message,
-          deviceType: options.deviceType,
-          browserConnected: this.browser?.isConnected() || false
-        });
-
-        // If this is not the last attempt, wait before retrying
-        if (attempt < maxRetries) {
-          const delay = attempt * 1000; // Exponential backoff
-          logger.debug(`Waiting ${delay}ms before retry...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
+      // Quick connection check
+      if (!this.browser.connected) {
+        throw new Error('Browser is not connected');
       }
-    }
 
-    // If all retries failed, throw the last error
-    logger.error('Failed to create page after all retries', {
-      error: lastError?.message,
-      deviceType: options.deviceType,
-      maxRetries
-    });
-    throw lastError || new Error('Unknown error during page creation');
+      const page = await this.browser.newPage();
+
+      // Basic page configuration
+      const deviceConfig = DEVICE_CONFIGURATIONS[options.deviceType];
+      await this.configurePageOptimized(page, deviceConfig, options);
+
+      // Set timeouts
+      page.setDefaultNavigationTimeout(options.timeout || 60000 * 3);
+      page.setDefaultTimeout(60000 * 3);
+
+      // Performance optimizations
+      await page.setRequestInterception(false);
+
+      // Enable JavaScript selectively for analysis
+      await page.setJavaScriptEnabled(true);
+
+      logger.debug('Page created and configured successfully', {
+        deviceType: options.deviceType,
+        viewport: deviceConfig.viewport,
+        timeout: options.timeout
+      });
+
+      return page;
+    } catch (error) {
+      logger.error('Failed to create page', {
+        error: error instanceof Error ? error.message : String(error),
+        deviceType: options.deviceType,
+        browserConnected: this.browser?.connected || false
+      });
+      throw error;
+    }
   }
 
   /**
-   * Configure page device settings
+   * Configure page device settings - streamlined for performance
    */
-  private async configurePageDevice(
+  private async configurePageOptimized(
     page: Page,
     config: DeviceConfiguration,
     options: PageAnalysisOptions
   ): Promise<void> {
     try {
-      logger.debug('Configuring page device settings...', {
-        viewport: config.viewport,
-        isMobile: config.viewport.isMobile,
+      // Quick check if page is still valid
+      if (page.isClosed()) {
+        throw new Error('Cannot configure device settings - page is closed');
+      }
+
+      // Simplified viewport configuration
+      const viewportConfig = {
+        width: config.viewport.width,
+        height: config.viewport.height,
+        deviceScaleFactor: config.viewport.deviceScaleFactor,
+        isMobile: options.deviceType === 'mobile',
+        hasTouch: options.deviceType === 'mobile'
+      };
+
+      // Set viewport with single attempt - let it fail fast if there are issues
+      await page.setViewport(viewportConfig);
+
+      logger.debug('Page device configuration completed', {
+        viewport: viewportConfig,
         deviceType: options.deviceType
       });
-
-      // Multiple verification points to ensure page is still open
-      if (page.isClosed()) {
-        throw new Error('Cannot configure device settings - page is already closed');
-      }
-
-      // Wait a moment to ensure page is stable
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      // Check again after delay
-      if (page.isClosed()) {
-        throw new Error('Page was closed during initialization delay');
-      }
-
-      // Add error handlers for page events BEFORE setting viewport
-      page.on('error', error => {
-        logger.error('Page error occurred', { error: error.message });
-      });
-
-      page.on('pageerror', error => {
-        logger.error('Page script error occurred', { error: error.message });
-      });
-
-      page.on('requestfailed', request => {
-        logger.debug('Request failed', {
-          url: request.url(),
-          failure: request.failure()?.errorText
-        });
-      });
-
-      // For desktop devices, always disable touch emulation to avoid protocol errors
-      // For mobile devices, enable touch but with fallback handling
-      const viewportConfig = { ...config.viewport };
-
-      if (options.deviceType === 'desktop') {
-        // Force disable touch for desktop to prevent emulation errors
-        viewportConfig.hasTouch = false;
-        viewportConfig.isMobile = false;
-        logger.debug('Forced touch emulation disabled for desktop device');
-      }
-
-      // Final check before setting viewport
-      if (page.isClosed()) {
-        throw new Error('Page was closed before viewport configuration');
-      }
-
-      // Set viewport configuration with careful error handling
-      // Note: page.setViewport() automatically calls Emulation.setTouchEmulationEnabled
-      // when hasTouch is true, which can fail if the CDP session is closing
-      try {
-        await page.setViewport(viewportConfig);
-        logger.debug('Viewport set successfully', {
-          width: viewportConfig.width,
-          height: viewportConfig.height,
-          isMobile: viewportConfig.isMobile,
-          hasTouch: viewportConfig.hasTouch
-        });
-      } catch (viewportError) {
-        const errorMessage =
-          viewportError instanceof Error ? viewportError.message : String(viewportError);
-
-        // Check if this is the touch emulation error or session closure
-        if (
-          errorMessage.includes('Emulation.setTouchEmulationEnabled') ||
-          errorMessage.includes('Session closed') ||
-          errorMessage.includes('Target closed') ||
-          errorMessage.includes('Connection closed')
-        ) {
-          logger.warn(
-            'Touch emulation or session failed - attempting minimal viewport configuration',
-            {
-              error: errorMessage,
-              isMobile: viewportConfig.isMobile,
-              hasTouch: viewportConfig.hasTouch,
-              deviceType: options.deviceType
-            }
-          );
-
-          // If the page is already closed, don't try fallback
-          if (page.isClosed()) {
-            throw new Error('Page was closed during viewport configuration - cannot recover');
-          }
-
-          // Try a minimal viewport configuration without any emulation
-          const minimalViewport = {
-            width: viewportConfig.width,
-            height: viewportConfig.height,
-            deviceScaleFactor: 1, // Reset to default
-            isMobile: false, // Always disable
-            hasTouch: false // Always disable
-          };
-
-          try {
-            await page.setViewport(minimalViewport);
-            logger.debug('Minimal viewport set successfully as fallback');
-          } catch (fallbackError) {
-            const fallbackMessage =
-              fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-            logger.error('Failed to set even minimal viewport configuration', {
-              error: fallbackMessage,
-              pageIsClosed: page.isClosed()
-            });
-
-            // If the page is closed, that's the real issue
-            if (page.isClosed()) {
-              throw new Error(
-                'Page was closed during viewport configuration - browser session lost'
-              );
-            }
-
-            throw fallbackError;
-          }
-        } else {
-          // Re-throw other viewport errors
-          logger.error('Viewport configuration failed with non-emulation error', {
-            error: errorMessage,
-            pageIsClosed: page.isClosed()
-          });
-          throw viewportError;
-        }
-      }
-
-      logger.debug('Page device configuration completed successfully');
     } catch (error) {
       logger.error('Failed to configure page device settings', {
         error: error instanceof Error ? error.message : String(error),
-        pageIsClosed: page.isClosed()
+        deviceType: options.deviceType
       });
       throw error;
     }
@@ -351,10 +307,18 @@ export class BrowserManager {
    */
   async close(): Promise<void> {
     if (this.browser) {
-      await this.browser.close();
+      if (this.isPooledBrowser) {
+        // Return to pool instead of closing
+        this.browserPool.releaseBrowser(this.browser);
+        logger.debug('Browser returned to pool');
+      } else {
+        // Close temporary browser
+        await this.browser.close();
+        logger.debug('Temporary browser closed');
+      }
+
       this.browser = null;
-      this.userDataDir = null;
-      logger.debug('Browser closed');
+      this.isPooledBrowser = false;
     }
   }
 
@@ -363,5 +327,17 @@ export class BrowserManager {
    */
   isActive(): boolean {
     return this.browser !== null;
+  }
+
+  /**
+   * Get browser pool statistics
+   */
+  getPoolStats(): { poolSize: number; activeBrowsers: number } {
+    const poolSize = this.browserPool['browsers'].size;
+    const activeBrowsers = Array.from(this.browserPool['browsers'].values()).filter(
+      b => b.inUse
+    ).length;
+
+    return { poolSize, activeBrowsers };
   }
 }

@@ -3,33 +3,8 @@
  */
 
 import { Page } from 'puppeteer';
-import { NetworkMonitor } from './network-monitor.js';
 import logger from '../../shared/logger.js';
-
-// Import ElementInfo from interaction-strategies or define it locally
-interface ElementInfo {
-  id: string;
-  type: string;
-  text: string;
-  selector: string;
-  tagName: string;
-  className: string;
-  elementId: string;
-  isVisible: boolean;
-  position: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  dataAttributes: string;
-  isDisabled: boolean;
-  hasClickHandler: boolean;
-  ariaLabel: string;
-  role: string;
-  isInteractive: boolean;
-  confidence?: number;
-}
+import { ElementInfo } from './interaction-strategies.js';
 
 export interface ScrollOptions {
   maxSteps?: number;
@@ -65,10 +40,7 @@ export interface DeviceCapabilityOptions {
 }
 
 export class BehaviorSimulator {
-  constructor(
-    private page: Page,
-    private networkMonitor: NetworkMonitor | null = null
-  ) {}
+  constructor(private page: Page) {}
 
   /**
    * Simulate natural scrolling behavior
@@ -244,79 +216,6 @@ export class BehaviorSimulator {
     logger.debug('✅ Typing simulation completed');
   }
 
-  /**
-   * Simulate viewport resize to test responsive behavior
-   */
-  async simulateViewportChanges(options: ViewportOptions = {}): Promise<void> {
-    const {
-      viewports = [
-        { width: 375, height: 667 }, // Mobile
-        { width: 768, height: 1024 }, // Tablet
-        { width: 1920, height: 1080 } // Desktop
-      ],
-      pauseBetweenChanges = 1000
-    } = options;
-
-    logger.debug('📱 Simulating viewport changes...');
-
-    for (const viewport of viewports) {
-      try {
-        await this.page.setViewport({
-          width: viewport.width,
-          height: viewport.height,
-          deviceScaleFactor: 1
-        });
-
-        // Wait for responsive changes to settle
-        await this.randomDelay([pauseBetweenChanges, pauseBetweenChanges * 1.5]);
-
-        // Wait for any responsive content
-        await this.waitForResponsiveContent();
-      } catch (error) {
-        logger.debug(`❌ Viewport change failed for ${viewport.width}x${viewport.height}`, {
-          error: error instanceof Error ? error.message : String(error)
-        });
-      }
-    }
-
-    logger.debug('✅ Viewport simulation completed');
-  }
-
-  /**
-   * Simulate device capabilities like touch, orientation
-   */
-  async simulateDeviceCapabilities(options: DeviceCapabilityOptions = {}): Promise<void> {
-    const { enableTouch = true, enableOrientation = false } = options;
-
-    logger.debug('📱 Simulating device capabilities...');
-
-    try {
-      if (enableTouch) {
-        // Enable touch events
-        await this.page.evaluateOnNewDocument(() => {
-          Object.defineProperty(navigator, 'maxTouchPoints', {
-            value: 1,
-            configurable: true
-          });
-        });
-      }
-
-      if (enableOrientation) {
-        // Simulate orientation change
-        await this.page.evaluate(() => {
-          window.dispatchEvent(new Event('orientationchange'));
-        });
-        await this.randomDelay([500, 1000]);
-      }
-
-      logger.debug('✅ Device capability simulation completed');
-    } catch (error) {
-      logger.debug('❌ Device capability simulation failed:', {
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-  }
-
   // Private helper methods
 
   private async waitForLazyContent(timeout = 2000): Promise<void> {
@@ -355,41 +254,6 @@ export class BehaviorSimulator {
       );
     } catch {
       // Timeout is acceptable
-    }
-  }
-
-  private async waitForResponsiveContent(timeout = 2000): Promise<void> {
-    try {
-      // Wait for responsive layout changes
-      await this.page.waitForFunction(
-        () => {
-          // Check if layout has stabilized by monitoring element positions
-          const elements = document.querySelectorAll('header, nav, main, .container');
-          return Array.from(elements).every(
-            el => (el as HTMLElement).offsetWidth > 0 && (el as HTMLElement).offsetHeight > 0
-          );
-        },
-        { timeout }
-      );
-    } catch {
-      // Timeout is acceptable
-    }
-  }
-
-  private async scrollToElement(element: ElementInfo): Promise<void> {
-    try {
-      await this.page.evaluate(selector => {
-        const el = document.querySelector(selector);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, element.selector);
-
-      await this.randomDelay([300, 600]);
-    } catch (error) {
-      logger.debug('❌ Scroll to element failed:', {
-        error: error instanceof Error ? error.message : String(error)
-      });
     }
   }
 

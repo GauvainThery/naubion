@@ -27,6 +27,7 @@ export interface ElementInfo {
   ariaLabel: string;
   role: string;
   isInteractive: boolean;
+  confidence?: number;
 }
 
 export interface InteractionResult {

@@ -8,6 +8,7 @@ import { PageAnalysisDomainService } from '../../domain/services/page-analysis-s
 import { ResourceService } from '../../domain/services/resource-service.js';
 import { BrowserManager } from '../../infrastructure/browser/browser-manager.js';
 import { NetworkMonitor } from '../../infrastructure/browser/network-monitor.js';
+import { PageLoadOptimizer } from '../../infrastructure/browser/page-load-optimizer.js';
 import { createUserSimulator } from '../../infrastructure/browser/user-simulator.js';
 import { AnalysisError } from '../../shared/errors.js';
 import logger from '../../shared/logger.js';
@@ -153,20 +154,24 @@ export class PageAnalysisService {
         'Navigating to target website and simulating user interactions...'
       );
 
-      // Phase 2: Setup monitoring and simulation
+      // Phase 2: Setup monitoring and simulation with optimization
       const client = await page.createCDPSession();
       const networkMonitor = new NetworkMonitor(client, page);
       const userSimulator = createUserSimulator(page, context.options);
+      const pageLoadOptimizer = new PageLoadOptimizer({
+        waitForImages: true, // Important for accurate size measurement
+        waitForFonts: true, // Important for accurate size measurement
+        waitForJS: true,
+        maxLoadTime: context.options.timeout * 0.8,
+        skipNonCriticalResources: false
+      });
 
       // Connect components
       userSimulator.setNetworkMonitor(networkMonitor);
       await networkMonitor.setupListeners();
 
-      // Phase 3: Navigate and analyze
-      await page.goto(context.url, {
-        waitUntil: 'networkidle2',
-        timeout: context.options.timeout
-      });
+      // Phase 3: Navigate and analyze with optimized loading
+      await pageLoadOptimizer.optimizePageLoad(page, context.url);
 
       // Phase 4: Simulate user behavior
       const simulationResult = await userSimulator.simulateUserBehavior();
