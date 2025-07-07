@@ -36,7 +36,7 @@ const ResultsSummary: React.FC<ResultsSummaryProps> = ({
           >
             "{url}"
           </a>{' '}
-          is {isGreenHosted ? '' : 'not '}green hosted and weighs a total of{' '}
+          is {isGreenHosted ? '' : 'potentially not '}green hosted and weighs a total of{' '}
           <span className="font-semibold text-text-light">{totalWeight}</span>
           .<br />
           <span className="font-semibold text-text-light">{visitsCount.toLocaleString()}</span>{' '}
