@@ -58,17 +58,17 @@ const PageCarbonFootprint: React.FC = () => {
   return (
     <MainLayout className="flex flex-col gap-32" currentPage="pageCarbonFootprint">
       {/* Error Message */}
-      {error && <ErrorAlert message={error} className="pt-24" />}
+      {error && <ErrorAlert message={error} className="pt-8 lg:pt-10 -mb-24" />}
 
       {/* Analysis Form */}
       {!results && !isLoading && (
-        <AnalysisForm className="pt-12" onSubmit={startAnalysis} isLoading={isLoading} />
+        <AnalysisForm className="pt-8 lg:pt-10" onSubmit={startAnalysis} isLoading={isLoading} />
       )}
 
       {/* Loading Section */}
       {isLoading && !error && (
         <LoadingSection
-          className="pt-24"
+          className="pt-8 lg:pt-10"
           steps={steps}
           progress={progress}
           currentStep={currentStep}
@@ -77,7 +77,7 @@ const PageCarbonFootprint: React.FC = () => {
       )}
 
       {/* Results Section */}
-      {results && <ResultsSection className="pt-24" results={results} />}
+      {results && <ResultsSection className="pt-8 lg:pt-10" results={results} />}
 
       {/* Methodology Section */}
       <MethodologySection className="pt-24" />
