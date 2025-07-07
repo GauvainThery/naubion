@@ -96,7 +96,7 @@ export class PageAnalysisService {
     const {
       interactionLevel = 'default',
       deviceType = 'desktop',
-      timeout = 60000
+      timeout = 60000 * 5
     } = analysisOptions;
 
     // Create analysis context using domain service
