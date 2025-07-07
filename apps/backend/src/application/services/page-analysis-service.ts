@@ -118,7 +118,7 @@ export class PageAnalysisService {
     };
 
     // Check cache first
-    updateProgress(5, 'cache', 'Checking if url analysis has already been performed recently...');
+    updateProgress(2, 'cache', 'Checking if url analysis has already been performed recently...');
 
     const cachedResult = await this.cacheService.getCachedAnalysis(context.url, context.options);
     if (cachedResult) {
@@ -139,20 +139,19 @@ export class PageAnalysisService {
       )
     });
 
-    updateProgress(10, 'setup', 'Setting up browser environment...');
+    updateProgress(5, 'setup', 'Setting up browser environment...');
 
     let page;
 
     try {
       // Phase 1: Setup browser environment
+      updateProgress(8, 'setup', 'Launching browser instance...');
       await this.browserManager.launch(context.options);
+
+      updateProgress(12, 'setup', 'Creating browser page...');
       page = await this.browserManager.createPage(context.options);
 
-      updateProgress(
-        25,
-        'navigation and simulation',
-        'Navigating to target website and simulating user interactions...'
-      );
+      updateProgress(18, 'navigation', 'Navigating to target website...');
 
       // Phase 2: Setup monitoring and simulation with optimization
       const client = await page.createCDPSession();
@@ -168,29 +167,37 @@ export class PageAnalysisService {
 
       // Connect components
       userSimulator.setNetworkMonitor(networkMonitor);
+      userSimulator.setProgressCallback(updateProgress);
       await networkMonitor.setupListeners();
 
+      updateProgress(25, 'navigation', 'Loading page and initial resources...');
+
       // Phase 3: Navigate and analyze with optimized loading
+      pageLoadOptimizer.setProgressCallback(updateProgress);
       await pageLoadOptimizer.optimizePageLoad(page, context.url);
+
+      updateProgress(40, 'simulation', 'Starting user behavior simulation...');
 
       // Phase 4: Simulate user behavior
       const simulationResult = await userSimulator.simulateUserBehavior();
 
-      updateProgress(70, 'processing', 'Processing collected resources...');
+      updateProgress(65, 'processing', 'Processing collected resources...');
 
       // Phase 5: Process any pending cross-origin requests
+      updateProgress(68, 'processing', 'Processing cross-origin requests...');
       await networkMonitor.processPendingCrossOriginRequests();
 
       // Phase 6: Process results
+      updateProgress(75, 'processing', 'Categorizing resources by type...');
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      updateProgress(92, 'green hosting', 'Assessing green hosting impact...');
+      updateProgress(80, 'green-hosting', 'Assessing green hosting impact...');
 
       // Phase 7: Green hosting assessment
       const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
 
-      updateProgress(94, 'co₂e conversion', 'Converting bytes into gCO₂e...');
+      updateProgress(88, 'co2e-conversion', 'Converting bytes into gCO₂e...');
 
       // Phase 8: Convert bytes into gCO2e
       const co2eBytesConverisonResults = this.co2eBytesConversionService.convertBytesIntoCo2e({
@@ -198,10 +205,14 @@ export class PageAnalysisService {
         isGreenHosted: greenHostingResult.green
       });
 
+      updateProgress(94, 'impact-calculation', 'Creating human-readable impact report...');
+
       // Phase 9: Create human-readable impact report
       const humanReadableImpact = this.humanReadableImpactService.convertToHumanReadableImpact({
         gCo2e: co2eBytesConverisonResults.value // always in g for now but be careful here!!
       });
+
+      updateProgress(98, 'finalizing', 'Finalizing analysis results...');
 
       // Phase 10: Create final result
       const pageMetadata = await page.evaluate(() => ({

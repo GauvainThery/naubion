@@ -207,6 +207,9 @@ export class AnalysisController {
         analysis.result = result;
       }
 
+      // Send final completion update
+      this.updateProgress(analysisId, 100, 'complete', 'Analysis completed successfully');
+
       logger.info('Analysis completed', { analysisId, url });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -215,7 +218,7 @@ export class AnalysisController {
       const analysis = ongoingAnalyses.get(analysisId);
       if (analysis) {
         analysis.status = 'failed';
-        analysis.error = errorMessage;
+        analysis.error = `Analysis failed: ${errorMessage}`;
       }
 
       this.updateProgress(analysisId, 0, 'error', `Analysis failed: ${errorMessage}`);

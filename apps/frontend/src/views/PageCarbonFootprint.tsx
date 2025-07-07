@@ -15,9 +15,12 @@ const PageCarbonFootprint: React.FC = () => {
     steps,
     progress,
     currentStep,
+    currentMessage,
     estimatedDuration,
     startAnalysis
   } = useAnalysis();
+  console.log('🔥 ・ progress:', progress);
+  console.log('🔥 ・ results:', results);
 
   // Check for URL parameters on mount and create form data
   const getFormDataFromUrlParams = (): AnalysisFormData | null => {
@@ -72,6 +75,7 @@ const PageCarbonFootprint: React.FC = () => {
           steps={steps}
           progress={progress}
           currentStep={currentStep}
+          currentMessage={currentMessage}
           estimatedDuration={estimatedDuration}
         />
       )}

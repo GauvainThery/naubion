@@ -31,11 +31,11 @@ const KeyFactsSection: React.FC<KeyFactsSectionProps> = ({
         />
         <MetricCard icon={<ResourceCountIcon />} value={resourceCount} label="Total Resources" />
         <FactCard
-          title={greenHosting.green ? 'Green hosted' : 'Not green hosted'}
+          title={greenHosting.green ? 'Green hosted' : 'Potentially not green hosted'}
           label={
             greenHosting.green
               ? `This page is hosted by ${greenHosting.data?.hosted_by || 'a green provider'} using renewable energy`
-              : 'This page is not hosted by a green hosting provider'
+              : 'Not enough information to determine if the hosting provider is green'
           }
           icon={<ServerIcon />}
           isPositive={greenHosting.green}

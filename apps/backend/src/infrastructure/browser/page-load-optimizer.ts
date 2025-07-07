@@ -14,14 +14,24 @@ export interface PageLoadOptions {
 }
 
 export class PageLoadOptimizer {
+  private progressCallback?: (progress: number, step: string, message?: string) => void;
+
   constructor(private options: PageLoadOptions) {}
+
+  setProgressCallback(callback: (progress: number, step: string, message?: string) => void): void {
+    this.progressCallback = callback;
+  }
 
   async optimizePageLoad(page: Page, url: string): Promise<void> {
     const startTime = Date.now();
 
     try {
+      this.progressCallback?.(28, 'navigation', 'Navigating to page...');
+
       // Navigate with optimized wait conditions
       await this.navigateWithOptimizedWait(page, url);
+
+      this.progressCallback?.(35, 'navigation', 'Waiting for critical resources...');
 
       // Wait for critical resources
       await this.waitForCriticalResources(page);
@@ -74,10 +84,12 @@ export class PageLoadOptimizer {
     const promises: Promise<void>[] = [];
 
     if (this.options.waitForImages) {
+      this.progressCallback?.(37, 'navigation', 'Loading images...');
       promises.push(this.waitForImages(page));
     }
 
     if (this.options.waitForJS) {
+      this.progressCallback?.(39, 'navigation', 'Executing JavaScript...');
       promises.push(this.waitForJavaScript(page));
     }
 

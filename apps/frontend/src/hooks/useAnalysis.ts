@@ -8,44 +8,55 @@ const useAnalysis = () => {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [currentStep, setCurrentStep] = useState<string>('');
+  const [currentMessage, setCurrentMessage] = useState<string>('');
   const [estimatedDuration, setEstimatedDuration] = useState<number>(0);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   const steps: LoadingStep[] = [
     {
       id: 'step1',
-      title: 'Cache',
+      title: 'Cache Check',
       description: 'Checking if url analysis has already been performed recently'
     },
     {
       id: 'step2',
       title: 'Setup',
-      description: 'Setting up browser environment'
+      description: 'Setting up browser environment and tools'
     },
     {
       id: 'step3',
-      title: 'Navigation and simulation',
-      description: 'Navigating to target website and simulating user interactions'
+      title: 'Navigation',
+      description: 'Navigating to target website and loading resources'
     },
     {
       id: 'step4',
-      title: 'Processing',
-      description: 'Processing and categorizing resources'
+      title: 'Simulation',
+      description: 'Simulating realistic user interactions and behavior'
     },
     {
       id: 'step5',
-      title: 'Green hosting',
-      description: 'Assessing green hosting practices'
+      title: 'Processing',
+      description: 'Processing and categorizing collected resources'
     },
     {
       id: 'step6',
-      title: 'CO₂e Conversion',
-      description: 'Convert page resources to CO₂e emissions'
+      title: 'Green Hosting',
+      description: 'Assessing hosting provider environmental impact'
     },
     {
       id: 'step7',
+      title: 'CO₂e Conversion',
+      description: 'Converting resource data to carbon emissions'
+    },
+    {
+      id: 'step8',
+      title: 'Impact Analysis',
+      description: 'Creating human-readable environmental impact report'
+    },
+    {
+      id: 'step9',
       title: 'Complete',
-      description: 'Finalizing analysis results'
+      description: 'Finalizing and caching analysis results'
     }
   ];
 
@@ -98,6 +109,7 @@ const useAnalysis = () => {
       setResults(null);
       setProgress(0);
       setCurrentStep('');
+      setCurrentMessage('');
 
       try {
         // Phase 1: Start analysis and get immediate response
@@ -127,6 +139,7 @@ const useAnalysis = () => {
           const progressData = JSON.parse(event.data);
           setProgress(progressData.progress);
           setCurrentStep(progressData.step);
+          setCurrentMessage(progressData.message || '');
 
           // Handle error state
           if (progressData.step === 'error' || progressData.status === 'failed') {
@@ -181,6 +194,7 @@ const useAnalysis = () => {
     steps,
     progress,
     currentStep,
+    currentMessage,
     estimatedDuration,
     startAnalysis
   };

@@ -33,6 +33,7 @@ export class UserSimulator {
   private interactionStrategies: InteractionStrategies;
   private behaviorSimulator: BehaviorSimulator;
   private config: SimulationConfig;
+  private progressCallback?: (progress: number, step: string, message?: string) => void;
 
   constructor(page: Page, options: PageAnalysisOptions) {
     this.config = {
@@ -50,6 +51,13 @@ export class UserSimulator {
     this.elementFinder = new ElementFinder(page);
     this.interactionStrategies = new InteractionStrategies(page, null);
     this.behaviorSimulator = new BehaviorSimulator(page);
+  }
+
+  /**
+   * Set progress callback for simulation updates
+   */
+  setProgressCallback(callback: (progress: number, step: string, message?: string) => void): void {
+    this.progressCallback = callback;
   }
 
   /**
@@ -75,26 +83,32 @@ export class UserSimulator {
       let successfulInteractions = 0;
 
       // Phase 1: Basic page exploration
+      this.progressCallback?.(42, 'simulation', 'Exploring page structure...');
       await this.explorePageStructure();
 
       // Phase 2: Simulate scrolling and reading behavior
+      this.progressCallback?.(48, 'simulation', 'Simulating reading behavior...');
       await this.simulateReadingBehavior();
 
       // Phase 3: Discover and interact with elements
+      this.progressCallback?.(55, 'simulation', 'Discovering interactive elements...');
       const interactionResult = await this.discoverAndInteractWithElements();
       totalInteractions += interactionResult.total;
       successfulInteractions += interactionResult.successful;
 
       // Phase 4: Advanced interactions (optional)
       if (this.config.enableHoverSimulation) {
+        this.progressCallback?.(58, 'simulation', 'Simulating hover interactions...');
         await this.performHoverInteractions();
       }
 
       if (this.config.enableFormInteraction) {
+        this.progressCallback?.(61, 'simulation', 'Testing form interactions...');
         await this.performFormInteractions();
       }
 
       // Phase 5: Final network settlement
+      this.progressCallback?.(64, 'simulation', 'Finalizing network activity...');
       await this.finalNetworkSettlement();
 
       logger.info(

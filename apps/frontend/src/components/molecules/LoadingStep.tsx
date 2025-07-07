@@ -56,7 +56,7 @@ const LoadingStep: React.FC<ExtendedLoadingStepProps> = ({
         <div
           className={cn(
             'font-medium transition-all duration-300',
-            isActive || isCompleted ? '' : 'opacity-50'
+            isActive || isCompleted ? 'text-text-primary' : 'text-text-secondary opacity-60'
           )}
         >
           {title}
@@ -64,7 +64,7 @@ const LoadingStep: React.FC<ExtendedLoadingStepProps> = ({
         <div
           className={cn(
             'text-sm transition-all duration-300 text-text-secondary transform',
-            isActive || isCompleted ? '' : 'opacity-50'
+            isActive || isCompleted ? 'opacity-100' : 'opacity-50'
           )}
         >
           {description}
