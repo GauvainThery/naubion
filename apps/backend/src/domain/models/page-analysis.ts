@@ -2,6 +2,7 @@
  * Page analysis domain model - Core analysis concepts and value objects
  */
 
+import { BotDetectionResult } from './bot-detection';
 import { GreenHostingResult } from './green-hosting';
 import { HumanReadableImpactResult } from './human-readable-impact';
 import { ResourceCollection } from './resource';
@@ -27,6 +28,7 @@ export interface PageAnalysisResult {
   greenHosting: GreenHostingResult;
   gCo2e: number;
   humanReadableImpact: HumanReadableImpactResult;
+  botDetection?: BotDetectionResult;
   metadata: {
     pageTitle?: string;
     hasFrames: boolean;

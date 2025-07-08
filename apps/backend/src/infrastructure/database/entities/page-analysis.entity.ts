@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn
 } from 'typeorm';
+import { BotDetectionResult } from '../../../domain/models/bot-detection.js';
 import { PageAnalysisOptions, PageAnalysisResult } from '../../../domain/models/page-analysis.js';
 import { GreenHostingResult } from '../../../domain/models/green-hosting.js';
 import { HumanReadableImpactResult } from '../../../domain/models/human-readable-impact.js';
@@ -55,6 +56,9 @@ export class PageAnalysisEntity {
   @Column({ name: 'human_readable_impact', type: 'jsonb' })
   humanReadableImpact!: HumanReadableImpactResult;
 
+  @Column({ name: 'bot_detection', type: 'jsonb', nullable: true })
+  botDetection?: BotDetectionResult;
+
   @Column({ type: 'jsonb', nullable: true })
   metadata?: {
     pageTitle?: string;
@@ -86,6 +90,7 @@ export class PageAnalysisEntity {
       greenHosting: this.greenHosting,
       gCo2e: this.gCo2e,
       humanReadableImpact: this.humanReadableImpact,
+      botDetection: this.botDetection,
       metadata: this.metadata || {
         hasFrames: false,
         hasServiceWorker: false,
@@ -112,6 +117,7 @@ export class PageAnalysisEntity {
     entity.greenHosting = result.greenHosting;
     entity.gCo2e = result.gCo2e;
     entity.humanReadableImpact = result.humanReadableImpact;
+    entity.botDetection = result.botDetection;
     entity.metadata = result.metadata;
 
     // Set explicit expiration date based on TTL

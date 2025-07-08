@@ -13,6 +13,7 @@ import { createUserSimulator } from '../../infrastructure/browser/user-simulator
 import { AnalysisError } from '../../shared/errors.js';
 import logger from '../../shared/logger.js';
 import { AnalysisCacheService } from './analysis-cache-service.js';
+import { BotDetectionService } from './bot-detection-service.js';
 import { Co2eBytesConversionService } from './co2e-bytes-conversion-service.js';
 import { GreenHostingService } from './green-hosting-service.js';
 import { HumanReadableImpactService } from './human-readable-impact-service.js';
@@ -25,6 +26,7 @@ export class PageAnalysisService {
   private co2eBytesConversionService: Co2eBytesConversionService;
   private humanReadableImpactService: HumanReadableImpactService;
   private cacheService: AnalysisCacheService;
+  private botDetectionService: BotDetectionService;
 
   constructor(
     resourceService: ResourceService,
@@ -39,6 +41,7 @@ export class PageAnalysisService {
     this.co2eBytesConversionService = co2eBytesConversionService;
     this.humanReadableImpactService = humanReadableImpactService;
     this.cacheService = new AnalysisCacheService();
+    this.botDetectionService = new BotDetectionService();
   }
 
   /**
@@ -176,6 +179,19 @@ export class PageAnalysisService {
       pageLoadOptimizer.setProgressCallback(updateProgress);
       await pageLoadOptimizer.optimizePageLoad(page, context.url);
 
+      updateProgress(35, 'simulation', 'Checking for bot detection measures...');
+
+      // Phase 3.5: Bot detection analysis
+      const botDetectionResult = await this.botDetectionService.detectBotBlocking(page);
+
+      if (botDetectionResult.detected) {
+        logger.warn('Bot detection measures detected', {
+          url: context.url,
+          confidence: botDetectionResult.confidence,
+          indicators: botDetectionResult.indicators.filter(i => i.found).map(i => i.type)
+        });
+      }
+
       updateProgress(40, 'simulation', 'Starting user behavior simulation...');
 
       // Phase 4: Simulate user behavior
@@ -235,7 +251,8 @@ export class PageAnalysisService {
           ...pageMetadata,
           simulation: simulationResult,
           networkActivity: networkMonitor.getTotalTransferSize()
-        }
+        },
+        botDetectionResult
       );
 
       logger.info(`Analysis completed in ${result.duration}ms for ${url}`, {

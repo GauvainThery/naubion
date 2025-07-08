@@ -12,3 +12,5 @@ export { default as ThumbIcon } from './ThumbIcon';
 export { default as CursorIcon } from './CursorIcon';
 export { default as SearchIcon } from './SearchIcon';
 export { default as InfoIcon } from './InfoIcon';
+export { default as WarningIcon } from './WarningIcon';
+export { default as ErrorIcon } from './ErrorIcon';

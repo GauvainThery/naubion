@@ -66,6 +66,28 @@ export interface PageAnalysisOptions {
   verboseLogging: boolean;
 }
 
+// Bot detection types for frontend display
+export interface BotDetectionResult {
+  detected: boolean;
+  confidence: number; // 0-1 scale
+  indicators: BotDetectionIndicator[];
+  message?: string;
+}
+
+export interface BotDetectionIndicator {
+  type:
+    | 'captcha'
+    | 'access_denied'
+    | 'challenge_page'
+    | 'suspicious_redirect'
+    | 'rate_limit'
+    | 'cloudflare_challenge'
+    | 'suspicious_content';
+  found: boolean;
+  details?: string;
+  element?: string; // CSS selector or description of detected element
+}
+
 export interface PageAnalysisResult {
   url: string;
   timestamp: string;
@@ -76,6 +98,7 @@ export interface PageAnalysisResult {
   greenHosting: GreenHostingResult;
   gCo2e: number;
   humanReadableImpact: HumanReadableImpactResult;
+  botDetection?: BotDetectionResult; // Optional bot detection results
   metadata: {
     pageTitle?: string;
     hasFrames: boolean;

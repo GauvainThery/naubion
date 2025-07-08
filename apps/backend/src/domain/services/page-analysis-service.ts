@@ -2,6 +2,7 @@
  * Page analysis domain service - Core analysis orchestration logic
  */
 
+import { BotDetectionResult } from '../models/bot-detection.js';
 import { SimulationResult } from '../../infrastructure/browser/user-simulator.js';
 import { GreenHostingResult } from '../models/green-hosting.js';
 import { HumanReadableImpactResult } from '../models/human-readable-impact.js';
@@ -63,7 +64,8 @@ export class PageAnalysisDomainService {
       pageSize?: { width: number; height: number };
       simulation?: SimulationResult;
       networkActivity?: number;
-    }
+    },
+    botDetection: BotDetectionResult
   ): PageAnalysisResult {
     const endTime = new Date();
     const duration = endTime.getTime() - context.startTime.getTime();
@@ -77,6 +79,7 @@ export class PageAnalysisDomainService {
       greenHosting,
       gCo2e,
       humanReadableImpact,
+      botDetection,
       metadata: {
         ...metadata,
         hasFrames: metadata.hasFrames || false,

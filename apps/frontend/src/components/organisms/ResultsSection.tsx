@@ -10,6 +10,7 @@ import {
   ResourceAnalysisSection,
   TryAnotherPageSection
 } from './../';
+import BotDetectionWarning from '../molecules/BotDetectionWarning';
 import {
   processLargestResources,
   roundResourceSize,
@@ -69,6 +70,11 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) =
           interactionLevel={results.options.interactionLevel}
           analysisDate={results.timestamp}
         />
+
+        {/* Bot Detection Warning */}
+        {results.botDetection?.detected && (
+          <BotDetectionWarning botDetection={results.botDetection} />
+        )}
 
         {/* Summary */}
         <ResultsSummary
