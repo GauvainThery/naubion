@@ -1,8 +1,10 @@
 import { AnalysisInitResponse, PageAnalysisResult } from '@naubion/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AnalysisFormData, LoadingStep } from '../types';
 
 const useAnalysis = () => {
+  const { t } = useTranslation('analysis');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [results, setResults] = useState<PageAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -15,48 +17,48 @@ const useAnalysis = () => {
   const steps: LoadingStep[] = [
     {
       id: 'step1',
-      title: 'Cache Check',
-      description: 'Checking if url analysis has already been performed recently'
+      title: t('loading.steps.step1.title'),
+      description: t('loading.steps.step1.description')
     },
     {
       id: 'step2',
-      title: 'Setup',
-      description: 'Setting up browser environment and tools'
+      title: t('loading.steps.step2.title'),
+      description: t('loading.steps.step2.description')
     },
     {
       id: 'step3',
-      title: 'Navigation',
-      description: 'Navigating to target website and loading resources'
+      title: t('loading.steps.step3.title'),
+      description: t('loading.steps.step3.description')
     },
     {
       id: 'step4',
-      title: 'Simulation',
-      description: 'Simulating realistic user interactions and behavior'
+      title: t('loading.steps.step4.title'),
+      description: t('loading.steps.step4.description')
     },
     {
       id: 'step5',
-      title: 'Processing',
-      description: 'Processing and categorizing collected resources'
+      title: t('loading.steps.step5.title'),
+      description: t('loading.steps.step5.description')
     },
     {
       id: 'step6',
-      title: 'Green Hosting',
-      description: 'Assessing hosting provider environmental impact'
+      title: t('loading.steps.step6.title'),
+      description: t('loading.steps.step6.description')
     },
     {
       id: 'step7',
-      title: 'CO₂e Conversion',
-      description: 'Converting resource data to carbon emissions'
+      title: t('loading.steps.step7.title'),
+      description: t('loading.steps.step7.description')
     },
     {
       id: 'step8',
-      title: 'Impact Analysis',
-      description: 'Creating human-readable environmental impact report'
+      title: t('loading.steps.step8.title'),
+      description: t('loading.steps.step8.description')
     },
     {
       id: 'step9',
-      title: 'Complete',
-      description: 'Finalizing and caching analysis results'
+      title: t('loading.steps.step9.title'),
+      description: t('loading.steps.step9.description')
     }
   ];
 

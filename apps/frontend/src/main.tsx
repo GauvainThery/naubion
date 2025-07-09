@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/index.css';
+import './i18n'; // Initialize i18n
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { page } from '@naubion/shared';
 import PageCarbonFootprint from './views/PageCarbonFootprint';

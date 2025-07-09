@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/classnames';
 
 type TextInputWithSubmitProps = {
@@ -18,8 +19,8 @@ type TextInputWithSubmitProps = {
 };
 
 const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
-  placeholder = 'Enter text...',
-  buttonText = 'Submit',
+  placeholder,
+  buttonText,
   onSubmit,
   disabled = false,
   loading = false,
@@ -30,12 +31,18 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
   required = false,
   error = null,
   success = false,
-  successMessage = 'Success!'
+  successMessage
 }) => {
+  const { t } = useTranslation('common');
   const [internalValue, setInternalValue] = useState('');
 
   // Use controlled value if provided, otherwise use internal state
   const value = controlledValue !== undefined ? controlledValue : internalValue;
+
+  // Use translation defaults if not provided
+  const defaultPlaceholder = placeholder ?? t('forms.placeholders.enterText');
+  const defaultButtonText = buttonText ?? t('buttons.submit');
+  const defaultSuccessMessage = successMessage ?? t('messages.success');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -63,7 +70,7 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
             type={type}
             value={value}
             onChange={handleInputChange}
-            placeholder={placeholder}
+            placeholder={defaultPlaceholder}
             disabled={disabled || success}
             required={required}
             className="flex-1 px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400 text-gray-900 rounded-l-full disabled:opacity-50"
@@ -94,13 +101,15 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
               </svg>
             )}
             <span className={loading ? 'opacity-70' : ''}>
-              {success ? 'Subscribed!' : buttonText}
+              {success ? t('newsletter.subscribed') : defaultButtonText}
             </span>
           </button>
         </div>
       </form>
 
-      {success && <div className="mt-2 text-sm text-primary text-center">{successMessage}</div>}
+      {success && (
+        <div className="mt-2 text-sm text-primary text-center">{defaultSuccessMessage}</div>
+      )}
 
       {error && <div className="mt-2 text-sm text-utils-700 text-center">{error}</div>}
     </div>

@@ -40,6 +40,7 @@ export { default as KeyboardDeck } from './molecules/Laptop/KeyboardDeck';
 export { default as LoginForm } from './molecules/LoginForm';
 export { default as CacheStats } from './molecules/CacheStats';
 export { default as AdminActions } from './molecules/AdminActions';
+export { default as LanguageSwitcher } from './molecules/LanguageSwitcher';
 
 // Organisms
 export { default as Header } from './organisms/Header';

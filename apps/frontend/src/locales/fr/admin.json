@@ -1,0 +1,48 @@
+{
+  "title": "Tableau de bord Admin",
+  "subtitle": "Gérer le cache et les opérations système",
+  "logout": "Déconnexion",
+  "sections": {
+    "cacheStatistics": "Statistiques du cache",
+    "actions": "Actions"
+  },
+  "stats": {
+    "totalAnalyses": "Total des analyses",
+    "avgCarbonFootprint": "Empreinte carbone moyenne",
+    "cacheHitRate": "Taux de réussite du cache",
+    "uniqueUrls": "URLs uniques",
+    "ttlHours": "TTL (Heures)",
+    "cacheStatus": "Statut du cache",
+    "enabled": "Activé",
+    "disabled": "Désactivé"
+  },
+  "actions": {
+    "fullCleanup": {
+      "label": "Nettoyage complet",
+      "description": "Exécuter un nettoyage complet du cache (entrées expirées + anciennes)"
+    },
+    "expiredCleanup": {
+      "label": "Nettoyage des expirés",
+      "description": "Supprimer uniquement les entrées expirées explicitement"
+    },
+    "oldCleanup": {
+      "label": "Nettoyage des anciens",
+      "description": "Supprimer les entrées du cache de plus de 30 jours"
+    },
+    "refreshStats": {
+      "label": "Actualiser les stats",
+      "description": "Mettre à jour l'affichage des statistiques du cache"
+    }
+  },
+  "messages": {
+    "statisticsRefreshed": "Statistiques actualisées avec succès",
+    "actionCompleted": "Action terminée avec succès",
+    "actionFailed": "Échec de l'action",
+    "unknownAction": "Action inconnue"
+  },
+  "login": {
+    "title": "Connexion Admin",
+    "subtitle": "Entrez votre mot de passe administrateur pour continuer",
+    "passwordPlaceholder": "Entrez le mot de passe administrateur"
+  }
+}

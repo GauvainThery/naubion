@@ -1,0 +1,26 @@
+{
+  "title": "Implementation in a heartbeat, impact forever",
+  "subtitle": "naubion is designed to be integrated seamlessly into your existing infrastructure and to help you reduce your application's carbon footprint with minimal effort.",
+  "cards": {
+    "easyImplementation": {
+      "title": "Easy implementation",
+      "description": "Simply add a snippet of code in both the frontend and the backend of your application"
+    },
+    "monitoring": {
+      "title": "Monitor your app",
+      "description": "Access an insightful dashboard with live and accurate data about your app environmental footprint"
+    },
+    "reduce": {
+      "title": "Reduce your footprint",
+      "description": "Reduce the carbon footprint of your application by understanding better your usage and the impact of your code"
+    },
+    "report": {
+      "title": "Report on your impact",
+      "description": "Report on your application's environmental footprint to legal instances"
+    },
+    "communicate": {
+      "title": "Communicate to your users",
+      "description": "Communicate transparently on your footprint and your actions to reduce it"
+    }
+  }
+}

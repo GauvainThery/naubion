@@ -49,3 +49,6 @@ export { page, Page } from './page';
 
 // API types for frontend-backend communication
 export * from './api-types';
+
+// Internationalization types
+export * from './i18n-types';

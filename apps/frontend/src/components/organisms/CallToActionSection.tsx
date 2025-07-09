@@ -1,20 +1,16 @@
 import { TextInputWithSubmit } from '../';
 import { useNewsletter } from '../../hooks/useNewsletter';
+import { useTranslation } from 'react-i18next';
 import { cn } from './../../utils/classnames';
 
 type CallToActionSectionProps = {
   className?: string;
-  subtitle?: string;
+  subtitle: string;
 };
 
-const DEFAULT_SUBTITLE =
-  "naubion is not yet available, but you can already start reducing your web application's carbon footprint. Join our community to stay updated on our progress and be the first to know when we launch.";
-
-const CallToActionSection = ({
-  className,
-  subtitle = DEFAULT_SUBTITLE
-}: CallToActionSectionProps) => {
+const CallToActionSection = ({ className, subtitle }: CallToActionSectionProps) => {
   const { subscribe, isLoading, error, success } = useNewsletter();
+  const { t } = useTranslation('cta');
 
   const handleEmailSubmit = async (email: string) => {
     await subscribe(email);
@@ -26,7 +22,7 @@ const CallToActionSection = ({
       <div className="container flex flex-col gap-18 relative z-10">
         <div className="w-full flex justify-center items-center">
           <div className="flex flex-col gap-3 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold">Join the fight for a greener web</h2>
+            <h2 className="text-2xl font-bold">{t('title')}</h2>
             <p className="text-text-secondary">{subtitle}</p>
           </div>
         </div>
@@ -34,13 +30,13 @@ const CallToActionSection = ({
           <TextInputWithSubmit
             type="email"
             className="w-auto min-w-[330px]"
-            placeholder="Enter your email..."
-            buttonText="Join!"
+            placeholder={t('hero:emailPlaceholder')}
+            buttonText={t('button')}
             onSubmit={handleEmailSubmit}
             loading={isLoading}
             error={error}
             success={success}
-            successMessage="Thank you and welcome!"
+            successMessage={t('hero:successMessage')}
             required
           />
         </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AnalysisFormData } from '../../types';
 import Button from '../atoms/Button';
 import Card from '../atoms/Card';
@@ -20,6 +21,7 @@ const DEFAULT_FORM_DATA: AnalysisFormData = {
 };
 
 const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, className }) => {
+  const { t } = useTranslation('analysis');
   const [formData, setFormData] = useState<AnalysisFormData>(DEFAULT_FORM_DATA);
 
   // Check for URL parameters on mount and populate form
@@ -80,20 +82,20 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
     {
       value: 'minimal',
       id: 'interactionMinimal',
-      title: 'Minimal',
-      description: 'Basic scrolling and reading'
+      title: t('form.interactionLevel.minimal.title'),
+      description: t('form.interactionLevel.minimal.description')
     },
     {
       value: 'default',
       id: 'interactionDefault',
-      title: 'Normal',
-      description: 'Scrolling, hover effects, and basic interactions'
+      title: t('form.interactionLevel.default.title'),
+      description: t('form.interactionLevel.default.description')
     },
     {
       value: 'thorough',
       id: 'interactionThorough',
-      title: 'Thorough',
-      description: 'Full interaction with most of the elements'
+      title: t('form.interactionLevel.thorough.title'),
+      description: t('form.interactionLevel.thorough.description')
     }
   ];
 
@@ -101,14 +103,14 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
     {
       value: 'desktop',
       id: 'deviceDesktop',
-      title: 'Desktop',
-      description: '1920x1080 with mouse interactions'
+      title: t('form.deviceType.desktop.title'),
+      description: t('form.deviceType.desktop.description')
     },
     {
       value: 'mobile',
       id: 'deviceMobile',
-      title: 'Mobile',
-      description: '375x667 with touch interactions'
+      title: t('form.deviceType.mobile.title'),
+      description: t('form.deviceType.mobile.description')
     }
   ];
 
@@ -129,33 +131,28 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
     <section className={cn('container', className)}>
       <Card className="p-12 flex flex-col gap-8">
         <div className="flex flex-col gap-1">
-          <h2 className="text-2xl font-bold">Web Page Environnemental Footprint</h2>
-          <p className="text-text-secondary lg:w-7/8">
-            While waiting for the official launch of naubion, you can already measure the
-            environmental impact of your web pages. Enter the URL of a page you want to analyze, and
-            we will provide you with an estimate of its carbon footprint based on the resources it
-            loads and the interactions it requires.
-          </p>
+          <h2 className="text-2xl font-bold">{t('title')}</h2>
+          <p className="text-text-secondary lg:w-7/8">{t('subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-12">
           <div className="flex gap-3 w-full items-center">
             <Input
               type="url"
-              placeholder="https://example.com"
+              placeholder={t('form.urlPlaceholder')}
               value={formData.url}
               onChange={e => handleInputChange('url', e.target.value)}
               required
               icon={<SearchIcon />}
             />
             <Button type="button" variant="secondary" onClick={handleClear} disabled={isLoading}>
-              Clear
+              {t('form.clearButton')}
             </Button>
           </div>
 
           <div className="flex flex-col lg:flex-row w-full gap-8">
             <div className="w-full flex flex-col gap-3">
-              <label className="block text-sm font-bold">Visitor Interaction Level</label>
+              <label className="block text-sm font-bold">{t('form.interactionLevel.label')}</label>
               <RadioGroup
                 options={interactionLevelOptions}
                 name="interactionLevel"
@@ -164,7 +161,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
               />
             </div>
             <div className="w-full flex flex-col gap-3">
-              <label className="block text-sm font-bold">Device Type</label>
+              <label className="block text-sm font-bold">{t('form.deviceType.label')}</label>
               <RadioGroup
                 options={deviceTypeOptions}
                 name="deviceType"
@@ -176,7 +173,7 @@ const AnalysisForm: React.FC<AnalysisFormProps> = ({ onSubmit, isLoading, classN
 
           <div className="flex justify-center w-full">
             <Button type="submit" loading={isLoading} disabled={!formData.url || isLoading}>
-              Analyze the page
+              {t('form.analyzeButton')}
             </Button>
           </div>
         </form>

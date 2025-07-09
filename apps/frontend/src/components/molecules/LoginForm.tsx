@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/classnames';
 import Button from '../atoms/Button';
 import Input from '../atoms/Input';
@@ -16,6 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   loading = false,
   className = ''
 }) => {
+  const { t } = useTranslation('admin');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,15 +30,15 @@ const LoginForm: React.FC<LoginFormProps> = ({
   return (
     <div className={cn('max-w-md mx-auto flex flex-col gap-6', className)}>
       <div className="text-center flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Admin Login</h1>
-        <p className="text-text-secondary">Enter your admin password to continue</p>
+        <h1 className="text-3xl font-bold">{t('login.title')}</h1>
+        <p className="text-text-secondary">{t('login.subtitle')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div>
           <Input
             type="password"
-            placeholder="Enter admin password"
+            placeholder={t('login.passwordPlaceholder')}
             value={password}
             onChange={e => setPassword(e.target.value)}
             required

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   ResourceList,
@@ -27,6 +28,7 @@ type ResultsSectionProps = {
 };
 
 const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) => {
+  const { t } = useTranslation('analysis');
   // State for visits multiplier (continuous range)
   const [visitsCount, setVisitsCount] = React.useState(3000); // Default to 3000 visits per month
 
@@ -52,12 +54,42 @@ const ResultsSection: React.FC<ResultsSectionProps> = ({ results, className }) =
   const largestResources = processLargestResources(results.resources.resources);
 
   const resourceTypes = [
-    { type: 'html', label: 'HTML Documents', color: 'html' as const, indicator: 'bg-blue-500' },
-    { type: 'css', label: 'Stylesheets', color: 'css' as const, indicator: 'bg-purple-500' },
-    { type: 'js', label: 'JavaScript', color: 'js' as const, indicator: 'bg-yellow-500' },
-    { type: 'media', label: 'Images & Media', color: 'media' as const, indicator: 'bg-green-500' },
-    { type: 'font', label: 'Web Fonts', color: 'font' as const, indicator: 'bg-pink-500' },
-    { type: 'other', label: 'Other Resources', color: 'other' as const, indicator: 'bg-gray-500' }
+    {
+      type: 'html',
+      label: t('results.resourceTypes.html'),
+      color: 'html' as const,
+      indicator: 'bg-blue-500'
+    },
+    {
+      type: 'css',
+      label: t('results.resourceTypes.css'),
+      color: 'css' as const,
+      indicator: 'bg-purple-500'
+    },
+    {
+      type: 'js',
+      label: t('results.resourceTypes.js'),
+      color: 'js' as const,
+      indicator: 'bg-yellow-500'
+    },
+    {
+      type: 'media',
+      label: t('results.resourceTypes.media'),
+      color: 'media' as const,
+      indicator: 'bg-green-500'
+    },
+    {
+      type: 'font',
+      label: t('results.resourceTypes.font'),
+      color: 'font' as const,
+      indicator: 'bg-pink-500'
+    },
+    {
+      type: 'other',
+      label: t('results.resourceTypes.other'),
+      color: 'other' as const,
+      indicator: 'bg-gray-500'
+    }
   ];
 
   return (

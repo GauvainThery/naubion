@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MetricCard, Slider, EarthIcon, CarIcon } from '../';
 
 type EnvironmentalImpactSectionProps = {
@@ -20,37 +21,37 @@ const EnvironmentalImpactSection: React.FC<EnvironmentalImpactSectionProps> = ({
   carbonEmission,
   carEquivalent
 }) => {
+  const { t } = useTranslation('analysis');
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <h4 className="text-lg font-semibold text-center lg:text-left">
-          Monthly Environmental Impact
+          {t('results.sections.environmentalImpact.title')}
         </h4>
         <p className="text-text-secondary lg:w-7/8">
-          Adjust the monthly visits count to see how it affects the carbon emissions and the
-          equivalent distance driven by a gasoline car. This will help you understand the
-          environmental impact of your page based on its traffic.
+          {t('results.sections.environmentalImpact.description')}
         </p>
       </div>
       <Slider
         value={visitsCount}
         onChange={onVisitsChange}
-        label="Monthly Visits On This Page"
-        description="Adjust the carbon footprint calculation based on your page's monthly visits count"
+        label={t('results.sections.environmentalImpact.monthlyVisitsLabel')}
+        description={t('results.sections.environmentalImpact.monthlyVisitsDescription')}
       />
       <div className="flex flex-col lg:flex-row gap-4 justify-between">
         <MetricCard
           icon={<EarthIcon />}
           value={carbonEmission.value}
           unit={carbonEmission.unit}
-          label="Total Carbon Emissions"
+          label={t('results.sections.environmentalImpact.totalCarbonEmissions')}
           isPrimary
         />
         <MetricCard
           icon={<CarIcon />}
           value={carEquivalent.value}
           unit={carEquivalent.unit}
-          label="Equivalent Distance by Gasoline Car"
+          label={t('results.sections.environmentalImpact.equivalentDistance')}
         />
       </div>
     </div>

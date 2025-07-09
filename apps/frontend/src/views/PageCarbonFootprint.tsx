@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import AnalysisForm from '../components/organisms/AnalysisFormSection';
 import LoadingSection from '../components/organisms/LoadingSection';
 import ResultsSection from '../components/organisms/ResultsSection';
@@ -8,6 +9,7 @@ import type { AnalysisFormData } from '../types';
 import { CallToActionSection, MethodologySection, FAQSection, ErrorAlert } from './../components';
 
 const PageCarbonFootprint: React.FC = () => {
+  const { t } = useTranslation('cta');
   const {
     isLoading,
     results,
@@ -19,8 +21,6 @@ const PageCarbonFootprint: React.FC = () => {
     estimatedDuration,
     startAnalysis
   } = useAnalysis();
-  console.log('🔥 ・ progress:', progress);
-  console.log('🔥 ・ results:', results);
 
   // Check for URL parameters on mount and create form data
   const getFormDataFromUrlParams = (): AnalysisFormData | null => {
@@ -89,7 +89,7 @@ const PageCarbonFootprint: React.FC = () => {
       {/* FAQ Section */}
       <FAQSection className="pt-12" />
 
-      <CallToActionSection subtitle="This tool gives you a first insight on the environnemental impact of a web page but it's not naubion. Join our waitlist to be the first to know when naubion is live!" />
+      <CallToActionSection subtitle={t('analysisPageSubtitle')} />
     </MainLayout>
   );
 };

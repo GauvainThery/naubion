@@ -1,0 +1,34 @@
+{
+  "tagline": "Control the environmental impact of your application",
+  "nav": {
+    "home": "Home",
+    "analysis": "Analysis",
+    "admin": "Admin",
+    "analyzePage": "Estimate your web page carbon footprint"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "join": "Join!",
+    "analyze": "Analyze",
+    "back": "Back",
+    "loading": "Loading..."
+  },
+  "messages": {
+    "success": "Success!",
+    "error": "An error occurred",
+    "required": "This field is required"
+  },
+  "forms": {
+    "placeholders": {
+      "enterText": "Enter text...",
+      "emailAddress": "Email address"
+    }
+  },
+  "newsletter": {
+    "subscribed": "Subscribed!",
+    "joinWaitlist": "Join the waitlist"
+  },
+  "footer": {
+    "madeSustainably": "Made <0>(</0>sustainably<1>)</1> with <2>♥</2> in Lille."
+  }
+}

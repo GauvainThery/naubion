@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { LoadingStep as LoadingStepType } from '../../types';
 import Card from '../atoms/Card';
 import LoadingStep from '../molecules/LoadingStep';
@@ -22,6 +23,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   estimatedDuration = 0,
   className
 }) => {
+  const { t } = useTranslation('analysis');
   const [smoothProgress, setSmoothProgress] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
 
@@ -120,19 +122,19 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   return (
     <section className={cn('container', className)}>
       <Card className="p-12 flex flex-col gap-12">
-        <h3 className="text-2xl font-bold">Analyzing your page...</h3>
+        <h3 className="text-2xl font-bold">{t('loading.title')}</h3>
 
         {smoothProgress > 0 && (
           <div className="flex flex-col gap-3">
             <div className="flex justify-between items-center">
-              <span className="font-bold">Analysis Progress</span>
+              <span className="font-bold">{t('loading.progress')}</span>
               <div className="flex items-center space-x-3">
                 <span className="font-bold transition-all duration-300 transform text-lg">
                   {Math.round(smoothProgress)}%
                 </span>
                 {remainingSeconds > 0 && smoothProgress < 100 && (
                   <span className="text-sm text-text-secondary px-2 py-1 bg-gray-100 rounded-full">
-                    ~{formatTime(remainingSeconds)} remaining
+                    ~{formatTime(remainingSeconds)} {t('loading.remaining')}
                   </span>
                 )}
               </div>

@@ -1,0 +1,240 @@
+{
+  "title": "Empreinte environnementale d'une page web",
+  "subtitle": "En attendant le lancement officiel de naubion, vous pouvez déjà mesurer l'impact environnemental de vos pages web. Entrez l'URL d'une page que vous souhaitez analyser, et nous vous fournirons une estimation de son empreinte carbone basée sur les ressources qu'elle charge et les interactions qu'elle nécessite.",
+  "form": {
+    "urlPlaceholder": "https://exemple.com",
+    "clearButton": "Effacer",
+    "analyzeButton": "Analyser la page",
+    "interactionLevel": {
+      "label": "Niveau d'Interaction du Visiteur",
+      "minimal": {
+        "title": "Minimal",
+        "description": "Défilement de base et lecture"
+      },
+      "default": {
+        "title": "Normal",
+        "description": "Défilement, effets de survol et interactions de base"
+      },
+      "thorough": {
+        "title": "Approfondi",
+        "description": "Interaction complète avec la plupart des éléments"
+      }
+    },
+    "deviceType": {
+      "label": "Type d'Appareil",
+      "desktop": {
+        "title": "Ordinateur",
+        "description": "1920x1080 avec interactions souris"
+      },
+      "mobile": {
+        "title": "Mobile",
+        "description": "375x667 avec interactions tactiles"
+      }
+    }
+  },
+  "loading": {
+    "title": "Analyse de votre page en cours...",
+    "progress": "Progression de l'Analyse",
+    "remaining": "restant",
+    "steps": {
+      "step1": {
+        "title": "Vérification du cache",
+        "description": "Vérification si l'analyse de l'URL a déjà été effectuée récemment"
+      },
+      "step2": {
+        "title": "Configuration",
+        "description": "Configuration de l'environnement de navigateur et des outils"
+      },
+      "step3": {
+        "title": "Navigation",
+        "description": "Navigation vers le site web cible et chargement des ressources"
+      },
+      "step4": {
+        "title": "Simulation",
+        "description": "Simulation d'interactions utilisateur réalistes et de comportement"
+      },
+      "step5": {
+        "title": "Traitement",
+        "description": "Traitement et catégorisation des ressources collectées"
+      },
+      "step6": {
+        "title": "Hébergement vert",
+        "description": "Évaluation de l'impact environnemental du fournisseur d'hébergement"
+      },
+      "step7": {
+        "title": "Conversion CO₂e",
+        "description": "Conversion des données de ressources en émissions de carbone"
+      },
+      "step8": {
+        "title": "Analyse d'impact",
+        "description": "Création d'un rapport d'impact environnemental lisible par l'homme"
+      },
+      "step9": {
+        "title": "Terminé",
+        "description": "Finalisation et mise en cache des résultats d'analyse"
+      }
+    }
+  },
+  "results": {
+    "error": "Échec de l'analyse du site web. Veuillez réessayer.",
+    "carbonFootprint": "Empreinte carbone",
+    "transferSize": "Taille de transfert",
+    "resources": "Ressources",
+    "greenHosting": "Hébergement vert",
+    "recommendations": "Recommandations",
+    "summary": {
+      "pageText": "La page",
+      "isGreenHosted": "est",
+      "isNotGreenHosted": "n'est potentiellement pas",
+      "greenHostedText": "hébergée de manière verte et pèse un total de",
+      "visitsText": "visites sur cette page par mois émettraient un total de",
+      "equivalentText": ", l'équivalent de conduire",
+      "carText": "en voiture à essence."
+    },
+    "resourceTypes": {
+      "html": "Documents HTML",
+      "css": "Feuilles de style",
+      "js": "JavaScript",
+      "media": "Images et médias",
+      "font": "Polices web",
+      "other": "Autres ressources"
+    },
+    "sections": {
+      "resourceAnalysis": {
+        "title": "Analyse par type de ressource",
+        "description": "Une répartition des ressources chargées par la page, catégorisées par type. Cette analyse aide à identifier quels types de ressources contribuent le plus à la taille totale de transfert de la page et peut guider les efforts d'optimisation."
+      },
+      "keyFacts": {
+        "title": "Indicateurs clés",
+        "description": "Indicateurs et métriques clés sur la page que vous venez d'analyser. Ceux-ci vous aideront à comprendre le poids des ressources chargées, l'impact environnemental de la page et de son hébergement.",
+        "totalPageWeight": "Poids total de la page",
+        "totalResources": "Total des ressources",
+        "greenHosted": "Hébergement vert",
+        "notGreenHosted": "Potentiellement pas d'hébergement vert",
+        "greenHostedDescription": "Cette page est hébergée par {{provider}} en utilisant des énergies renouvelables",
+        "greenHostedDescriptionGeneric": "Cette page est hébergée par un fournisseur vert utilisant des énergies renouvelables",
+        "notGreenHostedDescription": "Pas assez d'informations pour déterminer si le fournisseur d'hébergement est vert"
+      },
+      "environmentalImpact": {
+        "title": "Impact environnemental",
+        "description": "Ajustez le nombre de visites mensuelles pour voir comment cela affecte les émissions de carbone et la distance équivalente parcourue par une voiture à essence. Cela vous aidera à comprendre l'impact environnemental de votre page en fonction de son trafic.",
+        "monthlyVisitsLabel": "Visites mensuelles sur cette page",
+        "monthlyVisitsDescription": "Ajustez le calcul de l'empreinte carbone en fonction du nombre de visites mensuelles de votre page",
+        "totalCarbonEmissions": "Total des émissions de carbone",
+        "equivalentDistance": "Distance équivalente en voiture à essence"
+      },
+      "resourceList": {
+        "title": "Plus grosses ressources",
+        "description": "Les plus grosses ressources chargées par la page. Ces ressources peuvent considérablement impacter la performance et le temps de chargement de la page. Considérez les optimiser ou réduire leur taille pour améliorer l'expérience utilisateur."
+      },
+      "botDetection": {
+        "title": "Avertissement de détection de bot",
+        "confidenceLevel": "Niveau de confiance",
+        "fallbackMessage": "Des mesures de détection de bot ont été détectées sur cette page.",
+        "viewDetails": "Voir les détails de détection",
+        "indicator": "indicateur",
+        "indicators": "indicateurs",
+        "impactLabel": "Impact :",
+        "impactDescription": "L'analyse de l'empreinte carbone a quand même été effectuée, mais elle peut ne pas représenter fidèlement l'expérience utilisateur réelle pour ce site web.",
+        "warnings": {
+          "captcha": "Cette page affichait un CAPTCHA ou un défi de vérification humaine. Les résultats d'analyse peuvent ne pas refléter le contenu réel de la page.",
+          "cloudflareChallenge": "Cette page montrait un défi de sécurité Cloudflare. Les résultats d'analyse peuvent ne pas refléter le contenu réel de la page.",
+          "accessDenied": "Cette page montrait un message d'accès refusé ou interdit. Les résultats d'analyse peuvent ne pas refléter le contenu réel de la page.",
+          "rateLimit": "Cette page affichait un message de limitation de débit. Les résultats d'analyse peuvent ne pas refléter le contenu réel de la page.",
+          "general": "Cette page montrait un contenu potentiel de détection de bot. Les résultats d'analyse peuvent ne pas refléter avec précision l'expérience réelle de la page."
+        }
+      }
+    },
+    "tryAnotherPage": "Essayer sur une autre page",
+    "optionsDisplay": {
+      "deviceType": "Type d'appareil",
+      "interactionLevel": "Niveau d'interaction"
+    },
+    "resultsHeader": {
+      "lastAnalysisDate": "Date de la dernière analyse :",
+      "carbonFootprintFor": "Empreinte carbone pour :",
+      "cacheTooltip": "Cette date reflète quand l'analyse a été mise en cache. Les résultats sont réutilisés depuis le cache quand disponibles pour améliorer les performances et réduire l'impact environnemental."
+    },
+    "resourceBreakdown": {
+      "average": "Moy :",
+      "files": "fichiers"
+    },
+    "slider": {
+      "currentEstimate": "Estimation actuelle :",
+      "visit": "visite",
+      "visits": "visites",
+      "perMonth": "/mois"
+    }
+  },
+  "errorAlert": {
+    "title": "Erreur d'Analyse"
+  },
+  "methodology": {
+    "title": "Notre Méthodologie",
+    "subtitle": "Notre analyse d'empreinte carbone suit des méthodologies standards de l'industrie et utilise des outils open-source de confiance pour fournir des évaluations précises de l'impact environnemental des pages web.",
+    "steps": {
+      "resourceCollection": {
+        "title": "Collecte et Analyse des Ressources",
+        "description": "Nous simulons les interactions utilisateur sur votre page web en utilisant une véritable automatisation de navigateur (Puppeteer) pour capturer toutes les ressources réseau incluant HTML, CSS, JavaScript, images, polices et fichiers média. Notre système mesure la taille de transfert réelle de chaque ressource, fournissant des données précises sur ce que les utilisateurs téléchargent lors de la visite de votre page."
+      },
+      "interactionSimulation": {
+        "title": "Simulation d'Interaction",
+        "description": "Notre analyse inclut différents niveaux d'interaction (minimal, défaut, approfondi) pour simuler un comportement utilisateur réel comme le défilement, les clics et le chargement de contenu dynamique. Cela nous assure de capturer l'impact environnemental complet de votre page, pas seulement le chargement initial."
+      },
+      "greenHostingAssessment": {
+        "title": "Évaluation de l'Hébergement Vert",
+        "description": "Nous vérifions si votre site web est hébergé sur des serveurs verts alimentés par des énergies renouvelables en utilisant la base de données de The Green Web Foundation. Cette évaluation impacte le calcul de l'empreinte carbone, car les sites hébergés de manière verte ont des émissions significativement plus faibles par octet transféré."
+      },
+      "co2eCalculation": {
+        "title": "Calcul des Émissions CO₂e",
+        "description": "En utilisant la bibliothèque CO2.js de The Green Web Foundation avec le modèle Sustainable Web Design (SWD) v4, nous convertissons le transfert total de données en grammes d'émissions équivalent CO₂. Cette méthodologie standard de l'industrie prend en compte l'usage énergétique des appareils, l'infrastructure réseau et les opérations des centres de données."
+      },
+      "realWorldImpact": {
+        "title": "Traduction d'Impact du Monde Réel",
+        "description": "Nous convertissons les chiffres abstraits de CO₂e en équivalents tangibles comme les kilomètres parcourus par une voiture à essence (en utilisant le facteur d'émission standard de 200 gCO₂e/km). Cela vous aide à comprendre l'impact environnemental réel de votre page web en termes quotidiens."
+      }
+    }
+  },
+  "faq": {
+    "title": "Questions Fréquemment Posées",
+    "subtitle": "Obtenez des réponses aux questions courantes sur notre méthodologie d'analyse d'empreinte carbone et les résultats.",
+    "items": {
+      "isThisNaubion": {
+        "question": "Cet outil est-il naubion ou juste une démo ?",
+        "answer": "Cet outil est un aperçu des capacités de naubion, démontrant notre engagement envers la durabilité et la transparence dans le développement web. Bien qu'il fournisse des insights précieux sur l'empreinte carbone de votre site web, la plateforme naubion complète offrira des fonctionnalités encore plus avancées et des intégrations pour vous aider à construire des applications plus vertes."
+      },
+      "accuracy": {
+        "question": "À quel point les calculs d'empreinte carbone sont-ils précis ?",
+        "answer": "Nos calculs utilisent la bibliothèque CO2.js de The Green Web Foundation avec le modèle Sustainable Web Design (SWD) v4, qui est une méthodologie standard de l'industrie. Les résultats fournissent des estimations scientifiquement étayées basées sur le transfert de données réel et l'infrastructure d'hébergement. Bien que les estimations puissent varier de ±20% selon les conditions du monde réel, elles vous donnent une base fiable pour comprendre et améliorer l'impact environnemental de votre site web."
+      },
+      "interactionLevels": {
+        "question": "Que change le paramètre de niveau d'interaction ?",
+        "answer": "Les niveaux d'interaction simulent différents comportements utilisateur :\n\n• Minimal : Chargement de page de base avec défilement minimal\n• Défaut : Comportement utilisateur typique incluant défilement modéré et interaction\n• Approfondi : Analyse complète avec défilement étendu et simulation d'interaction\n\nLes niveaux d'interaction plus élevés peuvent révéler des ressources supplémentaires chargées dynamiquement, fournissant une image plus complète de l'impact environnemental total de votre page."
+      },
+      "greenHosting": {
+        "question": "Pourquoi l'hébergement vert est-il important pour les émissions carbone ?",
+        "answer": "L'hébergement vert réduit significativement les émissions carbone car il utilise des sources d'énergie renouvelable (solaire, éolien, hydraulique) au lieu de combustibles fossiles. Les sites web hébergés sur des serveurs verts peuvent avoir 50-70% d'émissions carbone en moins par octet transféré. Nous vérifions votre fournisseur d'hébergement contre la base de données de The Green Web Foundation des fournisseurs d'hébergement vert vérifiés."
+      },
+      "carEquivalent": {
+        "question": "Comment l'équivalent distance voiture est-il calculé ?",
+        "answer": "Nous utilisons le facteur d'émission automobile standard de 200 gCO₂e par kilomètre pour les voitures à essence. Cela signifie qu'1 gramme de CO₂e équivaut à approximativement 5 mètres de conduite. Cette conversion aide à traduire les chiffres carbone abstraits en équivalents tangibles et quotidiens qui sont plus faciles à comprendre et communiquer."
+      },
+      "resourcesIncluded": {
+        "question": "Quelles ressources sont incluses dans l'analyse ?",
+        "answer": "Notre analyse capture toutes les ressources téléchargées lors du chargement de votre page :\n\n• Documents HTML\n• Feuilles de style CSS\n• Fichiers JavaScript\n• Images et fichiers média\n• Polices web\n• Scripts et ressources tiers\n• Appels API et contenu dynamique\n\nNous mesurons la taille de transfert réelle (taille compressée) que les utilisateurs téléchargent, pas la taille de fichier non compressée."
+      },
+      "authentication": {
+        "question": "Puis-je analyser des pages derrière une authentification ou avec des interactions complexes ?",
+        "answer": "Actuellement, notre outil analyse les pages publiquement accessibles sans authentification. Pour les pages nécessitant une connexion ou des flux utilisateur complexes, nous recommandons d'analyser des pages publiques similaires ou les pages d'accueil principales qui représentent l'usage typique des ressources de votre site. Les versions futures pourraient inclure le support pour l'analyse authentifiée."
+      },
+      "desktopVsMobile": {
+        "question": "Quelle est la différence entre l'analyse ordinateur et mobile ?",
+        "answer": "Les analyses ordinateur et mobile simulent différents types d'appareils et tailles d'écran :\n\n• Ordinateur : Viewport 1920x1080, simule l'usage d'ordinateur traditionnel\n• Mobile : Viewport 375x667 avec simulation tactile, représente l'usage smartphone\n\nL'analyse mobile montre souvent des modèles de chargement de ressources différents et peut révéler des optimisations ou problèmes spécifiques au mobile."
+      },
+      "caching": {
+        "question": "L'analyse est-elle exécutée à chaque fois que je soumets une URL ?",
+        "answer": "Non, l'analyse n'est pas exécutée à chaque fois que vous soumettez une URL. Nous mettons en cache les résultats des analyses précédentes et les réutilisons quand la même URL est soumise à nouveau avec les mêmes options. Cela aide à améliorer les performances et réduire l'impact environnemental des analyses répétées."
+      }
+    }
+  }
+}

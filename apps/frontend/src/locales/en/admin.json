@@ -1,0 +1,48 @@
+{
+  "title": "Admin Dashboard",
+  "subtitle": "Manage cache and system operations",
+  "logout": "Logout",
+  "sections": {
+    "cacheStatistics": "Cache Statistics",
+    "actions": "Actions"
+  },
+  "stats": {
+    "totalAnalyses": "Total Analyses",
+    "avgCarbonFootprint": "Avg Carbon Footprint",
+    "cacheHitRate": "Cache Hit Rate",
+    "uniqueUrls": "Unique URLs",
+    "ttlHours": "TTL (Hours)",
+    "cacheStatus": "Cache Status",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "actions": {
+    "fullCleanup": {
+      "label": "Full Cleanup",
+      "description": "Run complete cache cleanup (expired + old entries)"
+    },
+    "expiredCleanup": {
+      "label": "Expired Cleanup",
+      "description": "Remove only explicitly expired cache entries"
+    },
+    "oldCleanup": {
+      "label": "Old Cleanup",
+      "description": "Remove cache entries older than 30 days"
+    },
+    "refreshStats": {
+      "label": "Refresh Stats",
+      "description": "Update cache statistics display"
+    }
+  },
+  "messages": {
+    "statisticsRefreshed": "Statistics refreshed successfully",
+    "actionCompleted": "Action completed successfully",
+    "actionFailed": "Action failed",
+    "unknownAction": "Unknown action"
+  },
+  "login": {
+    "title": "Admin Login",
+    "subtitle": "Enter your admin password to continue",
+    "passwordPlaceholder": "Enter admin password"
+  }
+}

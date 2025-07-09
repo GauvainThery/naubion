@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MetricCard, FactCard, TotalSizeIcon, ResourceCountIcon, ServerIcon } from '../';
 import { GreenHostingResult } from '@naubion/shared';
 
@@ -13,29 +14,42 @@ const KeyFactsSection: React.FC<KeyFactsSectionProps> = ({
   resourceCount,
   greenHosting
 }) => {
+  const { t } = useTranslation('analysis');
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h4 className="text-lg font-semibold text-center lg:text-left">Key Facts And Metrics</h4>
-        <p className="text-text-secondary lg:w-7/8">
-          Key facts and metrics about the page you just analyzed. These will help you understand the
-          weight of the resources loaded, the environmental impact of the page and its hosting.
-        </p>
+        <h4 className="text-lg font-semibold text-center lg:text-left">
+          {t('results.sections.keyFacts.title')}
+        </h4>
+        <p className="text-text-secondary lg:w-7/8">{t('results.sections.keyFacts.description')}</p>
       </div>
       <div className="grid lg:grid-cols-2 grid-cols-1 w-full gap-4">
         <MetricCard
           icon={<TotalSizeIcon />}
           value={totalWeight}
-          label="Total Page Weight"
+          label={t('results.sections.keyFacts.totalPageWeight')}
           isPrimary
         />
-        <MetricCard icon={<ResourceCountIcon />} value={resourceCount} label="Total Resources" />
+        <MetricCard
+          icon={<ResourceCountIcon />}
+          value={resourceCount}
+          label={t('results.sections.keyFacts.totalResources')}
+        />
         <FactCard
-          title={greenHosting.green ? 'Green hosted' : 'Potentially not green hosted'}
+          title={
+            greenHosting.green
+              ? t('results.sections.keyFacts.greenHosted')
+              : t('results.sections.keyFacts.notGreenHosted')
+          }
           label={
             greenHosting.green
-              ? `This page is hosted by ${greenHosting.data?.hosted_by || 'a green provider'} using renewable energy`
-              : 'Not enough information to determine if the hosting provider is green'
+              ? greenHosting.data?.hosted_by
+                ? t('results.sections.keyFacts.greenHostedDescription', {
+                    provider: greenHosting.data.hosted_by
+                  })
+                : t('results.sections.keyFacts.greenHostedDescriptionGeneric')
+              : t('results.sections.keyFacts.notGreenHostedDescription')
           }
           icon={<ServerIcon />}
           isPositive={greenHosting.green}

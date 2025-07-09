@@ -1,4 +1,5 @@
 import { IconCard } from '../';
+import { useTranslation } from 'react-i18next';
 import { cn } from './../../utils/classnames';
 
 type FeatureSectionProps = {
@@ -6,6 +7,8 @@ type FeatureSectionProps = {
 };
 
 const FeatureSection = ({ className }: FeatureSectionProps) => {
+  const { t } = useTranslation('features');
+
   return (
     <section
       className={cn(
@@ -25,43 +28,40 @@ const FeatureSection = ({ className }: FeatureSectionProps) => {
       <div className="container flex flex-col gap-18 lg:gap-24 relative z-10">
         <div className="w-full flex justify-center items-center">
           <div className="flex flex-col gap-3 max-w-2xl text-center">
-            <h2 className="text-2xl font-bold">Implementation in a heartbeat, impact forever</h2>
-            <p className="text-text-secondary-light">
-              naubion is designed to be integrated seamlessly into your existing infrastructure and
-              to help you reduce your application's carbon footprint with minimal effort.
-            </p>
+            <h2 className="text-2xl font-bold">{t('title')}</h2>
+            <p className="text-text-secondary-light">{t('subtitle')}</p>
           </div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-18 lg:gap-24">
           <IconCard
             icon="code"
-            description="Simply add a snippet of code in both the frontend and the backend of your application"
-            title="Easy implementation"
+            description={t('cards.easyImplementation.description')}
+            title={t('cards.easyImplementation.title')}
           />
 
           <IconCard
             icon="magnifyingGlass"
-            description="Access an insightful dashboard with live and accurate data about your app environmental footprint"
-            title="Monitor your app"
+            description={t('cards.monitoring.description')}
+            title={t('cards.monitoring.title')}
           />
 
           <IconCard
             icon="charts"
-            description="Reduce the carbon footprint of your application by understanding better your usage and the impact of your code"
-            title="Reduce your footprint"
+            description={t('cards.reduce.description')}
+            title={t('cards.reduce.title')}
           />
 
           <IconCard
             icon="sheet"
-            description="Report on your application's environmental footprint to legal instances"
-            title="Report on your impact"
+            description={t('cards.report.description')}
+            title={t('cards.report.title')}
           />
 
           <IconCard
             icon="thumb"
-            description="Communicate transparently on your footprint and your actions to reduce it"
-            title="Communicate to your users"
+            description={t('cards.communicate.description')}
+            title={t('cards.communicate.title')}
           />
         </div>
       </div>

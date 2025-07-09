@@ -1,0 +1,240 @@
+{
+  "title": "Web Page Environnemental Footprint",
+  "subtitle": "While waiting for the official launch of naubion, you can already measure the environmental impact of your web pages. Enter the URL of a page you want to analyze, and we will provide you with an estimate of its carbon footprint based on the resources it loads and the interactions it requires.",
+  "form": {
+    "urlPlaceholder": "https://example.com",
+    "clearButton": "Clear",
+    "analyzeButton": "Analyze the page",
+    "interactionLevel": {
+      "label": "Visitor Interaction Level",
+      "minimal": {
+        "title": "Minimal",
+        "description": "Basic scrolling and reading"
+      },
+      "default": {
+        "title": "Normal",
+        "description": "Scrolling, hover effects, and basic interactions"
+      },
+      "thorough": {
+        "title": "Thorough",
+        "description": "Full interaction with most of the elements"
+      }
+    },
+    "deviceType": {
+      "label": "Device Type",
+      "desktop": {
+        "title": "Desktop",
+        "description": "1920x1080 with mouse interactions"
+      },
+      "mobile": {
+        "title": "Mobile",
+        "description": "375x667 with touch interactions"
+      }
+    }
+  },
+  "loading": {
+    "title": "Analyzing your page...",
+    "progress": "Analysis Progress",
+    "remaining": "remaining",
+    "steps": {
+      "step1": {
+        "title": "Cache Check",
+        "description": "Checking if url analysis has already been performed recently"
+      },
+      "step2": {
+        "title": "Setup",
+        "description": "Setting up browser environment and tools"
+      },
+      "step3": {
+        "title": "Navigation",
+        "description": "Navigating to target website and loading resources"
+      },
+      "step4": {
+        "title": "Simulation",
+        "description": "Simulating realistic user interactions and behavior"
+      },
+      "step5": {
+        "title": "Processing",
+        "description": "Processing and categorizing collected resources"
+      },
+      "step6": {
+        "title": "Green Hosting",
+        "description": "Assessing hosting provider environmental impact"
+      },
+      "step7": {
+        "title": "CO₂e Conversion",
+        "description": "Converting resource data to carbon emissions"
+      },
+      "step8": {
+        "title": "Impact Analysis",
+        "description": "Creating human-readable environmental impact report"
+      },
+      "step9": {
+        "title": "Complete",
+        "description": "Finalizing and caching analysis results"
+      }
+    }
+  },
+  "results": {
+    "error": "Failed to analyze the website. Please try again.",
+    "carbonFootprint": "Carbon Footprint",
+    "transferSize": "Transfer Size",
+    "resources": "Resources",
+    "greenHosting": "Green Hosting",
+    "recommendations": "Recommendations",
+    "summary": {
+      "pageText": "The page",
+      "isGreenHosted": "is",
+      "isNotGreenHosted": "is potentially not",
+      "greenHostedText": "green hosted and weighs a total of",
+      "visitsText": "visits on this unique page per month would emit a total of",
+      "equivalentText": ", the equivalent of driving",
+      "carText": "by gasoline car."
+    },
+    "resourceTypes": {
+      "html": "HTML Documents",
+      "css": "Stylesheets",
+      "js": "JavaScript",
+      "media": "Images & Media",
+      "font": "Web Fonts",
+      "other": "Other Resources"
+    },
+    "sections": {
+      "resourceAnalysis": {
+        "title": "Resource Type Analysis",
+        "description": "A breakdown of the resources loaded by the page, categorized by type. This analysis helps identify which types of resources contribute most to the page's total transfer size and can guide optimization efforts."
+      },
+      "keyFacts": {
+        "title": "Key Facts",
+        "description": "Key facts and metrics about the page you just analyzed. These will help you understand the weight of the resources loaded, the environmental impact of the page and its hosting.",
+        "totalPageWeight": "Total Page Weight",
+        "totalResources": "Total Resources",
+        "greenHosted": "Green hosted",
+        "notGreenHosted": "Potentially not green hosted",
+        "greenHostedDescription": "This page is hosted by {{provider}} using renewable energy",
+        "greenHostedDescriptionGeneric": "This page is hosted by a green provider using renewable energy",
+        "notGreenHostedDescription": "Not enough information to determine if the hosting provider is green"
+      },
+      "environmentalImpact": {
+        "title": "Environmental Impact",
+        "description": "Adjust the monthly visits count to see how it affects the carbon emissions and the equivalent distance driven by a gasoline car. This will help you understand the environmental impact of your page based on its traffic.",
+        "monthlyVisitsLabel": "Monthly Visits On This Page",
+        "monthlyVisitsDescription": "Adjust the carbon footprint calculation based on your page's monthly visits count",
+        "totalCarbonEmissions": "Total Carbon Emissions",
+        "equivalentDistance": "Equivalent Distance by Gasoline Car"
+      },
+      "resourceList": {
+        "title": "Largest Resources",
+        "description": "The largest resources loaded by the page. These resources can significantly impact the page's performance and loading time. Consider optimizing or reducing their size to improve user experience."
+      },
+      "botDetection": {
+        "title": "Bot Detection Warning",
+        "confidenceLevel": "Confidence Level",
+        "fallbackMessage": "Bot detection measures were detected on this page.",
+        "viewDetails": "View Detection Details",
+        "indicator": "indicator",
+        "indicators": "indicators",
+        "impactLabel": "Impact:",
+        "impactDescription": "The carbon footprint analysis was still performed, but it may not accurately represent the real user experience for this website.",
+        "warnings": {
+          "captcha": "This page displayed a CAPTCHA or human verification challenge. The analysis results may not reflect the actual page content.",
+          "cloudflareChallenge": "This page showed a Cloudflare security challenge. The analysis results may not reflect the actual page content.",
+          "accessDenied": "This page showed an access denied or forbidden message. The analysis results may not reflect the actual page content.",
+          "rateLimit": "This page displayed a rate limiting message. The analysis results may not reflect the actual page content.",
+          "general": "This page showed potential bot detection content. The analysis results may not accurately reflect the real page experience."
+        }
+      }
+    },
+    "tryAnotherPage": "Try on another page",
+    "optionsDisplay": {
+      "deviceType": "Device Type",
+      "interactionLevel": "Interaction Level"
+    },
+    "resultsHeader": {
+      "lastAnalysisDate": "Last Analysis Date:",
+      "carbonFootprintFor": "Carbon Footprint for:",
+      "cacheTooltip": "This date reflects when the analysis was cached. Results are reused from cache when available to improve performance and reduce environmental impact."
+    },
+    "resourceBreakdown": {
+      "average": "Avg:",
+      "files": "files"
+    },
+    "slider": {
+      "currentEstimate": "Current estimate:",
+      "visit": "visit",
+      "visits": "visits",
+      "perMonth": "/month"
+    }
+  },
+  "errorAlert": {
+    "title": "Analysis Error"
+  },
+  "methodology": {
+    "title": "Our Methodology",
+    "subtitle": "Our carbon footprint analysis follows industry-standard methodologies and uses trusted, open-source tools to provide accurate environmental impact assessments of web pages.",
+    "steps": {
+      "resourceCollection": {
+        "title": "Resource Collection & Analysis",
+        "description": "We simulate user interactions on your webpage using real browser automation (Puppeteer) to capture all network resources including HTML, CSS, JavaScript, images, fonts, and media files. Our system measures the actual transfer size of each resource, providing accurate data on what users download when visiting your page."
+      },
+      "interactionSimulation": {
+        "title": "Interaction Simulation",
+        "description": "Our analysis includes different interaction levels (minimal, default, thorough) to simulate real user behavior like scrolling, clicking, and loading dynamic content. This ensures we capture the full environmental impact of your page, not just the initial load."
+      },
+      "greenHostingAssessment": {
+        "title": "Green Hosting Assessment",
+        "description": "We check if your website is hosted on green, renewable energy-powered servers using The Green Web Foundation's database. This assessment impacts the carbon footprint calculation, as green-hosted sites have significantly lower emissions per byte transferred."
+      },
+      "co2eCalculation": {
+        "title": "CO₂e Emissions Calculation",
+        "description": "Using The Green Web Foundation's CO2.js library with the Sustainable Web Design (SWD) model v4, we convert the total data transfer into grams of CO₂ equivalent emissions. This industry-standard methodology accounts for device energy use, network infrastructure, and data center operations."
+      },
+      "realWorldImpact": {
+        "title": "Real-World Impact Translation",
+        "description": "We convert abstract CO₂e numbers into tangible equivalents like kilometers driven by a gasoline car (using the standard 200 gCO₂e/km emission factor). This helps you understand the real environmental impact of your webpage in everyday terms."
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Get answers to common questions about our carbon footprint analysis methodology and results.",
+    "items": {
+      "isThisNaubion": {
+        "question": "Is this tool naubion or just a demo?",
+        "answer": "This tool is a sneak peek of naubion's capabilities, showcasing our commitment to sustainability and transparency in web development. While it provides valuable insights into your website's carbon footprint, the full naubion platform will offer even more advanced features and integrations to help you build greener applications."
+      },
+      "accuracy": {
+        "question": "How accurate are the carbon footprint calculations?",
+        "answer": "Our calculations use The Green Web Foundation's CO2.js library with the Sustainable Web Design (SWD) model v4, which is an industry-standard methodology. The results provide scientifically-backed estimates based on actual data transfer and hosting infrastructure. While estimates may vary ±20% depending on real-world conditions, they give you a reliable baseline for understanding and improving your website's environmental impact."
+      },
+      "interactionLevels": {
+        "question": "What does the interaction level setting change?",
+        "answer": "Interaction levels simulate different user behaviors:\n\n• Minimal: Basic page load with minimal scrolling\n• Default: Typical user behavior including moderate scrolling and interaction\n• Thorough: Comprehensive analysis with extensive scrolling and interaction simulation\n\nHigher interaction levels may reveal additional resources loaded dynamically, providing a more complete picture of your page's total environmental impact."
+      },
+      "greenHosting": {
+        "question": "Why does green hosting matter for carbon emissions?",
+        "answer": "Green hosting significantly reduces carbon emissions because it uses renewable energy sources (solar, wind, hydro) instead of fossil fuels. Websites hosted on green servers can have 50-70% lower carbon emissions per byte transferred. We check your hosting provider against The Green Web Foundation's database of verified green hosting providers."
+      },
+      "carEquivalent": {
+        "question": "How is the car distance equivalent calculated?",
+        "answer": "We use the standard automotive emission factor of 200 gCO₂e per kilometer for gasoline cars. This means 1 gram of CO₂e equals approximately 5 meters of driving. This conversion helps translate abstract carbon numbers into tangible, everyday equivalents that are easier to understand and communicate."
+      },
+      "resourcesIncluded": {
+        "question": "What resources are included in the analysis?",
+        "answer": "Our analysis captures all resources downloaded when loading your page:\n\n• HTML documents\n• CSS stylesheets\n• JavaScript files\n• Images and media files\n• Web fonts\n• Third-party scripts and resources\n• API calls and dynamic content\n\nWe measure the actual transfer size (compressed size) that users download, not the uncompressed file size."
+      },
+      "authentication": {
+        "question": "Can I analyze pages behind authentication or with complex interactions?",
+        "answer": "Currently, our tool analyzes publicly accessible pages without authentication. For pages requiring login or complex user flows, we recommend analyzing similar public pages or the main landing pages that represent your site's typical resource usage. Future versions may include support for authenticated analysis."
+      },
+      "desktopVsMobile": {
+        "question": "What's the difference between desktop and mobile analysis?",
+        "answer": "Desktop and mobile analyses simulate different device types and screen sizes:\n\n• Desktop: 1920x1080 viewport, simulates traditional computer usage\n• Mobile: 375x667 viewport with touch simulation, represents smartphone usage\n\nMobile analysis often shows different resource loading patterns and may reveal mobile-specific optimizations or issues."
+      },
+      "caching": {
+        "question": "Is the analysis ran every time I submit a URL?",
+        "answer": "No, the analysis is not run every time you submit a URL. We cache the results of previous analyses and reuse them when the same URL is submitted again with the same options. This helps improve performance and reduce the environmental impact of repeated analyses."
+      }
+    }
+  }
+}

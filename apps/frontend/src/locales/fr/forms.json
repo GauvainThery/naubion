@@ -1,0 +1,12 @@
+{
+  "validation": {
+    "email": {
+      "required": "L'email est requis",
+      "invalid": "Veuillez entrer une adresse email valide"
+    },
+    "url": {
+      "required": "L'URL est requise",
+      "invalid": "Veuillez entrer une URL valide"
+    }
+  }
+}

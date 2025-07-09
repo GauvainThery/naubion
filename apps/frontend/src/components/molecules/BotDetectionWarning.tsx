@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BotDetectionResult, BotDetectionIndicator } from '@naubion/shared';
 import { cn } from '../../utils/classnames';
 import { WarningIcon, ErrorIcon, InfoIcon } from '../icons';
@@ -9,9 +10,26 @@ type BotDetectionWarningProps = {
 };
 
 const BotDetectionWarning: React.FC<BotDetectionWarningProps> = ({ botDetection, className }) => {
+  console.log('🔥 ・ botDetection:', botDetection);
+  const { t } = useTranslation('analysis');
+
   if (!botDetection.detected) {
     return null;
   }
+
+  // Translate the message if it's a translation key
+  const getTranslatedMessage = (message: string | undefined): string => {
+    if (!message) {
+      return t('results.sections.botDetection.fallbackMessage');
+    }
+    // Check if the message is a translation key (starts with 'botDetection.warnings.')
+    if (message.startsWith('botDetection.warnings.')) {
+      return t(`results.sections.${message}`);
+    }
+
+    // Otherwise, return the original message
+    return message;
+  };
 
   const getIconForIndicator = (type: BotDetectionIndicator['type']) => {
     switch (type) {
@@ -53,15 +71,17 @@ const BotDetectionWarning: React.FC<BotDetectionWarningProps> = ({ botDetection,
         <WarningIcon className={cn('w-5 h-5 mt-0.5 flex-shrink-0', iconStyles[severityLevel])} />
 
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 mb-2">Bot Detection Warning</h3>
+          <h3 className="font-semibold text-gray-900 mb-2">
+            {t('results.sections.botDetection.title')}
+          </h3>
 
-          <p className="text-gray-700 mb-3">
-            {botDetection.message || 'Bot detection measures were detected on this page.'}
-          </p>
+          <p className="text-gray-700 mb-3">{getTranslatedMessage(botDetection.message)}</p>
 
           <div className="space-y-2">
             <div className="text-sm text-gray-600">
-              <span className="font-medium">Confidence Level:</span>{' '}
+              <span className="font-medium">
+                {t('results.sections.botDetection.confidenceLevel')}:
+              </span>{' '}
               <span
                 className={cn('font-semibold', {
                   'text-red-600': severityLevel === 'high',
@@ -76,8 +96,11 @@ const BotDetectionWarning: React.FC<BotDetectionWarningProps> = ({ botDetection,
             {detectedIndicators.length > 0 && (
               <details className="text-sm">
                 <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
-                  View Detection Details ({detectedIndicators.length} indicator
-                  {detectedIndicators.length !== 1 ? 's' : ''})
+                  {t('results.sections.botDetection.viewDetails')} ({detectedIndicators.length}{' '}
+                  {detectedIndicators.length === 1
+                    ? t('results.sections.botDetection.indicator')
+                    : t('results.sections.botDetection.indicators')}
+                  )
                 </summary>
 
                 <div className="mt-2 pl-4 space-y-2">
@@ -100,8 +123,8 @@ const BotDetectionWarning: React.FC<BotDetectionWarningProps> = ({ botDetection,
           </div>
 
           <div className="mt-3 text-sm text-gray-600 bg-white bg-opacity-60 rounded p-2">
-            <strong>Impact:</strong> The carbon footprint analysis was still performed, but it may
-            not accurately represent the real user experience for this website.
+            <strong>{t('results.sections.botDetection.impactLabel')}</strong>{' '}
+            {t('results.sections.botDetection.impactDescription')}
           </div>
         </div>
       </div>

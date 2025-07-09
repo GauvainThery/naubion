@@ -1,17 +1,20 @@
-import React from 'react';
-import { Button, Logo } from '..';
-import { Link } from 'react-router';
 import { page } from '@naubion/shared';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+import { Button, Logo } from '..';
 
 type HeaderProps = {
   currentPage: keyof typeof page;
 };
 
 const Header: React.FC<HeaderProps> = ({ currentPage }) => {
+  const { t } = useTranslation('common');
+
   const navigationLinks: Record<keyof typeof page, [string, string]> = {
-    home: [page.pageCarbonFootprint, 'Estimate your web page carbon footprint'],
-    pageCarbonFootprint: [page.home, 'Join the waitlist!'],
-    admin: [page.home, 'ADmin']
+    home: [page.pageCarbonFootprint, t('nav.analyzePage')],
+    pageCarbonFootprint: [page.home, t('nav.home')],
+    admin: [page.home, t('nav.admin')]
   };
 
   return (
@@ -25,10 +28,10 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
           {/* Mobile logo */}
           <Logo size="md" hasDropShadow className="lg:hidden" />
         </Link>
-        <p className="font-bold text-xs">Control the environmental impact of your application</p>
+        <p className="font-bold text-xs">{t('tagline')}</p>
       </div>
 
-      <div className="lg:w-1/3 flex items-center justify-end">
+      <div className="lg:w-1/3 flex items-center justify-end gap-4">
         <Link className="hidden fixed lg:block z-20" to={navigationLinks[currentPage][0]}>
           <Button>{navigationLinks[currentPage][1]}</Button>
         </Link>

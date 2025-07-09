@@ -1,0 +1,34 @@
+{
+  "tagline": "Contrôlez l'impact environnemental de votre application",
+  "nav": {
+    "home": "Accueil",
+    "analysis": "Analyse",
+    "admin": "Admin",
+    "analyzePage": "Estimez l'empreinte carbone de votre page web"
+  },
+  "buttons": {
+    "submit": "Valider",
+    "join": "Rejoindre !",
+    "analyze": "Analyser",
+    "back": "Retour",
+    "loading": "Chargement..."
+  },
+  "messages": {
+    "success": "Succès !",
+    "error": "Une erreur est survenue",
+    "required": "Ce champ est obligatoire"
+  },
+  "forms": {
+    "placeholders": {
+      "enterText": "Entrez du texte...",
+      "emailAddress": "Adresse e-mail"
+    }
+  },
+  "newsletter": {
+    "subscribed": "Inscrit !",
+    "joinWaitlist": "Rejoindre la liste d'attente"
+  },
+  "footer": {
+    "madeSustainably": "Fait <0>(</0>durablement<1>)</1> avec <2>♥</2> à Lille."
+  }
+}

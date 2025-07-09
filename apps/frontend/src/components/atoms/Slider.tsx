@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/classnames';
 
 type SliderProps = {
@@ -18,6 +19,8 @@ const Slider: React.FC<SliderProps> = ({
   className,
   disabled = false
 }) => {
+  const { t } = useTranslation('analysis');
+
   // Convert actual value to slider position (0-100)
   const actualToSlider = (actualValue: number): number => {
     if (actualValue <= 1) return 1;
@@ -107,9 +110,11 @@ const Slider: React.FC<SliderProps> = ({
 
         <div className="text-center">
           <p className="text-sm text-gray-600">
-            Current estimate:{' '}
+            {t('results.slider.currentEstimate')}{' '}
             <span className="font-semibold text-primary">
-              {value.toLocaleString()} visit{value === 1 ? '' : 's'}/month
+              {value.toLocaleString()}{' '}
+              {value === 1 ? t('results.slider.visit') : t('results.slider.visits')}
+              {t('results.slider.perMonth')}
             </span>
           </p>
         </div>

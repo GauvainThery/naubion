@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from './../../utils/classnames';
 
 interface ErrorAlertProps {
@@ -8,12 +9,9 @@ interface ErrorAlertProps {
   onDismiss?: () => void;
 }
 
-const ErrorAlert: React.FC<ErrorAlertProps> = ({
-  message,
-  title = 'Analysis Error',
-  className = '',
-  onDismiss
-}) => {
+const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, title, className = '', onDismiss }) => {
+  const { t } = useTranslation('analysis');
+  const defaultTitle = title || t('errorAlert.title');
   return (
     <section className={cn('bg-red-50 border border-red-200 rounded-xl container p-6', className)}>
       <div className="flex items-center">
@@ -27,7 +25,7 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({
           </svg>
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-red-800">{title}</h3>
+          <h3 className="text-sm font-medium text-red-800">{defaultTitle}</h3>
           <div className="mt-2 text-sm text-red-700">{message}</div>
         </div>
         {onDismiss && (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import ProgressBar from '../atoms/ProgressBar';
 
 type ExtendedResourceBreakdownItemProps = {
@@ -22,6 +23,8 @@ const ResourceBreakdownItem: React.FC<ExtendedResourceBreakdownItemProps> = ({
   color,
   indicator
 }) => {
+  const { t } = useTranslation('analysis');
+
   return (
     <div className="p-4 bg-gray-50 rounded-xl flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -31,7 +34,9 @@ const ResourceBreakdownItem: React.FC<ExtendedResourceBreakdownItemProps> = ({
         </div>
         <div className="text-right">
           <div className="font-semibold">{size}</div>
-          <div className="text-sm text-text-secondary">({count} files)</div>
+          <div className="text-sm text-text-secondary">
+            ({count} {t('results.resourceBreakdown.files')})
+          </div>
         </div>
       </div>
 
@@ -39,7 +44,9 @@ const ResourceBreakdownItem: React.FC<ExtendedResourceBreakdownItemProps> = ({
 
       <div className="flex justify-between items-center text-sm">
         <span className="text-text-secondary">{percentage}%</span>
-        <span className="text-text-secondary">Avg: {average}</span>
+        <span className="text-text-secondary">
+          {t('results.resourceBreakdown.average')} {average}
+        </span>
       </div>
     </div>
   );

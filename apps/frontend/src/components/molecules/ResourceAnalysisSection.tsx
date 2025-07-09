@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ResourceBreakdownItem } from '../';
 import { processResourceData } from '../../utils/websiteAnalysisResultProcessors';
 import { Resource } from '@naubion/shared';
@@ -21,14 +22,16 @@ const ResourceAnalysisSection: React.FC<ResourceAnalysisSectionProps> = ({
   totalTransferSize,
   resourceTypes
 }) => {
+  const { t } = useTranslation('analysis');
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <h4 className="text-lg font-semibold text-center lg:text-left">Resource Type Analysis</h4>
+        <h4 className="text-lg font-semibold text-center lg:text-left">
+          {t('results.sections.resourceAnalysis.title')}
+        </h4>
         <p className="text-text-secondary lg:w-7/8">
-          A breakdown of the resources loaded by the page, categorized by type. This analysis helps
-          identify which types of resources contribute most to the page's total transfer size and
-          can guide optimization efforts.
+          {t('results.sections.resourceAnalysis.description')}
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

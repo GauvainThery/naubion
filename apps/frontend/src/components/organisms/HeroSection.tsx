@@ -1,5 +1,6 @@
 import { Laptop, TextInputWithSubmit } from '../';
 import { useNewsletter } from '../../hooks/useNewsletter';
+import { useTranslation } from 'react-i18next';
 import { cn } from './../../utils/classnames';
 
 type HeroSectionProps = {
@@ -8,6 +9,7 @@ type HeroSectionProps = {
 
 const HeroSection = ({ className }: HeroSectionProps) => {
   const { subscribe, isLoading, error, success } = useNewsletter();
+  const { t } = useTranslation('hero');
 
   const handleEmailSubmit = async (email: string) => {
     await subscribe(email);
@@ -22,31 +24,24 @@ const HeroSection = ({ className }: HeroSectionProps) => {
     >
       <div className="lg:w-1/2 flex flex-col gap-8 lg:gap-16 lg:pb-28 h-[312px] lg:h-[496px]">
         <div className="flex flex-col gap-3 text-center lg:text-left">
-          <h1 className="text-3xl lg:text-4xl font-bold">
-            Regain control of your application's carbon footprint
-          </h1>
-          <p className="text-text-secondary lg:w-7/8">
-            Empower your digital sustainability with cutting-edge tools to track and reduce carbon
-            emissions from your websites and applications. From frontend to backend, ensure a
-            greener digital presence.
-          </p>
+          <h1 className="text-3xl lg:text-4xl font-bold">{t('title')}</h1>
+          <p className="text-text-secondary lg:w-7/8">{t('subtitle')}</p>
         </div>
 
         <div className="flex flex-col gap-6 text-center justify-center items-center w-full">
           <p className="secondary-font">
-            <strong>naubion</strong> is coming soon! Join our waiting list and be at the forefront
-            of web decarbonization.
+            <strong>naubion</strong> {t('comingSoon')}
           </p>
           <TextInputWithSubmit
             type="email"
-            placeholder="Enter your email..."
+            placeholder={t('emailPlaceholder')}
             className="w-auto min-w-[330px]"
-            buttonText="Join!"
+            buttonText={t('common:buttons.join')}
             onSubmit={handleEmailSubmit}
             loading={isLoading}
             error={error}
             success={success}
-            successMessage="Thank you and welcome!"
+            successMessage={t('successMessage')}
             required
           />
         </div>

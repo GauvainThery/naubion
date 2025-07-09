@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/classnames';
 import CacheStats from '../molecules/CacheStats';
 import AdminActions from '../molecules/AdminActions';
@@ -28,6 +29,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   onLogout,
   className = ''
 }) => {
+  const { t } = useTranslation('admin');
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [alert, setAlert] = useState<{
     message: string;
@@ -62,18 +64,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
           break;
         case 'refresh-stats':
           await onRefreshStats();
-          showAlert('Statistics refreshed successfully', 'success');
+          showAlert(t('messages.statisticsRefreshed'), 'success');
           return;
         default:
-          throw new Error('Unknown action');
+          throw new Error(t('messages.unknownAction'));
       }
 
-      showAlert(result.message || 'Action completed successfully', 'success');
+      showAlert(result.message || t('messages.actionCompleted'), 'success');
 
       // Refresh stats after successful action
       await onRefreshStats();
     } catch (error) {
-      showAlert(error instanceof Error ? error.message : 'Action failed', 'error');
+      showAlert(error instanceof Error ? error.message : t('messages.actionFailed'), 'error');
     } finally {
       setLoading(actionId, false);
     }
@@ -82,29 +84,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const actions = [
     {
       id: 'full-cleanup',
-      label: 'Full Cleanup',
-      description: 'Run complete cache cleanup (expired + old entries)',
+      label: t('actions.fullCleanup.label'),
+      description: t('actions.fullCleanup.description'),
       icon: '🌿',
       variant: 'primary' as const
     },
     {
       id: 'cleanup-expired',
-      label: 'Cleanup Expired',
-      description: 'Remove only explicitly expired cache entries',
+      label: t('actions.expiredCleanup.label'),
+      description: t('actions.expiredCleanup.description'),
       icon: '🍃',
       variant: 'secondary' as const
     },
     {
       id: 'cleanup-old',
-      label: 'Cleanup Old',
-      description: 'Remove cache entries older than 30 days',
+      label: t('actions.oldCleanup.label'),
+      description: t('actions.oldCleanup.description'),
       icon: '🌱',
       dangerous: true
     },
     {
       id: 'refresh-stats',
-      label: 'Refresh Stats',
-      description: 'Update cache statistics display',
+      label: t('actions.refreshStats.label'),
+      description: t('actions.refreshStats.description'),
       icon: '🔄',
       variant: 'secondary' as const
     }
@@ -115,11 +117,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-text-dark">🛠️ Admin Dashboard</h1>
-          <p className="text-text-secondary">Manage cache and system operations</p>
+          <h1 className="text-3xl font-bold text-text-dark">🛠️ {t('title')}</h1>
+          <p className="text-text-secondary">{t('subtitle')}</p>
         </div>
         <Button onClick={onLogout} variant="secondary">
-          Logout
+          {t('logout')}
         </Button>
       </div>
 
@@ -132,7 +134,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Cache Statistics */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-text-dark">📊 Cache Statistics</h2>
+        <h2 className="text-xl font-semibold text-text-dark">
+          📊 {t('results.sections.cacheStatistics')}
+        </h2>
         <CacheStats
           stats={
             stats || {
@@ -148,7 +152,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Admin Actions */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-text-dark">⚡ Actions</h2>
+        <h2 className="text-xl font-semibold text-text-dark">⚡ {t('results.sections.actions')}</h2>
         <AdminActions actions={actions} onAction={handleAction} loadingStates={loadingStates} />
       </section>
     </div>

@@ -403,7 +403,7 @@ export class BotDetectionService {
   }
 
   /**
-   * Generate a user-friendly warning message
+   * Generate a translation key for warning message
    */
   private generateWarningMessage(indicators: BotDetectionIndicator[]): string {
     if (indicators.length === 0) return '';
@@ -411,21 +411,21 @@ export class BotDetectionService {
     const types = indicators.map(i => i.type);
 
     if (types.includes('captcha')) {
-      return 'This page displayed a CAPTCHA or human verification challenge. The analysis results may not reflect the actual page content.';
+      return 'botDetection.warnings.captcha';
     }
 
     if (types.includes('cloudflare_challenge')) {
-      return 'This page showed a Cloudflare security challenge. The analysis results may not reflect the actual page content.';
+      return 'botDetection.warnings.cloudflareChallenge';
     }
 
     if (types.includes('access_denied')) {
-      return 'This page showed an access denied or forbidden message. The analysis results may not reflect the actual page content.';
+      return 'botDetection.warnings.accessDenied';
     }
 
     if (types.includes('rate_limit')) {
-      return 'This page displayed a rate limiting message. The analysis results may not reflect the actual page content.';
+      return 'botDetection.warnings.rateLimit';
     }
 
-    return 'This page showed potential bot detection content. The analysis results may not accurately reflect the real page experience.';
+    return 'botDetection.warnings.general';
   }
 }
