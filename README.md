@@ -32,8 +32,6 @@ pnpm run dev
 ```bash
 # Deploy with Docker
 git push origin main  # Triggers automatic deployment
-# or
-./scripts/deploy.sh latest
 ```
 
 ## Project Structure
