@@ -134,9 +134,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Cache Statistics */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-text-dark">
-          📊 {t('results.sections.cacheStatistics')}
-        </h2>
+        <h2 className="text-xl font-semibold text-text-dark">📊 {t('sections.cacheStatistics')}</h2>
         <CacheStats
           stats={
             stats || {
@@ -152,7 +150,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Admin Actions */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-text-dark">⚡ {t('results.sections.actions')}</h2>
+        <h2 className="text-xl font-semibold text-text-dark">⚡ {t('sections.actions')}</h2>
         <AdminActions actions={actions} onAction={handleAction} loadingStates={loadingStates} />
       </section>
     </div>

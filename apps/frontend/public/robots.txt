@@ -1,0 +1,17 @@
+# Robots.txt for naubion
+
+User-agent: *
+Allow: /
+
+# Main sitemap
+Sitemap: https://naubion.com/sitemap.xml
+
+# Block admin areas from search engines
+Disallow: /admin
+Disallow: /api/
+
+# Allow specific API endpoints that might be useful for discovery
+Allow: /api/health
+
+# Crawl delay to be respectful of resources
+Crawl-delay: 1

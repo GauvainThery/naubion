@@ -88,11 +88,21 @@ function createApp(): Application {
   // API routes
   app.use('/api', apiRoutes);
 
-  // Admin routes
-  app.use('/api/admin', adminRoutes);
+  // Admin routes with SEO protection
+  app.use(
+    '/api/admin',
+    (req, res, next) => {
+      // Add noindex headers for all admin routes
+      res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+      next();
+    },
+    adminRoutes
+  );
 
-  // Serve admin page
+  // Serve admin page with SEO protection
   app.get('/admin', (req, res) => {
+    // Add noindex headers for admin page
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
     res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
   });
 

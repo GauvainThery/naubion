@@ -5,11 +5,15 @@ import LoadingSection from '../components/organisms/LoadingSection';
 import ResultsSection from '../components/organisms/ResultsSection';
 import MainLayout from '../components/templates/MainLayout';
 import useAnalysis from '../hooks/useAnalysis';
+import { useSEO, PAGE_SEO } from '../hooks/useSEO';
 import type { AnalysisFormData } from '../types';
 import { CallToActionSection, MethodologySection, FAQSection, ErrorAlert } from './../components';
 
 const PageCarbonFootprint: React.FC = () => {
   const { t } = useTranslation('cta');
+
+  useSEO(PAGE_SEO.pageCarbonFootprint);
+
   const {
     isLoading,
     results,

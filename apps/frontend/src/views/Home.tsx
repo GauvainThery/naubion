@@ -1,9 +1,12 @@
 import React from 'react';
 import { CallToActionSection, FeatureSection, HeroSection, MainLayout } from '../components';
 import { useTranslation } from 'react-i18next';
+import { useSEO, PAGE_SEO } from '../hooks/useSEO';
 
 const Home: React.FC = () => {
   const { t } = useTranslation('cta');
+
+  useSEO(PAGE_SEO.home);
 
   return (
     <MainLayout currentPage="home" className="flex flex-col gap-32">
