@@ -1,15 +1,27 @@
-ISC License
+Naubion Source Available License
 
-Copyright (c) 2025, naubion contributors
+Copyright (c) 2025 Naubion Contributors
 
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
+This source code is made available for viewing and educational purposes only.
 
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+PERMITTED USES:
+
+- View and study the source code
+- Use for educational and research purposes
+- Reference implementation details
+
+PROHIBITED USES:
+
+- Commercial use of any kind
+- Copying, modifying, or distributing the code
+- Creating derivative works
+- Using in production environments
+- Reverse engineering for competitive purposes
+
+The software is provided "AS IS" without warranty of any kind. The copyright
+holders disclaim all warranties, express or implied, including but not limited
+to warranties of merchantability and fitness for a particular purpose.
+
+For commercial licensing or usage permissions, please contact the project maintainers.
+
+All rights reserved.
