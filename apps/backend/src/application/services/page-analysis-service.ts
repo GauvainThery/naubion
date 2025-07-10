@@ -179,7 +179,7 @@ export class PageAnalysisService {
       pageLoadOptimizer.setProgressCallback(updateProgress);
       await pageLoadOptimizer.optimizePageLoad(page, context.url);
 
-      updateProgress(35, 'simulation', 'Checking for bot detection measures...');
+      updateProgress(39, 'simulation', 'Checking for bot detection measures...');
 
       // Phase 3.5: Bot detection analysis
       const botDetectionResult = await this.botDetectionService.detectBotBlocking(page);

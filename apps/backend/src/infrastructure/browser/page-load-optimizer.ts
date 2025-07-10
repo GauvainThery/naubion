@@ -89,7 +89,7 @@ export class PageLoadOptimizer {
     }
 
     if (this.options.waitForJS) {
-      this.progressCallback?.(39, 'navigation', 'Executing JavaScript...');
+      this.progressCallback?.(38, 'navigation', 'Executing JavaScript...');
       promises.push(this.waitForJavaScript(page));
     }
 
