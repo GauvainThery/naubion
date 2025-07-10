@@ -38,12 +38,11 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
       </div>
 
       {/* Mobile Link */}
-      <Link
-        className="w-4/5 fixed top-4 left-4 lg:hidden z-20"
-        to={navigationLinks[currentPage][0]}
-      >
-        <Button>{navigationLinks[currentPage][1]}</Button>
-      </Link>
+      <div className="w-[calc(100%-32px)] fixed top-4 left-4 lg:hidden z-20">
+        <Link to={navigationLinks[currentPage][0]}>
+          <Button>{navigationLinks[currentPage][1]}</Button>
+        </Link>
+      </div>
     </header>
   );
 };

@@ -44,7 +44,12 @@ const Button: React.FC<ButtonProps> = ({
       {loading && (
         <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
       )}
-      <span className={cn('flex gap-3 justify-center items-center', loading ? 'opacity-0' : '')}>
+      <span
+        className={cn(
+          'w-full flex gap-3 justify-center items-center text-center',
+          loading ? 'opacity-0' : ''
+        )}
+      >
         {children}
       </span>
     </button>
