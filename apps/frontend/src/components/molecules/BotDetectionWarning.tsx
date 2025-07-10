@@ -10,7 +10,6 @@ type BotDetectionWarningProps = {
 };
 
 const BotDetectionWarning: React.FC<BotDetectionWarningProps> = ({ botDetection, className }) => {
-  console.log('🔥 ・ botDetection:', botDetection);
   const { t } = useTranslation('analysis');
 
   if (!botDetection.detected) {

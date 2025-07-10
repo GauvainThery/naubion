@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { subscribeToNewsletter } from '../utils/newsletter';
 
 interface UseNewsletterReturn {
@@ -13,6 +14,7 @@ export const useNewsletter = (): UseNewsletterReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { i18n } = useTranslation();
 
   const subscribe = async (email: string, name?: string) => {
     setIsLoading(true);
@@ -20,7 +22,10 @@ export const useNewsletter = (): UseNewsletterReturn => {
     setSuccess(false);
 
     try {
-      await subscribeToNewsletter(email, name);
+      // Map language to country for Mailjet
+      const country = i18n.language === 'fr' ? 'FR' : 'EN';
+
+      await subscribeToNewsletter(email, name, country);
       setSuccess(true);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to subscribe to newsletter';

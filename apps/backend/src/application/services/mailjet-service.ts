@@ -5,6 +5,7 @@ type MailjetClient = ReturnType<typeof mailjet.apiConnect>;
 export class MailjetService {
   private client: MailjetClient;
   private contactListId: number;
+  private countryPropertyCreated: boolean = false;
 
   constructor() {
     const apiKey = process.env.MAILJET_API_KEY;
@@ -22,24 +23,82 @@ export class MailjetService {
     }
   }
 
+  private async ensureCountryPropertyExists(): Promise<void> {
+    if (this.countryPropertyCreated) {
+      return;
+    }
+
+    try {
+      // Check if the country property already exists
+      const existingPropertiesResponse = await this.client.get('contactmetadata').request();
+      const existingProperties = (
+        existingPropertiesResponse.body as { Data: Array<{ Name: string }> }
+      ).Data;
+
+      const countryPropertyExists = existingProperties.some(prop => prop.Name === 'country');
+
+      if (!countryPropertyExists) {
+        // Create the country property
+        await this.client.post('contactmetadata').request({
+          Name: 'country',
+          Datatype: 'str',
+          NameSpace: 'static'
+        });
+      }
+
+      this.countryPropertyCreated = true;
+    } catch (error) {
+      console.warn('Failed to ensure country property exists:', error);
+      // Continue anyway - the property might already exist
+      this.countryPropertyCreated = true;
+    }
+  }
+
   async addEmailToContactList(
     email: string,
-    name?: string
+    name?: string,
+    country?: string
   ): Promise<{ success: boolean; message: string }> {
     try {
+      // Ensure the country property exists if we need to use it
+      if (country) {
+        await this.ensureCountryPropertyExists();
+      }
+
       // First, create or get the contact
       const contactResponse = await this.client.post('contact').request({
         Email: email,
         Name: name || ''
       });
 
-      console.log(
-        'Contact created/retrieved:',
-        (contactResponse.body as { Data: unknown[] }).Data[0]
-      );
+      const contactData = (contactResponse.body as { Data: Array<{ ID: number }> }).Data[0];
+      const contactId = contactData.ID;
+
+      // Add contact properties if provided
+      if (country) {
+        try {
+          await this.client
+            .put('contactdata')
+            .id(contactId)
+            .request({
+              Data: [
+                {
+                  Name: 'country',
+                  Value: country
+                }
+              ]
+            });
+        } catch (propertyError) {
+          console.warn(
+            'Failed to update contact properties, but contact was created:',
+            propertyError
+          );
+          // Continue with adding to list even if properties fail
+        }
+      }
 
       // Then add the contact to the list
-      const addToListResponse = await this.client
+      await this.client
         .post('contactslist')
         .id(this.contactListId)
         .action('managecontact')
@@ -47,8 +106,6 @@ export class MailjetService {
           Email: email,
           Action: 'addnoforce'
         });
-
-      console.log('Contact added to list:', addToListResponse.body);
 
       return {
         success: true,

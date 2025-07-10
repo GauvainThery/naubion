@@ -163,6 +163,7 @@ export interface AnalysisProgress {
 export interface NewsletterSubscription {
   email: string;
   name?: string;
+  country?: string;
 }
 
 export interface NewsletterResponse {

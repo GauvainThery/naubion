@@ -2,7 +2,8 @@ import { NewsletterResponse } from '@naubion/shared';
 
 export const subscribeToNewsletter = async (
   email: string,
-  name?: string
+  name?: string,
+  country?: string
 ): Promise<NewsletterResponse> => {
   try {
     const response = await fetch('/api/newsletter/subscribe', {
@@ -10,7 +11,7 @@ export const subscribeToNewsletter = async (
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, name })
+      body: JSON.stringify({ email, name, country })
     });
 
     const data: NewsletterResponse = await response.json();

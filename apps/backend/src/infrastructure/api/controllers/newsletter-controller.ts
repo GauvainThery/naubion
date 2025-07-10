@@ -10,7 +10,7 @@ export class NewsletterController {
 
   subscribe = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { email, name } = req.body;
+      const { email, name, country } = req.body;
 
       if (!email) {
         res.status(400).json({
@@ -30,7 +30,7 @@ export class NewsletterController {
         return;
       }
 
-      const result = await this.mailjetService.addEmailToContactList(email, name);
+      const result = await this.mailjetService.addEmailToContactList(email, name, country);
 
       if (result.success) {
         res.status(200).json({
