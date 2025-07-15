@@ -29,7 +29,7 @@ const FactCard: React.FC<FactCardProps> = ({
         <div
           className={cn(
             'p-3 rounded-xl',
-            isPositive ? 'bg-primary/10 text-primary' : 'bg-utils-700/10 text-shadow-utils-600'
+            isPositive ? 'bg-primary/10 text-primary' : 'bg-utils-600/10 text-shadow-utils-600'
           )}
         >
           {icon}
