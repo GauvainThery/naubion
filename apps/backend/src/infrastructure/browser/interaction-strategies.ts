@@ -3,7 +3,6 @@
  */
 
 import { Page } from 'puppeteer';
-import { NetworkMonitor } from './network-monitor.js';
 import logger from '../../shared/logger.js';
 
 export interface ElementInfo {
@@ -37,10 +36,7 @@ export interface InteractionResult {
 }
 
 export class InteractionStrategies {
-  constructor(
-    private page: Page,
-    private networkMonitor: NetworkMonitor | null = null
-  ) {}
+  constructor(private page: Page) {}
 
   /**
    * Attempt to click an element using multiple strategies
@@ -100,7 +96,9 @@ export class InteractionStrategies {
   }
 
   private async waitForNetworkIdle(): Promise<void> {
-    await this.page.waitForNetworkIdle();
+    await this.page.waitForNetworkIdle({
+      timeout: 3000
+    });
   }
 
   /**
@@ -168,15 +166,26 @@ class EvaluateStrategy implements InteractionStrategy {
   name = 'evaluate';
   priority = 0.3;
 
-  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
     try {
-      const result = await page.evaluate(selector => {
+      const evaluatePromise = page.evaluate(selector => {
         const el = document.querySelector(selector);
-        if (!el) return false;
+        if (!el) {
+          return false;
+        }
 
         (el as HTMLElement).click();
         return true;
       }, element.selector);
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () => reject(new Error(`Evaluate strategy timed out after ${timeout}ms`)),
+          timeout
+        );
+      });
+
+      const result = await Promise.race([evaluatePromise, timeoutPromise]);
 
       if (!result) {
         return { success: false, error: 'Element not found during evaluation' };
@@ -197,11 +206,13 @@ class DispatchEventStrategy implements InteractionStrategy {
   name = 'dispatch_event';
   priority = 0.4;
 
-  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
     try {
-      const result = await page.evaluate(selector => {
+      const dispatchPromise = page.evaluate(selector => {
         const el = document.querySelector(selector);
-        if (!el) return false;
+        if (!el) {
+          return false;
+        }
 
         // Dispatch multiple events to simulate real interaction
         const events = ['mousedown', 'mouseup', 'click'];
@@ -217,6 +228,12 @@ class DispatchEventStrategy implements InteractionStrategy {
 
         return true;
       }, element.selector);
+
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(`Event dispatch timed out after ${timeout}ms`)), timeout);
+      });
+
+      const result = await Promise.race([dispatchPromise, timeoutPromise]);
 
       if (!result) {
         return { success: false, error: 'Element not found during event dispatch' };
@@ -237,13 +254,22 @@ class CoordinateStrategy implements InteractionStrategy {
   name = 'coordinate';
   priority = 0.6;
 
-  async execute(page: Page, element: ElementInfo): Promise<InteractionResult> {
+  async execute(page: Page, element: ElementInfo, timeout: number): Promise<InteractionResult> {
     try {
       if (!element.isVisible || element.position.x <= 0 || element.position.y <= 0) {
         return { success: false, error: 'Element not visible or has invalid coordinates' };
       }
 
-      await page.mouse.click(element.position.x, element.position.y);
+      // Set a timeout for the coordinate click operation
+      const clickPromise = page.mouse.click(element.position.x, element.position.y);
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () => reject(new Error(`Coordinate click timed out after ${timeout}ms`)),
+          timeout
+        );
+      });
+
+      await Promise.race([clickPromise, timeoutPromise]);
       return { success: true };
     } catch (error) {
       return {

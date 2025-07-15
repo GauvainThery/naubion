@@ -49,7 +49,7 @@ export class UserSimulator {
 
     // Initialize strategy classes
     this.elementFinder = new ElementFinder(page);
-    this.interactionStrategies = new InteractionStrategies(page, null);
+    this.interactionStrategies = new InteractionStrategies(page);
     this.behaviorSimulator = new BehaviorSimulator(page);
   }
 
@@ -65,10 +65,7 @@ export class UserSimulator {
    */
   setNetworkMonitor(networkMonitor: NetworkMonitor): void {
     this.networkMonitor = networkMonitor;
-    this.interactionStrategies = new InteractionStrategies(
-      this.elementFinder['page'],
-      networkMonitor
-    );
+    this.interactionStrategies = new InteractionStrategies(this.elementFinder['page']);
     this.behaviorSimulator = new BehaviorSimulator(this.elementFinder['page']);
   }
 
@@ -160,39 +157,6 @@ export class UserSimulator {
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
-    }
-  }
-
-  /**
-   * Custom interaction with specific element
-   */
-  async customInteraction(
-    elementSelector: string,
-    timeout?: number
-  ): Promise<{ success: boolean; error?: string }> {
-    const actualTimeout = timeout || this.config.elementTimeout;
-
-    try {
-      const element = await this.elementFinder['page'].evaluate(selector => {
-        const el = document.querySelector(selector);
-        if (!el) return null;
-
-        // Use the helper functions injected by ElementFinder
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (window as any)._createElement(el, 'custom', 'custom');
-      }, elementSelector);
-
-      if (!element) {
-        return { success: false, error: 'Element not found' };
-      }
-
-      const result = await this.interactionStrategies.clickElement(element, actualTimeout);
-      return result;
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      };
     }
   }
 
@@ -336,15 +300,13 @@ export class UserSimulator {
   }
 
   private async finalNetworkSettlement(): Promise<void> {
-    if (!this.networkMonitor) return;
+    if (!this.networkMonitor) {
+      return;
+    }
 
     logger.debug('🌐 Final network activity check...');
 
-    await this.networkMonitor.waitForNetworkIdle(
-      5000, // 5 seconds of complete quiet
-      1000, // Max wait 30 seconds
-      this.config.verboseLogging
-    );
+    await this.networkMonitor.waitForNetworkIdle(5000, 1000, this.config.verboseLogging);
 
     const finalResourceCount = this.networkMonitor.getResources().length;
     const finalTransferSize = this.networkMonitor.getTotalTransferSize();
@@ -358,7 +320,9 @@ export class UserSimulator {
     const seen = new Set();
     return elements.filter(element => {
       const key = `${element.selector}_${element.text}`;
-      if (seen.has(key)) return false;
+      if (seen.has(key)) {
+        return false;
+      }
       seen.add(key);
       return true;
     });
