@@ -6,6 +6,7 @@ import ResultsSection from '../components/organisms/ResultsSection';
 import MainLayout from '../components/templates/MainLayout';
 import useAnalysis from '../hooks/useAnalysis';
 import { useSEO, PAGE_SEO } from '../hooks/useSEO';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import type { AnalysisFormData } from '../types';
 import { CallToActionSection, MethodologySection, FAQSection, ErrorAlert } from './../components';
 
@@ -13,6 +14,9 @@ const PageCarbonFootprint: React.FC = () => {
   const { t } = useTranslation('cta');
 
   useSEO(PAGE_SEO.pageCarbonFootprint);
+
+  // Automatically scroll to top when navigating to this page
+  useScrollToTop();
 
   const {
     isLoading,
@@ -91,9 +95,9 @@ const PageCarbonFootprint: React.FC = () => {
       <MethodologySection className="pt-24" />
 
       {/* FAQ Section */}
-      <FAQSection className="pt-12" />
+      <FAQSection className="pt-24" />
 
-      <CallToActionSection subtitle={t('analysisPageSubtitle')} />
+      <CallToActionSection subtitle={t('analysisPageSubtitle')} className="pt-4" />
     </MainLayout>
   );
 };

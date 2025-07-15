@@ -197,7 +197,6 @@
   },
   "faq": {
     "title": "Frequently Asked Questions",
-    "subtitle": "Get answers to common questions about our carbon footprint analysis methodology and results.",
     "items": {
       "isThisNaubion": {
         "question": "Is this tool naubion or just a demo?",

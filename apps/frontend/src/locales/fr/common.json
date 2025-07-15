@@ -4,7 +4,7 @@
     "home": "Accueil",
     "analysis": "Analyse",
     "admin": "Admin",
-    "analyzePage": "Estimez l'empreinte carbone de votre page web"
+    "analyzePage": "Essayer sur une URL →"
   },
   "buttons": {
     "submit": "Valider",

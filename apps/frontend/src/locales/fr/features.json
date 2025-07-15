@@ -1,25 +1,25 @@
 {
   "title": "Implémentation immédiate, impact pour toujours",
-  "subtitle": "naubion est conçu pour s'intégrer parfaitement dans votre infrastructure existante et vous aider à réduire l'empreinte carbone de votre application avec un effort minimal.",
+  "subtitle": "naubion est conçu pour s'intégrer parfaitement dans votre infrastructure et vous aider à réduire facilement l'empreinte carbone de votre application.",
   "cards": {
     "easyImplementation": {
-      "title": "Implémentation facile",
+      "title": "Implémentez facilement",
       "description": "Ajoutez simplement un extrait de code dans le frontend et le backend de votre application"
     },
     "monitoring": {
-      "title": "Surveillez votre app",
-      "description": "Accédez à un tableau de bord perspicace avec des données en temps réel et précises sur l'empreinte environnementale de votre app"
+      "title": "Surveillez votre application",
+      "description": "Accédez à un tableau de bord avec des données en temps réel et précises sur l'empreinte environnementale de votre application"
     },
     "reduce": {
       "title": "Réduisez votre empreinte",
       "description": "Réduisez l'empreinte carbone de votre application en comprenant mieux votre usage et l'impact de votre code"
     },
     "report": {
-      "title": "Rapportez votre impact",
-      "description": "Rapportez l'empreinte environnementale de votre application aux instances légales"
+      "title": "Répondez aux exigences légales",
+      "description": "Éditez des rapports d'impact environnemental pour répondre aux exigences légales et réglementaires"
     },
     "communicate": {
-      "title": "Communiquez à vos utilisateurs",
+      "title": "Gagnez la confiance de vos utilisateurs",
       "description": "Communiquez de manière transparente sur votre empreinte et vos actions pour la réduire"
     }
   }

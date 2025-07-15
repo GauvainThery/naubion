@@ -4,9 +4,11 @@ import LoginForm from '../components/molecules/LoginForm';
 import AdminDashboard from '../components/organisms/AdminDashboard';
 import { useAdminAuth, useAdminStats } from '../hooks/useAdmin';
 import { useSEO, PAGE_SEO } from '../hooks/useSEO';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 
 const AdminPage: React.FC = () => {
   useSEO(PAGE_SEO.admin);
+  useScrollToTop();
 
   const { isAuthenticated, login, logout } = useAdminAuth();
   const { stats, refresh: refreshStats } = useAdminStats();

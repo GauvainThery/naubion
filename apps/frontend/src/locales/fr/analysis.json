@@ -102,7 +102,7 @@
     "sections": {
       "resourceAnalysis": {
         "title": "Analyse par type de ressource",
-        "description": "Une répartition des ressources chargées par la page, catégorisées par type. Cette analyse aide à identifier quels types de ressources contribuent le plus à la taille totale de transfert de la page et peut guider les efforts d'optimisation."
+        "description": "Répartition des ressources chargées par la page, catégorisées par type. Cette analyse permet d'identifier quels types de ressources contribuent le plus à la taille totale de transfert de la page et peut guider les efforts d'optimisation."
       },
       "keyFacts": {
         "title": "Indicateurs clés",
@@ -125,7 +125,7 @@
       },
       "resourceList": {
         "title": "Plus grosses ressources",
-        "description": "Les plus grosses ressources chargées par la page. Ces ressources peuvent considérablement impacter la performance et le temps de chargement de la page. Considérez les optimiser ou réduire leur taille pour améliorer l'expérience utilisateur."
+        "description": "Les plus grosses ressources chargées par la page. Ces ressources peuvent considérablement impacter la performance et le temps de chargement de la page. Pensez à les optimiser ou réduire leur taille pour améliorer l'expérience utilisateur."
       },
       "botDetection": {
         "title": "Avertissement de détection de bot",
@@ -197,7 +197,6 @@
   },
   "faq": {
     "title": "Questions Fréquemment Posées",
-    "subtitle": "Obtenez des réponses aux questions courantes sur notre méthodologie d'analyse d'empreinte carbone et les résultats.",
     "items": {
       "isThisNaubion": {
         "question": "Cet outil est-il naubion ou juste une démo ?",

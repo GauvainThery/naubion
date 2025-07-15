@@ -41,6 +41,7 @@ export { default as LoginForm } from './molecules/LoginForm';
 export { default as CacheStats } from './molecules/CacheStats';
 export { default as AdminActions } from './molecules/AdminActions';
 export { default as LanguageSwitcher } from './molecules/LanguageSwitcher';
+export { default as PageCarbonAnalyzerIntro } from './molecules/PageCarbonAnalyzerIntro';
 
 // Organisms
 export { default as Header } from './organisms/Header';
@@ -55,6 +56,7 @@ export { default as MethodologySection } from './organisms/MethodologySection';
 export { default as FAQSection } from './organisms/FAQSection';
 export { default as Laptop } from './molecules/Laptop/Laptop';
 export { default as AdminDashboard } from './organisms/AdminDashboard';
+export { default as PageCarbonAnalyzerSection } from './organisms/PageCarbonAnalyzerSection';
 
 // Templates
 export { default as MainLayout } from './templates/MainLayout';

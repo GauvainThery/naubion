@@ -54,7 +54,6 @@ const FAQSection: React.FC<FAQSectionProps> = ({ className }) => {
       <div className="flex flex-col gap-12">
         <div className="text-center flex flex-col gap-2">
           <h2 className="text-2xl font-bold">{t('faq.title')}</h2>
-          <p className="text-text-secondary">{t('faq.subtitle')}</p>
         </div>
 
         <div className="flex flex-col gap-4">

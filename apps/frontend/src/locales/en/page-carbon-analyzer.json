@@ -1,0 +1,26 @@
+{
+  "intro": {
+    "title": "Get a sneak peek at naubion's capabilities",
+    "subtitle": "Widget preview",
+    "description": "Before the official launch of naubion, explore our page carbon analyzer tool. This widget gives you a taste of how naubion will help you measure and reduce your website's environmental impact.",
+    "keyFeatures": "Key features of the preview:",
+    "features": {
+      "realTime": "Carbon footprint analysis of a web page",
+      "detailed": "Detailed resource's weight breakdown",
+      "hosting": "Assessment of hosting's environmental impact"
+    },
+    "cta": "Try now",
+    "readyToExplore": "Ready to explore?",
+    "startAnalyzing": "Start analyzing your website's carbon footprint",
+    "demo": {
+      "keyFacts": "Key Facts",
+      "keyFactsDescription": "Essential metrics about this page's performance and hosting",
+      "totalPageWeight": "Total Page Weight",
+      "totalResources": "Total Resources",
+      "greenHostingDetected": "Green Hosting Detected",
+      "greenHostingDescription": "Your website is hosted on renewable energy",
+      "resourceAnalysis": "Resource Analysis",
+      "resourceAnalysisDescription": "Breakdown of different resource types and their impact on page size"
+    }
+  }
+}

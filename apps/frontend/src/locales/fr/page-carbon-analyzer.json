@@ -1,0 +1,26 @@
+{
+  "intro": {
+    "title": "Découvrez les capacités de naubion en avant-première",
+    "subtitle": "Outil de prévisualisation",
+    "description": "Avant le lancement officiel de naubion, explorez notre outil de mesure de l'empreinte carbone des pages web. Ce widget vous donne un aperçu de la façon dont naubion vous aidera à mesurer et réduire l'impact environnemental de votre site web.",
+    "keyFeatures": "Fonctionnalités clés de cette prévisualisation :",
+    "features": {
+      "realTime": "Analyse de l'empreinte carbone d'une page web",
+      "detailed": "Affichage détaillé du poids des ressources",
+      "hosting": "Évaluation de l'impact environnemental de l'hébergement"
+    },
+    "cta": "Essayer maintenant",
+    "readyToExplore": "Prêt à explorer ?",
+    "startAnalyzing": "Commencez à analyser l'empreinte carbone de votre site web",
+    "demo": {
+      "keyFacts": "Faits clés",
+      "keyFactsDescription": "Métriques essentielles sur les performances et l'hébergement de cette page",
+      "totalPageWeight": "Poids total de la page",
+      "totalResources": "Total des ressources",
+      "greenHostingDetected": "Hébergement vert détecté",
+      "greenHostingDescription": "Votre site web est hébergé sur de l'énergie renouvelable",
+      "resourceAnalysis": "Analyse des ressources",
+      "resourceAnalysisDescription": "Répartition des différents types de ressources et leur impact sur la taille de la page"
+    }
+  }
+}

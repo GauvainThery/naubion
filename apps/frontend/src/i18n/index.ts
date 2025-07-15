@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { getInitialLanguage, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../utils/i18n';
+import { getInitialLanguage, SUPPORTED_LANGUAGES } from '../utils/i18n';
 
 // Import English translations
 import enCommon from '../locales/en/common.json';
@@ -11,6 +11,7 @@ import enCta from '../locales/en/cta.json';
 import enAnalysis from '../locales/en/analysis.json';
 import enAdmin from '../locales/en/admin.json';
 import enForms from '../locales/en/forms.json';
+import enPageCarbonAnalyzer from '../locales/en/page-carbon-analyzer.json';
 
 // Import French translations
 import frCommon from '../locales/fr/common.json';
@@ -20,6 +21,7 @@ import frCta from '../locales/fr/cta.json';
 import frAnalysis from '../locales/fr/analysis.json';
 import frAdmin from '../locales/fr/admin.json';
 import frForms from '../locales/fr/forms.json';
+import frPageCarbonAnalyzer from '../locales/fr/page-carbon-analyzer.json';
 
 const resources = {
   en: {
@@ -29,7 +31,8 @@ const resources = {
     cta: enCta,
     analysis: enAnalysis,
     admin: enAdmin,
-    forms: enForms
+    forms: enForms,
+    'page-carbon-analyzer': enPageCarbonAnalyzer
   },
   fr: {
     common: frCommon,
@@ -38,7 +41,8 @@ const resources = {
     cta: frCta,
     analysis: frAnalysis,
     admin: frAdmin,
-    forms: frForms
+    forms: frForms,
+    'page-carbon-analyzer': frPageCarbonAnalyzer
   }
 };
 
