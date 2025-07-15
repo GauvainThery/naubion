@@ -66,16 +66,10 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
     }
 
     const elapsed = Date.now() - startTime;
-    const progressRatio = smoothProgress / 100;
 
-    if (progressRatio <= 0) {
-      return Math.ceil(estimatedDuration / 1000);
-    }
-
-    const estimatedTotal = elapsed / progressRatio;
-    const remaining = Math.max(0, estimatedTotal - elapsed);
-
-    return Math.ceil(remaining / 1000);
+    return Math.ceil(
+      (estimatedDuration - estimatedDuration * (smoothProgress / 100) - elapsed) / 1000
+    );
   };
 
   const remainingSeconds = calculateRemainingTime();
@@ -91,8 +85,8 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
     }
 
     const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
+    const remainingSecondsInMinute = seconds % 60;
+    return `${minutes}m ${remainingSecondsInMinute}s`;
   };
 
   // Step mapping - more accurate to backend step names
