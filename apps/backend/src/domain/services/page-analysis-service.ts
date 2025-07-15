@@ -148,11 +148,11 @@ export class PageAnalysisDomainService {
    * Estimate analysis duration based on options
    */
   estimatePageAnalysisDuration(options: PageAnalysisOptions): number {
-    const baseTime = 15000; // 15 seconds base
+    const baseTime = 20000; // 20 seconds base
     const complexityScore = this.calculatePageAnalysisComplexityScore(options);
 
     // Scale duration based on complexity
-    return baseTime + complexityScore * 10000; // +10s per complexity point
+    return baseTime + complexityScore * 20000; // +20s per complexity point
   }
 
   /**
