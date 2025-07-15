@@ -18,11 +18,14 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
   };
 
   return (
-    <header className="flex justify-between items-center py-6 max-w-8xl mx-auto px-3 sm:px-5 lg:px-7 pt-24 lg:pt-10">
+    <header
+      className="flex justify-between items-center py-6 max-w-8xl mx-auto px-3 sm:px-5 lg:px-7 pt-24 lg:pt-10"
+      role="banner"
+    >
       <div className="lg:w-1/3" />
 
       <div className="lg:w-1/3 flex flex-col items-center justify-center gap-3 text-center">
-        <Link to={page.home}>
+        <Link to={page.home} aria-label="Go to naubion homepage">
           <Logo size="lg" hasDropShadow className="lg:block hidden" />
 
           {/* Mobile logo */}
@@ -31,18 +34,30 @@ const Header: React.FC<HeaderProps> = ({ currentPage }) => {
         <p className="font-bold text-xs">{t('tagline')}</p>
       </div>
 
-      <div className="lg:w-1/3 flex items-center justify-end gap-4">
-        <Link className="hidden fixed lg:block z-20" to={navigationLinks[currentPage][0]}>
+      <nav
+        className="lg:w-1/3 flex items-center justify-end gap-4"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <Link
+          className="hidden fixed lg:block z-20"
+          to={navigationLinks[currentPage][0]}
+          aria-label={navigationLinks[currentPage][1]}
+        >
           <Button>{navigationLinks[currentPage][1]}</Button>
         </Link>
-      </div>
+      </nav>
 
       {/* Mobile Link */}
-      <div className="w-[calc(100%-32px)] fixed top-4 left-4 lg:hidden z-20">
-        <Link to={navigationLinks[currentPage][0]}>
+      <nav
+        className="w-[calc(100%-32px)] fixed top-4 left-4 lg:hidden z-20"
+        role="navigation"
+        aria-label="Mobile navigation"
+      >
+        <Link to={navigationLinks[currentPage][0]} aria-label={navigationLinks[currentPage][1]}>
           <Button>{navigationLinks[currentPage][1]}</Button>
         </Link>
-      </div>
+      </nav>
     </header>
   );
 };

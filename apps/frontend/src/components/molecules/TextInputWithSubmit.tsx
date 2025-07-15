@@ -73,11 +73,15 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
             placeholder={defaultPlaceholder}
             disabled={disabled || success}
             required={required}
+            aria-invalid={!!error}
+            aria-describedby={error ? 'input-error' : success ? 'input-success' : undefined}
             className="flex-1 px-4 py-3 bg-transparent border-none outline-none placeholder-gray-400 text-gray-900 rounded-l-full disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={isSubmitDisabled || success}
+            aria-busy={loading}
+            aria-label={loading ? 'Submitting...' : defaultButtonText}
             className={cn(
               'px-6 py-3 bg-primary text-text-light font-medium rounded-full transition-all duration-200',
               'hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2',
@@ -88,10 +92,19 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
             )}
           >
             {loading && (
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              <div
+                className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
+                aria-hidden="true"
+              />
             )}
             {success && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -100,7 +113,7 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
                 />
               </svg>
             )}
-            <span className={loading ? 'opacity-70' : ''}>
+            <span className={loading ? 'sr-only' : ''}>
               {success ? t('newsletter.subscribed') : defaultButtonText}
             </span>
           </button>
@@ -108,10 +121,26 @@ const TextInputWithSubmit: React.FC<TextInputWithSubmitProps> = ({
       </form>
 
       {success && (
-        <div className="mt-2 text-sm text-primary text-center">{defaultSuccessMessage}</div>
+        <div
+          id="input-success"
+          className="mt-2 text-sm text-primary text-center"
+          role="status"
+          aria-live="polite"
+        >
+          {defaultSuccessMessage}
+        </div>
       )}
 
-      {error && <div className="mt-2 text-sm text-utils-700 text-center">{error}</div>}
+      {error && (
+        <div
+          id="input-error"
+          className="mt-2 text-sm text-utils-700 text-center"
+          role="alert"
+          aria-live="polite"
+        >
+          {error}
+        </div>
+      )}
     </div>
   );
 };

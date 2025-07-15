@@ -12,7 +12,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, currentPage, classNam
   return (
     <div className="bg-background-light text-text-dark text-sm">
       <Header currentPage={currentPage} />
-      <main className={className}>{children}</main>
+      <main id="main-content" className={className} role="main" aria-label="Main content">
+        {children}
+      </main>
       <Footer />
     </div>
   );

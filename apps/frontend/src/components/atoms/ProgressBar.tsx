@@ -66,7 +66,14 @@ const ProgressBar: React.FC<ExtendedProgressBarProps> = ({
   const animationClass = animated ? 'transition-all duration-700 ease-out' : '';
 
   return (
-    <div className={cn('relative w-full bg-gray-200 rounded-full h-3 overflow-hidden', className)}>
+    <div
+      className={cn('relative w-full bg-gray-200 rounded-full h-3 overflow-hidden', className)}
+      role="progressbar"
+      aria-valuenow={Math.round(value)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Progress: ${Math.round(value)}%`}
+    >
       {/* Background track with subtle inner shadow */}
       <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full shadow-inner" />
 

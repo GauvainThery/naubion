@@ -22,7 +22,7 @@ const PageCarbonAnalyzerIntro: React.FC<PageCarbonAnalyzerIntroProps> = ({ class
       <div className="relative w-full flex justify-center items-center">
         <img
           src={`/assets/demo_${currentLanguage}.png`}
-          alt="Page Carbon Analyzer Demo"
+          alt="Screenshot of the page carbon analyzer interface showing key metrics including page weight, resource count, and environmental impact analysis"
           className=" h-auto rounded-xl shadow-lg border-4 border-primary w-full max-w-[650px]"
         />
       </div>

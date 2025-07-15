@@ -10,6 +10,8 @@ type ButtonProps = {
   disabled?: boolean;
   loading?: boolean;
   className?: string;
+  ariaLabel?: string;
+  ariaDescribedBy?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -20,6 +22,8 @@ const Button: React.FC<ButtonProps> = ({
   loading = false,
   onClick,
   className = '',
+  ariaLabel,
+  ariaDescribedBy,
   ...props
 }) => {
   const variants = {
@@ -34,6 +38,9 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      aria-busy={loading}
       className={cn(
         'drop-shadow text-text-light hover:cursor-pointer hover:contrast-125 py-3 px-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 hover:shadow-md',
         variants[variant],
@@ -42,7 +49,10 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading && (
-        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        <div
+          className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"
+          aria-hidden="true"
+        />
       )}
       <span
         className={cn(

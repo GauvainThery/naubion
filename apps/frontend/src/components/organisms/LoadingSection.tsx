@@ -114,7 +114,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
   };
 
   return (
-    <section className={cn('container', className)}>
+    <section className={cn('container', className)} aria-live="polite" aria-busy="true">
       <Card className="p-12 flex flex-col gap-12">
         <h3 className="text-2xl font-bold">{t('loading.title')}</h3>
 
@@ -123,7 +123,10 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
             <div className="flex justify-between items-center">
               <span className="font-bold">{t('loading.progress')}</span>
               <div className="flex items-center space-x-3">
-                <span className="font-bold transition-all duration-300 transform text-lg">
+                <span
+                  className="font-bold transition-all duration-300 transform text-lg"
+                  aria-live="polite"
+                >
                   {Math.round(smoothProgress)}%
                 </span>
                 {remainingSeconds > 0 && smoothProgress < 100 && (
@@ -140,7 +143,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
               showGlow={true}
             />
             {(currentStep || currentMessage) && (
-              <div className="text-sm text-text-secondary italic">
+              <div className="text-sm text-text-secondary italic" role="status" aria-live="polite">
                 {currentMessage || `Current: ${currentStep}`}
               </div>
             )}

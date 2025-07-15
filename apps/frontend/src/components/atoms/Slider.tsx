@@ -20,6 +20,8 @@ const Slider: React.FC<SliderProps> = ({
   disabled = false
 }) => {
   const { t } = useTranslation('analysis');
+  const sliderId = `slider-${Math.random().toString(36).substr(2, 9)}`;
+  const descriptionId = description ? `${sliderId}-description` : undefined;
 
   // Convert actual value to slider position (0-100)
   const actualToSlider = (actualValue: number): number => {
@@ -57,11 +59,15 @@ const Slider: React.FC<SliderProps> = ({
       <div className={cn('flex flex-col gap-3', className)}>
         {label && (
           <div className="flex items-center justify-between">
-            <label>{label}</label>
+            <label htmlFor={sliderId}>{label}</label>
           </div>
         )}
 
-        {description && <p className="text-sm text-text-secondary">{description}</p>}
+        {description && (
+          <p id={descriptionId} className="text-sm text-text-secondary">
+            {description}
+          </p>
+        )}
 
         <div className="relative">
           {/* Track */}
@@ -81,17 +87,23 @@ const Slider: React.FC<SliderProps> = ({
 
           {/* Slider input */}
           <input
+            id={sliderId}
             type="range"
             min={1}
             max={100}
             step={0.1}
             value={sliderValue}
+            disabled={disabled}
+            aria-describedby={descriptionId}
+            aria-valuemin={1}
+            aria-valuemax={100000}
+            aria-valuenow={value}
+            aria-valuetext={`${value.toLocaleString()} ${value === 1 ? t('results.environmentalImpact.visit') : t('results.environmentalImpact.visits')}`}
             onChange={e => {
               const newSliderValue = Number(e.target.value);
               const newActualValue = Math.round(sliderToActual(newSliderValue));
               onChange(newActualValue);
             }}
-            disabled={disabled}
             className={cn(
               'absolute top-0 left-0 w-full h-2 opacity-0 cursor-grab active:cursor-grabbing',
               disabled && 'cursor-not-allowed'
