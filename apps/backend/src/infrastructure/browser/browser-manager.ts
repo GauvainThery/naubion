@@ -20,7 +20,7 @@ import logger from '../../shared/logger.js';
 class BrowserPool {
   private static instance: BrowserPool;
   private browsers: Map<string, { browser: Browser; lastUsed: number; inUse: boolean }> = new Map();
-  private readonly maxPoolSize = 3;
+  private readonly maxPoolSize = this.calculateOptimalPoolSize();
   private readonly maxIdleTime = 30000; // 30 seconds
 
   static getInstance(): BrowserPool {
@@ -32,6 +32,16 @@ class BrowserPool {
 
   async getBrowser(options: PageAnalysisOptions): Promise<Browser> {
     const poolKey = `${options.deviceType}_${options.interactionLevel}`;
+
+    // Monitor memory usage
+    const memUsage = process.memoryUsage();
+    if (memUsage.heapUsed > memUsage.heapTotal * 0.9) {
+      logger.warn('High memory usage detected', {
+        heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
+        poolSize: this.browsers.size
+      });
+    }
 
     // Clean up idle browsers
     await this.cleanupIdleBrowsers();
@@ -184,6 +194,31 @@ class BrowserPool {
     await Promise.allSettled(promises);
     this.browsers.clear();
     logger.debug('Closed all pooled browsers');
+  }
+
+  private calculateOptimalPoolSize(): number {
+    // Adjust pool size based on available memory
+    const totalMemoryMB = process.env.NODE_OPTIONS?.includes('--max-old-space-size=')
+      ? parseInt(process.env.NODE_OPTIONS.match(/--max-old-space-size=(\d+)/)?.[1] || '512')
+      : 512;
+
+    // Estimate ~150MB per Chrome instance + 100MB for Node.js overhead
+    const estimatedInstanceMemory = 150;
+    const nodeOverhead = 100;
+    const availableForBrowsers = totalMemoryMB - nodeOverhead;
+    const calculatedSize = Math.floor(availableForBrowsers / estimatedInstanceMemory);
+
+    // Ensure we have at least 1 and at most 5 browsers
+    const optimalSize = Math.max(1, Math.min(5, calculatedSize));
+
+    logger.info('Calculated optimal browser pool size', {
+      totalMemoryMB,
+      availableForBrowsers,
+      estimatedInstanceMemory,
+      calculatedSize: optimalSize
+    });
+
+    return optimalSize;
   }
 }
 

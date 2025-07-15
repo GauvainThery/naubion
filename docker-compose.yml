@@ -53,7 +53,7 @@ services:
 
       # Analysis Configuration
       - MAX_CONCURRENT_ANALYSIS=${MAX_CONCURRENT_ANALYSIS:-10}
-      - ANALYSIS_TIMEOUT=${ANALYSIS_TIMEOUT:-300000}
+      - ANALYSIS_TIMEOUT=${ANALYSIS_TIMEOUT:-120000}
       - ANALYSIS_RETRIES=${ANALYSIS_RETRIES:-3}
 
       # External services

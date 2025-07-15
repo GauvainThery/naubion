@@ -164,7 +164,7 @@ export class PageAnalysisService {
         waitForImages: true, // Important for accurate size measurement
         waitForFonts: true, // Important for accurate size measurement
         waitForJS: true,
-        maxLoadTime: context.options.timeout * 0.8,
+        maxLoadTime: context.options.timeout * 0.3,
         skipNonCriticalResources: false
       });
 
