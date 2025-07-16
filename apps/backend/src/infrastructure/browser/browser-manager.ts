@@ -260,9 +260,19 @@ export class BrowserManager {
     try {
       logger.debug('Creating new browser page...');
 
-      // Quick connection check
+      // Enhanced connection check with recovery
       if (!this.browser.connected) {
-        throw new Error('Browser is not connected');
+        logger.warn('Browser disconnected, attempting to reconnect...');
+        try {
+          // Try to get a new browser from the pool
+          this.browser = await this.browserPool.getBrowser(options);
+          this.isPooledBrowser = true;
+        } catch (recoveryError) {
+          logger.error('Browser recovery failed', {
+            error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError)
+          });
+          throw new Error('Browser is not connected and recovery failed');
+        }
       }
 
       const page = await this.browser.newPage();
@@ -271,9 +281,10 @@ export class BrowserManager {
       const deviceConfig = DEVICE_CONFIGURATIONS[options.deviceType];
       await this.configurePageOptimized(page, deviceConfig, options);
 
-      // Set timeouts
-      page.setDefaultNavigationTimeout(options.timeout || 60000 * 3);
-      page.setDefaultTimeout(60000 * 3);
+      // Set more conservative timeouts to avoid hanging
+      const conservativeTimeout = Math.min(options.timeout || 60000, 60000); // Cap at 60s
+      page.setDefaultNavigationTimeout(conservativeTimeout);
+      page.setDefaultTimeout(conservativeTimeout);
 
       // Performance optimizations
       await page.setRequestInterception(false);
