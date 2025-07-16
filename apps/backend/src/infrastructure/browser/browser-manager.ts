@@ -33,22 +33,58 @@ class BrowserPool {
   async getBrowser(options: PageAnalysisOptions): Promise<Browser> {
     const poolKey = `${options.deviceType}_${options.interactionLevel}`;
 
-    // Monitor memory usage
+    // Monitor memory usage - use more realistic thresholds
     const memUsage = process.memoryUsage();
-    if (memUsage.heapUsed > memUsage.heapTotal * 0.9) {
+    const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+    const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
+
+    // Get the actual memory limit (default is usually around 1.4GB for 64-bit Node.js)
+    const maxHeapMB = this.getMaxHeapSize();
+    const memoryPressureThreshold = maxHeapMB * 0.85; // 85% of actual limit
+
+    if (heapUsedMB > memoryPressureThreshold) {
       logger.warn('High memory usage detected', {
-        heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
-        heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
-        poolSize: this.browsers.size
+        heapUsedMB,
+        heapTotalMB,
+        maxHeapMB,
+        memoryPressureThreshold: Math.round(memoryPressureThreshold),
+        poolSize: this.browsers.size,
+        utilizationPercent: Math.round((heapUsedMB / maxHeapMB) * 100)
       });
+
+      // Trigger more aggressive cleanup when under memory pressure
+      await this.cleanupIdleBrowsers();
+
+      // Force garbage collection if available (in production)
+      if (global.gc) {
+        global.gc();
+        logger.debug('Forced garbage collection due to memory pressure');
+      }
+
+      // In very low memory situations, close unused browsers immediately
+      if (heapUsedMB > maxHeapMB * 0.95) {
+        await this.forceCleanupUnusedBrowsers();
+      }
     }
 
     // Clean up idle browsers
     await this.cleanupIdleBrowsers();
 
+    // Log memory stats periodically for monitoring (every 10th call)
+    if (Math.random() < 0.1) {
+      logger.debug('Memory usage stats', {
+        heapUsedMB,
+        heapTotalMB,
+        maxHeapMB,
+        utilizationPercent: Math.round((heapUsedMB / maxHeapMB) * 100),
+        poolSize: this.browsers.size,
+        memoryPressureThreshold: Math.round(memoryPressureThreshold)
+      });
+    }
+
     // Check if we have an available browser
     const pooledBrowser = this.browsers.get(poolKey);
-    if (pooledBrowser && !pooledBrowser.inUse && pooledBrowser.browser.isConnected()) {
+    if (pooledBrowser && !pooledBrowser.inUse && pooledBrowser.browser.connected) {
       pooledBrowser.inUse = true;
       pooledBrowser.lastUsed = Date.now();
       logger.debug('Reusing pooled browser', { poolKey });
@@ -107,8 +143,41 @@ class BrowserPool {
     }
   }
 
+  private async forceCleanupUnusedBrowsers(): Promise<void> {
+    const toRemove: string[] = [];
+
+    // In critical memory situations, close ALL unused browsers immediately
+    for (const [key, pooledBrowser] of this.browsers.entries()) {
+      if (!pooledBrowser.inUse) {
+        toRemove.push(key);
+      }
+    }
+
+    if (toRemove.length > 0) {
+      logger.warn('Force closing unused browsers due to critical memory pressure', {
+        browsersToClose: toRemove.length
+      });
+
+      for (const key of toRemove) {
+        const pooledBrowser = this.browsers.get(key);
+        if (pooledBrowser) {
+          try {
+            await pooledBrowser.browser.close();
+          } catch (error) {
+            logger.debug('Error force closing browser', { error });
+          }
+          this.browsers.delete(key);
+        }
+      }
+    }
+  }
+
   private async createOptimizedBrowser(options: PageAnalysisOptions): Promise<Browser> {
     const userDataDir = `${process.env.CHROME_CONFIG_DIR || '/tmp/chrome'}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Calculate memory limits based on available heap
+    const maxHeapMB = this.getMaxHeapSize();
+    const chromeMemoryLimit = Math.max(64, Math.floor(maxHeapMB * 0.4)); // 40% of heap for Chrome
 
     const launchOptions: LaunchOptions = {
       // Use system Chromium from Alpine package
@@ -130,24 +199,38 @@ class BrowserPool {
         '--disable-translate',
         '--disable-features=TranslateUI,VizDisplayCompositor,Translate',
 
-        // Memory optimizations
+        // Memory optimizations - FIXED: Remove conflicting Node.js flag
         '--memory-pressure-off',
-        '--max_old_space_size=512',
+        `--max-old-space-size=${chromeMemoryLimit}`, // Chrome memory limit
         '--disable-background-timer-throttling',
         '--disable-backgrounding-occluded-windows',
         '--disable-renderer-backgrounding',
 
-        // Network optimizations
+        // Network optimizations - Add better network handling
         '--disable-background-networking',
         '--disable-client-side-phishing-detection',
         '--disable-component-extensions-with-background-pages',
         '--disable-hang-monitor',
+        '--disable-domain-reliability', // Reduce network overhead
+        '--disable-background-networking',
 
         // Stability improvements
         '--disable-ipc-flooding-protection',
         '--disable-prompt-on-repost',
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
+
+        // Low memory environment optimizations
+        '--aggressive-cache-discard',
+        '--disable-features=AudioServiceOutOfProcess',
+        '--disable-features=IPH_DesktopTabGroupsNewTabButton',
+        '--disable-features=MediaRouter',
+        '--disable-blink-features=AutomationControlled', // Avoid detection
+
+        // Anti-bot detection measures
+        '--disable-blink-features=AutomationControlled',
+        '--exclude-switches=enable-automation',
+        '--disable-extensions-http-throttling',
 
         // Directory settings
         `--user-data-dir=${userDataDir}`,
@@ -167,14 +250,31 @@ class BrowserPool {
       launchOptions.args?.push('--enable-features=NetworkService', '--force-device-scale-factor=1');
     }
 
-    const browser = await puppeteer.launch(launchOptions);
+    // Add timeout for browser launch to prevent hanging
+    const launchTimeout = 30000; // 30 seconds
+    const browserPromise = puppeteer.launch(launchOptions);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Browser launch timeout')), launchTimeout);
+    });
+
+    const browser = await Promise.race([browserPromise, timeoutPromise]);
+
+    // Set a realistic User Agent to avoid bot detection
+    const pages = await browser.pages();
+    const defaultPage = pages[0];
+    if (defaultPage) {
+      await defaultPage.setUserAgent(
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      );
+    }
 
     // Verify browser is working
     const version = await browser.version();
     logger.debug('Browser launched successfully', {
       deviceType: options.deviceType,
       version: version.substring(0, 50), // Truncate long version strings
-      userDataDir
+      userDataDir,
+      memoryLimit: `${chromeMemoryLimit}MB`
     });
 
     return browser;
@@ -198,27 +298,61 @@ class BrowserPool {
 
   private calculateOptimalPoolSize(): number {
     // Adjust pool size based on available memory
-    const totalMemoryMB = process.env.NODE_OPTIONS?.includes('--max-old-space-size=')
-      ? parseInt(process.env.NODE_OPTIONS.match(/--max-old-space-size=(\d+)/)?.[1] || '512')
-      : 512;
+    const totalMemoryMB = this.getMaxHeapSize();
 
-    // Estimate ~150MB per Chrome instance + 100MB for Node.js overhead
-    const estimatedInstanceMemory = 150;
-    const nodeOverhead = 100;
+    // For very low memory environments (< 512MB), be much more conservative
+    if (totalMemoryMB <= 512) {
+      logger.info('Low memory environment detected, using minimal browser pool', {
+        totalMemoryMB,
+        poolSize: 1
+      });
+      return 1; // Only 1 browser for very low memory
+    }
+
+    // Estimate memory usage more accurately for production
+    // Chrome in headless mode typically uses 100-200MB, but can spike higher
+    // Be conservative in Docker environments
+    const estimatedInstanceMemory = totalMemoryMB <= 1000 ? 200 : 150; // More conservative for small containers
+    const nodeOverhead = Math.max(100, totalMemoryMB * 0.25); // Reserve 25% for Node.js
     const availableForBrowsers = totalMemoryMB - nodeOverhead;
     const calculatedSize = Math.floor(availableForBrowsers / estimatedInstanceMemory);
 
-    // Ensure we have at least 1 and at most 5 browsers
-    const optimalSize = Math.max(1, Math.min(5, calculatedSize));
+    // Ensure we have at least 1 and at most 3 browsers (reduced max for production)
+    const optimalSize = Math.max(1, Math.min(3, calculatedSize));
 
     logger.info('Calculated optimal browser pool size', {
       totalMemoryMB,
       availableForBrowsers,
       estimatedInstanceMemory,
+      nodeOverhead,
       calculatedSize: optimalSize
     });
 
     return optimalSize;
+  }
+
+  private getMaxHeapSize(): number {
+    // Check if max-old-space-size is set via NODE_OPTIONS
+    const nodeOptions = process.env.NODE_OPTIONS || '';
+    const maxOldSpaceMatch = nodeOptions.match(/--max-old-space-size=(\d+)/);
+
+    if (maxOldSpaceMatch) {
+      return parseInt(maxOldSpaceMatch[1], 10);
+    }
+
+    // Check V8 flags (alternative way to set memory limit)
+    const v8Options = process.env.V8_OPTIONS || '';
+    const v8MaxOldSpaceMatch = v8Options.match(/--max-old-space-size=(\d+)/);
+
+    if (v8MaxOldSpaceMatch) {
+      return parseInt(v8MaxOldSpaceMatch[1], 10);
+    }
+
+    // Default Node.js heap size limits based on architecture
+    // For 64-bit systems, default is around 1.4GB (1400MB)
+    // For 32-bit systems, default is around 700MB
+    const is64Bit = process.arch === 'x64' || process.arch === 'arm64';
+    return is64Bit ? 1400 : 700;
   }
 }
 
@@ -276,6 +410,11 @@ export class BrowserManager {
       }
 
       const page = await this.browser.newPage();
+
+      // Set realistic User Agent to avoid bot detection
+      await page.setUserAgent(
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      );
 
       // Basic page configuration
       const deviceConfig = DEVICE_CONFIGURATIONS[options.deviceType];
