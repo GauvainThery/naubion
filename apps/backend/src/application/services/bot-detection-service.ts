@@ -205,6 +205,30 @@ export class BotDetectionService {
    */
   private async checkForCloudflareChallenge(page: Page): Promise<BotDetectionIndicator> {
     try {
+      // First check the current URL for Cloudflare challenge patterns
+      const currentUrl = page.url();
+      const cloudflareUrlPatterns = [
+        'challenges.cloudflare.com',
+        'cdn-cgi/challenge-platform',
+        'cdn-cgi/challenge',
+        '/cdn-cgi/l/chk_captcha',
+        '/cdn-cgi/l/chk_jschl',
+        'ray=' // Cloudflare ray ID in URL
+      ];
+
+      const foundUrlPattern = cloudflareUrlPatterns.find(pattern =>
+        currentUrl.toLowerCase().includes(pattern)
+      );
+
+      if (foundUrlPattern) {
+        return {
+          type: 'cloudflare_challenge',
+          found: true,
+          details: `Cloudflare challenge URL detected: ${foundUrlPattern}`,
+          element: 'url'
+        };
+      }
+
       const cloudflareFound = await page.evaluate(() => {
         // Check for Cloudflare challenge indicators
         const cfSelectors = [
@@ -212,7 +236,14 @@ export class BotDetectionService {
           '.cf-checking-browser',
           '#cf-challenge-running',
           '.cf-challenge-form',
-          '[data-ray]' // Cloudflare ray ID
+          '.cf-captcha-container',
+          '.challenge-form',
+          '[data-ray]', // Cloudflare ray ID
+          '[class*="cloudflare"]',
+          '[id*="cloudflare"]',
+          '.cf-wrapper',
+          '.cf-column',
+          '.cf-section'
         ];
 
         for (const selector of cfSelectors) {
@@ -223,18 +254,38 @@ export class BotDetectionService {
 
         // Check for Cloudflare text indicators
         const bodyText = document.body.textContent?.toLowerCase() || '';
+        const title = document.title.toLowerCase();
         const cfTexts = [
           'checking your browser',
           'cloudflare',
           'ddos protection',
           'security check required',
           'please wait while we verify',
-          'browser verification'
+          'browser verification',
+          'verify you are human',
+          'just a moment',
+          'please enable javascript',
+          'enable cookies',
+          'challenge running',
+          'checking if the site connection is secure',
+          'ray id'
         ];
 
         for (const text of cfTexts) {
-          if (bodyText.includes(text)) {
+          if (bodyText.includes(text) || title.includes(text)) {
             return { found: true, text };
+          }
+        }
+
+        // Check for meta tags that might indicate Cloudflare
+        const metaTags = document.querySelectorAll('meta[name], meta[property]');
+        for (const meta of metaTags) {
+          const content = (meta as HTMLMetaElement).content?.toLowerCase() || '';
+          const metaElement = meta as HTMLMetaElement;
+          const nameAttr = metaElement.name || metaElement.getAttribute('property');
+          const name = nameAttr?.toLowerCase() || '';
+          if (content.includes('cloudflare') || name.includes('cloudflare')) {
+            return { found: true, meta: name };
           }
         }
 
@@ -245,7 +296,7 @@ export class BotDetectionService {
         type: 'cloudflare_challenge',
         found: cloudflareFound.found,
         details: cloudflareFound.found
-          ? `Cloudflare challenge detected: ${cloudflareFound.text || cloudflareFound.selector}`
+          ? `Cloudflare challenge detected: ${cloudflareFound.text || cloudflareFound.selector || cloudflareFound.meta}`
           : undefined,
         element: cloudflareFound.found ? cloudflareFound.selector : undefined
       };
