@@ -304,9 +304,9 @@ class BrowserPool {
     if (totalMemoryMB <= 512) {
       logger.info('Low memory environment detected, using minimal browser pool', {
         totalMemoryMB,
-        poolSize: 1
+        poolSize: 2
       });
-      return 1; // Only 1 browser for very low memory
+      return 2; // Only 2 browsers for very low memory
     }
 
     // Estimate memory usage more accurately for production

@@ -16,6 +16,32 @@ import { errorHandler, notFoundHandler } from './shared/errors.js';
 import logger from './shared/logger.js';
 
 /**
+ * Global error handlers to prevent server crashes
+ */
+process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+  logger.error('Unhandled Promise Rejection detected', {
+    reason: reason instanceof Error ? reason.message : String(reason),
+    stack: reason instanceof Error ? reason.stack : undefined,
+    promise: promise.toString()
+  });
+
+  // Log the error but don't exit the process immediately
+  // This allows the server to continue running for other requests
+  logger.warn('Server continuing to run despite unhandled rejection');
+});
+
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught Exception detected - this is critical', {
+    error: error.message,
+    stack: error.stack
+  });
+
+  // For uncaught exceptions, we should exit as the process state is unknown
+  logger.error('Server will exit due to uncaught exception');
+  process.exit(1);
+});
+
+/**
  * Create and configure Express application
  */
 function createApp(): Application {

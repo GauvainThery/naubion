@@ -177,7 +177,51 @@ export class PageAnalysisService {
 
       // Phase 3: Navigate and analyze with optimized loading
       pageLoadOptimizer.setProgressCallback(updateProgress);
-      await pageLoadOptimizer.optimizePageLoad(page, context.url);
+
+      try {
+        await pageLoadOptimizer.optimizePageLoad(page, context.url);
+      } catch (navigationError) {
+        const errorMessage =
+          navigationError instanceof Error ? navigationError.message : String(navigationError);
+
+        // Log the navigation error but don't immediately fail
+        logger.warn('Page navigation encountered issues, attempting to continue with analysis', {
+          url: context.url,
+          error: errorMessage,
+          willAttemptAnalysis: true
+        });
+
+        // Check if we can still analyze the page (sometimes partial loads are sufficient)
+        try {
+          const currentUrl = page.url();
+          const pageTitle = await page.title().catch(() => '');
+
+          if (
+            currentUrl &&
+            !currentUrl.includes('about:blank') &&
+            !currentUrl.includes('chrome-error')
+          ) {
+            logger.info('Page partially loaded, continuing with analysis', {
+              url: context.url,
+              currentUrl,
+              title: pageTitle || 'No title available'
+            });
+            updateProgress(35, 'navigation', 'Page partially loaded, continuing analysis...');
+          } else {
+            // Page completely failed to load
+            throw new AnalysisError(
+              `Unable to load page for analysis: ${errorMessage}. The website may be blocking automated requests or experiencing issues.`,
+              context.url
+            );
+          }
+        } catch {
+          // Even checking the page failed
+          throw new AnalysisError(
+            `Complete navigation failure: ${errorMessage}. Unable to access the website.`,
+            context.url
+          );
+        }
+      }
 
       updateProgress(39, 'simulation', 'Checking for bot detection measures...');
 

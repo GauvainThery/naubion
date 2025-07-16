@@ -127,36 +127,69 @@ export class PageLoadOptimizer {
       'networkidle2' // Most complete but can hang
     ];
 
+    let lastError: Error | null = null;
+
     for (const waitUntil of waitStrategies) {
       try {
+        logger.debug(`Attempting navigation with ${waitUntil} strategy for ${url}`);
+
         await page.goto(url, {
           waitUntil,
           timeout: waitUntil === 'networkidle2' ? Math.min(timeout, 20000) : timeout
         });
 
         // Additional validation that page actually loaded
-        const pageTitle = await page.title();
+        const pageTitle = await page.title().catch(() => '');
         const pageUrl = page.url();
 
-        if (!pageTitle && !pageUrl.includes(new URL(url).hostname)) {
-          throw new Error('Page appears to have failed to load properly');
+        // More lenient validation - some sites might block or redirect
+        if (
+          pageUrl &&
+          (pageUrl.includes('about:blank') || pageUrl === 'chrome-error://chromewebdata/')
+        ) {
+          throw new Error('Page failed to load - got error page');
         }
 
-        logger.debug(`Navigation successful with ${waitUntil} strategy`);
+        logger.debug(`Navigation successful with ${waitUntil} strategy`, {
+          url,
+          finalUrl: pageUrl,
+          title: pageTitle || 'No title'
+        });
         return;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        logger.debug(`Navigation with ${waitUntil} failed: ${errorMessage}`);
+        lastError = error instanceof Error ? error : new Error(errorMessage);
+
+        logger.debug(`Navigation with ${waitUntil} failed: ${errorMessage}`, {
+          url,
+          strategy: waitUntil,
+          isNetworkError: errorMessage.includes('ERR_') || errorMessage.includes('net::'),
+          isTimeoutError: errorMessage.includes('timeout') || errorMessage.includes('Timeout')
+        });
 
         // If this isn't the last strategy, try the next one
         if (waitUntil !== waitStrategies[waitStrategies.length - 1]) {
           continue;
         }
-
-        // All strategies failed, throw the error
-        throw error;
       }
     }
+
+    // All strategies failed - provide more helpful error information
+    const isNetworkError =
+      lastError?.message.includes('ERR_') || lastError?.message.includes('net::');
+    const isTimeoutError =
+      lastError?.message.includes('timeout') || lastError?.message.includes('Timeout');
+
+    let errorType = 'Unknown navigation error';
+    if (isNetworkError) {
+      errorType = 'Network error - site may be blocking requests or unreachable';
+    } else if (isTimeoutError) {
+      errorType = 'Timeout error - site is taking too long to respond';
+    }
+
+    throw new Error(
+      `All navigation strategies failed for ${url}. ${errorType}. Last error: ${lastError?.message || 'Unknown error'}`
+    );
   }
 
   private getWaitUntilCondition(): 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2' {
