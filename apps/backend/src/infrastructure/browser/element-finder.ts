@@ -207,13 +207,28 @@ export class ElementFinder {
       ): ElementInfo {
         const rect = element.getBoundingClientRect();
 
+        // Safely extract className to handle both string and SVGAnimatedString
+        let className = '';
+        if (element.className) {
+          if (typeof element.className === 'string') {
+            className = element.className;
+          } else {
+            // Handle SVGAnimatedString case
+            const classNameObj = element.className as unknown as {
+              baseVal?: string;
+              toString(): string;
+            };
+            className = classNameObj.baseVal || classNameObj.toString();
+          }
+        }
+
         return {
           id,
           type,
           text: element.textContent?.trim().substring(0, 50) || '',
           selector: windowTyped._getBestSelector(element),
           tagName: element.tagName.toLowerCase(),
-          className: element.className || '',
+          className,
           elementId: element.id || '',
           isVisible:
             rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.top <= window.innerHeight,
@@ -237,8 +252,22 @@ export class ElementFinder {
       windowTyped._getBestSelector = function (element: HTMLElement): string {
         if (element.id) return `#${element.id}`;
         if (element.className) {
-          const firstClass = element.className.split(' ')[0];
-          if (firstClass) return `.${firstClass}`;
+          // Handle both string className and SVGAnimatedString for SVG elements
+          let className: string;
+          if (typeof element.className === 'string') {
+            className = element.className;
+          } else {
+            // Handle SVGAnimatedString case - cast to unknown first to avoid TypeScript issues
+            const classNameObj = element.className as unknown as {
+              baseVal?: string;
+              toString(): string;
+            };
+            className = classNameObj.baseVal || classNameObj.toString();
+          }
+          if (className && typeof className === 'string') {
+            const firstClass = className.split(' ')[0];
+            if (firstClass) return `.${firstClass}`;
+          }
         }
         return element.tagName.toLowerCase();
       };
