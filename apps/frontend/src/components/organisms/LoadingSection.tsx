@@ -65,11 +65,7 @@ const LoadingSection: React.FC<LoadingSectionProps> = ({
       return 0;
     }
 
-    const elapsed = Date.now() - startTime;
-
-    return Math.ceil(
-      (estimatedDuration - estimatedDuration * (smoothProgress / 100) - elapsed) / 1000
-    );
+    return Math.ceil((estimatedDuration - estimatedDuration * (smoothProgress / 100)) / 1000);
   };
 
   const remainingSeconds = calculateRemainingTime();

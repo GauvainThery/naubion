@@ -192,7 +192,7 @@ export class PageAnalysisService {
         });
       }
 
-      updateProgress(40, 'simulation', 'Starting user behavior simulation...');
+      updateProgress(45, 'simulation', 'Starting user behavior simulation...');
 
       // Phase 4: Simulate user behavior
       const simulationResult = await userSimulator.simulateUserBehavior();
@@ -208,12 +208,12 @@ export class PageAnalysisService {
       const resources = networkMonitor.getResources();
       const resourceCollection = this.resourceService.processResources(resources);
 
-      updateProgress(80, 'green-hosting', 'Assessing green hosting impact...');
+      updateProgress(77, 'green-hosting', 'Assessing green hosting impact...');
 
       // Phase 7: Green hosting assessment
       const greenHostingResult = await this.greenHostingService.assessGreenHosting(url);
 
-      updateProgress(88, 'co2e-conversion', 'Converting bytes into gCO₂e...');
+      updateProgress(81, 'co2e-conversion', 'Converting bytes into gCO₂e...');
 
       // Phase 8: Convert bytes into gCO2e
       const co2eBytesConverisonResults = this.co2eBytesConversionService.convertBytesIntoCo2e({
@@ -221,14 +221,14 @@ export class PageAnalysisService {
         isGreenHosted: greenHostingResult.green
       });
 
-      updateProgress(94, 'impact-calculation', 'Creating human-readable impact report...');
+      updateProgress(88, 'impact-calculation', 'Creating human-readable impact report...');
 
       // Phase 9: Create human-readable impact report
       const humanReadableImpact = this.humanReadableImpactService.convertToHumanReadableImpact({
         gCo2e: co2eBytesConverisonResults.value // always in g for now but be careful here!!
       });
 
-      updateProgress(98, 'finalizing', 'Finalizing analysis results...');
+      updateProgress(95, 'finalizing', 'Finalizing analysis results...');
 
       // Phase 10: Create final result
       const pageMetadata = await page.evaluate(() => ({
